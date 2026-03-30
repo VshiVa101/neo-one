@@ -9,17 +9,13 @@ export const Media: React.FC<Props> = (props) => {
   const { className, htmlElement = 'div', resource } = props
 
   const isVideo = typeof resource === 'object' && resource?.mimeType?.includes('video')
-  const Tag = htmlElement || Fragment
+  const content = isVideo ? <VideoMedia {...props} /> : <ImageMedia {...props} />
+
+  // When `htmlElement` is explicitly `null`, we render as a Fragment (no wrapper element).
+  // This avoids TS inferring a too-restrictive `children` type for a dynamic JSX tag.
+  if (htmlElement === null) return <Fragment>{content}</Fragment>
 
   return (
-    <Tag
-      {...(htmlElement !== null
-        ? {
-            className,
-          }
-        : {})}
-    >
-      {isVideo ? <VideoMedia {...props} /> : <ImageMedia {...props} />}
-    </Tag>
+    React.createElement(htmlElement || 'div', { ...(className ? { className } : null) }, content)
   )
 }

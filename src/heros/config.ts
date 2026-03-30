@@ -24,6 +24,10 @@ export const hero: Field = {
           value: 'none',
         },
         {
+          label: 'Neo Uncensored (Landing)',
+          value: 'neoUncensored',
+        },
+        {
           label: 'High Impact',
           value: 'highImpact',
         },
