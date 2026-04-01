@@ -72,6 +72,8 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
+    clusters: Cluster;
+    artworks: Artwork;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -94,6 +96,8 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    clusters: ClustersSelect<false> | ClustersSelect<true>;
+    artworks: ArtworksSelect<false> | ArtworksSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -395,7 +399,22 @@ export interface FolderInterface {
  */
 export interface Category {
   id: number;
+  /**
+   * Esempio: Tarocchi, Illustrazioni, Merch...
+   */
   title: string;
+  /**
+   * Seleziona a quale gruppo principale appartiene (es: B/N).
+   */
+  parentCluster: number | Cluster;
+  /**
+   * Breve descrizione dello stile o del tema di questa selezione.
+   */
+  description?: string | null;
+  /**
+   * Scegli quale opera deve apparire come la "prima carta" del mazzo. Se lasciato vuoto, il sistema userà l'ultima inserita.
+   */
+  featuredArtwork?: (number | null) | Artwork;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -410,6 +429,99 @@ export interface Category {
         id?: string | null;
       }[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clusters".
+ */
+export interface Cluster {
+  id: number;
+  /**
+   * Esempio: B/N, NeON, fOtO...
+   */
+  title: string;
+  /**
+   * Spiego qui il senso di questo cluster (l'urlo che ci sta dietro).
+   */
+  description?: string | null;
+  /**
+   * Immagine principale che rappresenta il cluster nel layout.
+   */
+  image: number | Media;
+  /**
+   * Codice colore per il titolo (es: #768b1a)
+   */
+  titleColor?: string | null;
+  /**
+   * Codice colore per il testo manifesto (es: #fc5896)
+   */
+  descColor?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "artworks".
+ */
+export interface Artwork {
+  id: number;
+  /**
+   * Il nome dell'opera (es: Il bacio del pixel).
+   */
+  title: string;
+  /**
+   * Identificativo unico di Neo-One (es: N.01, N.22...).
+   */
+  nid: string;
+  /**
+   * L'immagine principale dell'opera che verrà mostrata in gallery.
+   */
+  mainImage: number | Media;
+  /**
+   * Seleziona il sottogruppo specifico (es: Tarocchi).
+   */
+  category: number | Category;
+  status: 'available' | 'sold' | 'reserved' | 'coming_soon';
+  /**
+   * Lascia vuoto se non in vendita o prezzo su richiesta.
+   */
+  price?: number | null;
+  gallery?:
+    | {
+        image?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Qui puoi scrivere il significato, la tecnica o la storia dietro l'opera.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -992,6 +1104,14 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'clusters';
+        value: number | Cluster;
+      } | null)
+    | ({
+        relationTo: 'artworks';
+        value: number | Artwork;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null)
@@ -1319,6 +1439,9 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
+  parentCluster?: T;
+  description?: T;
+  featuredArtwork?: T;
   generateSlug?: T;
   slug?: T;
   parent?: T;
@@ -1355,6 +1478,44 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clusters_select".
+ */
+export interface ClustersSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  image?: T;
+  titleColor?: T;
+  descColor?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "artworks_select".
+ */
+export interface ArtworksSelect<T extends boolean = true> {
+  title?: T;
+  nid?: T;
+  mainImage?: T;
+  category?: T;
+  status?: T;
+  price?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  description?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -12,6 +12,8 @@ import { post3 } from './post-3'
 
 const collections: CollectionSlug[] = [
   'categories',
+  'clusters',
+  'artworks',
   'media',
   'pages',
   'posts',
@@ -127,16 +129,32 @@ export const seed = async ({
       data: imageHero1,
       file: hero1Buffer,
     }),
+  ])
+
+  payload.logger.info(`— Seeding Clusters and Subclusters...`)
+
+  const generalCluster = await payload.create({
+    collection: 'clusters',
+    data: {
+      title: 'General',
+      slug: 'general',
+      description: 'General cluster for seeded categories',
+      image: imageHomeDoc.id,
+    },
+  })
+
+  await Promise.all(
     categories.map((category) =>
       payload.create({
         collection: 'categories',
         data: {
           title: category,
           slug: category,
+          parentCluster: generalCluster.id,
         },
       }),
     ),
-  ])
+  )
 
   payload.logger.info(`— Seeding posts...`)
 
