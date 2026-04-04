@@ -15,8 +15,10 @@ export default function HeroPage() {
         className="absolute inset-0 w-full h-full object-cover z-0 opacity-60 pointer-events-none"
       />
       
-      {/* The 3D Scene */}
-      <EyeScene />
+      {/* The 3D Scene - con testo circolare solo qui nella Hero */}
+      <div className="fixed inset-0 z-10 w-full h-screen">
+        <EyeScene targetRoute="/home" showCircularText={true} />
+      </div>
     </main>
   )
 }

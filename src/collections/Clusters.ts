@@ -1,54 +1,85 @@
 import type { CollectionConfig } from 'payload'
-import { anyone } from '../access/anyone'
-import { authenticated } from '../access/authenticated'
-import { slugField } from 'payload'
 
 export const Clusters: CollectionConfig = {
   slug: 'clusters',
-  access: {
-    create: authenticated,
-    delete: authenticated,
-    read: anyone,
-    update: authenticated,
-  },
+  labels: { singular: 'Cluster', plural: 'Cluster' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'slug', 'updatedAt'],
+    defaultColumns: ['title', 'sortOrder', 'updatedAt'],
+    group: 'CONTENUTI ART HUB',
+  },
+  access: {
+    read: () => true,
+    create: ({ req: { user } }) => Boolean(user),
+    update: ({ req: { user } }) => Boolean(user),
+    delete: ({ req: { user } }) => Boolean(user),
   },
   fields: [
     {
       name: 'title',
+      label: 'Titolo',
       type: 'text',
       required: true,
     },
     {
-      name: 'description',
-      type: 'textarea',
+      name: 'slug',
+      label: 'Slug',
+      type: 'text',
+      unique: true,
+      index: true,
+      admin: {
+        position: 'sidebar',
+        description: 'URL-friendly. Es: "b-n", "neon", "foto", "cose", "rumore".',
+      },
     },
     {
-      name: 'image',
+      name: 'manifesto',
+      label: 'Manifesto / Descrizione',
+      type: 'textarea',
+      required: true,
+    },
+    {
+      name: 'coverImage',
+      label: 'Immagine Copertina',
       type: 'upload',
       relationTo: 'media',
       required: true,
     },
     {
-      name: 'titleColor',
-      label: 'Colore Titolo (HEX)',
+      name: 'cta',
+      label: 'Call to Action (opzionale)',
       type: 'text',
-      defaultValue: '#768b1a',
+    },
+    {
+      name: 'sortOrder',
+      label: 'Ordine',
+      type: 'number',
+      defaultValue: 0,
       admin: {
-        description: 'Colore del titolo nel frontend (es: #768b1a)',
+        position: 'sidebar',
       },
     },
     {
-      name: 'descColor',
-      label: 'Colore Descrizione (HEX)',
-      type: 'text',
-      defaultValue: '#fc5896',
-      admin: {
-        description: 'Colore della descrizione nel frontend (es: #fc5896)',
-      },
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Design',
+          fields: [
+            {
+              name: 'primaryColor',
+              label: 'Colore Primario (HEX)',
+              type: 'text',
+              admin: { placeholder: '#F45390' },
+            },
+            {
+              name: 'secondaryColor',
+              label: 'Colore Secondario (HEX)',
+              type: 'text',
+              admin: { placeholder: '#B3828B' },
+            },
+          ],
+        },
+      ],
     },
-    slugField(),
   ],
 }

@@ -74,6 +74,7 @@ export interface Config {
     users: User;
     clusters: Cluster;
     artworks: Artwork;
+    signals: Signal;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -98,6 +99,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     clusters: ClustersSelect<false> | ClustersSelect<true>;
     artworks: ArtworksSelect<false> | ArtworksSelect<true>;
+    signals: SignalsSelect<false> | SignalsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -116,10 +118,16 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    'hero-settings': HeroSetting;
+    'calendar-settings': CalendarSetting;
+    'cart-settings': CartSetting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    'hero-settings': HeroSettingsSelect<false> | HeroSettingsSelect<true>;
+    'calendar-settings': CalendarSettingsSelect<false> | CalendarSettingsSelect<true>;
+    'cart-settings': CartSettingsSelect<false> | CartSettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -280,6 +288,7 @@ export interface Post {
  */
 export interface Media {
   id: number;
+  cloudinaryPublicId?: string | null;
   alt?: string | null;
   caption?: {
     root: {
@@ -399,27 +408,15 @@ export interface FolderInterface {
  */
 export interface Category {
   id: number;
-  /**
-   * Esempio: Tarocchi, Illustrazioni, Merch...
-   */
   title: string;
+  slug?: string | null;
+  cluster: number | Cluster;
   /**
-   * Seleziona a quale gruppo principale appartiene (es: B/N).
-   */
-  parentCluster: number | Cluster;
-  /**
-   * Breve descrizione dello stile o del tema di questa selezione.
-   */
-  description?: string | null;
-  /**
-   * Scegli quale opera deve apparire come la "prima carta" del mazzo. Se lasciato vuoto, il sistema userà l'ultima inserita.
+   * Se vuoto, si usa la prima opera del mazzo come copertina.
    */
   featuredArtwork?: (number | null) | Artwork;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
+  mood?: string | null;
+  sortOrder?: number | null;
   parent?: (number | null) | Category;
   breadcrumbs?:
     | {
@@ -438,31 +435,17 @@ export interface Category {
  */
 export interface Cluster {
   id: number;
-  /**
-   * Esempio: B/N, NeON, fOtO...
-   */
   title: string;
   /**
-   * Spiego qui il senso di questo cluster (l'urlo che ci sta dietro).
+   * URL-friendly. Es: "b-n", "neon", "foto", "cose", "rumore".
    */
-  description?: string | null;
-  /**
-   * Immagine principale che rappresenta il cluster nel layout.
-   */
-  image: number | Media;
-  /**
-   * Codice colore per il titolo (es: #768b1a)
-   */
-  titleColor?: string | null;
-  /**
-   * Codice colore per il testo manifesto (es: #fc5896)
-   */
-  descColor?: string | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
+  slug?: string | null;
+  manifesto: string;
+  coverImage: number | Media;
+  cta?: string | null;
+  sortOrder?: number | null;
+  primaryColor?: string | null;
+  secondaryColor?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -473,55 +456,38 @@ export interface Cluster {
 export interface Artwork {
   id: number;
   /**
-   * Il nome dell'opera (es: Il bacio del pixel).
-   */
-  title: string;
-  /**
-   * Identificativo unico di Neo-One (es: N.01, N.22...).
+   * Codice numerico unico dell'opera.
    */
   nid: string;
   /**
-   * L'immagine principale dell'opera che verrà mostrata in gallery.
+   * Neo spesso usa solo il N.ID.
    */
+  title?: string | null;
+  slug?: string | null;
   mainImage: number | Media;
   /**
-   * Seleziona il sottogruppo specifico (es: Tarocchi).
+   * Scatti extra, close-up, dettagli.
    */
-  category: number | Category;
-  status: 'available' | 'sold' | 'reserved' | 'coming_soon';
-  /**
-   * Lascia vuoto se non in vendita o prezzo su richiesta.
-   */
-  price?: number | null;
-  gallery?:
+  detailGallery?:
     | {
-        image?: (number | null) | Media;
+        image: number | Media;
         id?: string | null;
       }[]
     | null;
+  executionMethod?: string | null;
+  support?: string | null;
   /**
-   * Qui puoi scrivere il significato, la tecnica o la storia dietro l'opera.
+   * Testo libero.
    */
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  creationDate?: string | null;
+  originalDimensions?: string | null;
+  availability: 'comprabile' | 'ordinabile' | 'non_disponibile';
   /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   * Testo libero: prezzo originale, prezzo stampe, su richiesta, ecc.
    */
-  generateSlug?: boolean | null;
-  slug: string;
+  priceInfo?: string | null;
+  subcluster: number | Category;
+  sortOrder?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -895,6 +861,40 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "signals".
+ */
+export interface Signal {
+  id: number;
+  title: string;
+  slug?: string | null;
+  /**
+   * Il frontend estrae giorno e mese automaticamente.
+   */
+  eventDate: string;
+  description: string;
+  /**
+   * Immagine piccola visibile nella lista calendario.
+   */
+  previewImage: number | Media;
+  detailImages?:
+    | {
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Se vuoto, si usa il CTA default dalle impostazioni calendario.
+   */
+  eventCTA?: string | null;
+  /**
+   * Override su ordine cronologico.
+   */
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1110,6 +1110,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'artworks';
         value: number | Artwork;
+      } | null)
+    | ({
+        relationTo: 'signals';
+        value: number | Signal;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1344,6 +1348,7 @@ export interface PostsSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  cloudinaryPublicId?: T;
   alt?: T;
   caption?: T;
   folder?: T;
@@ -1439,11 +1444,11 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
-  parentCluster?: T;
-  description?: T;
-  featuredArtwork?: T;
-  generateSlug?: T;
   slug?: T;
+  cluster?: T;
+  featuredArtwork?: T;
+  mood?: T;
+  sortOrder?: T;
   parent?: T;
   breadcrumbs?:
     | T
@@ -1485,12 +1490,13 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface ClustersSelect<T extends boolean = true> {
   title?: T;
-  description?: T;
-  image?: T;
-  titleColor?: T;
-  descColor?: T;
-  generateSlug?: T;
   slug?: T;
+  manifesto?: T;
+  coverImage?: T;
+  cta?: T;
+  sortOrder?: T;
+  primaryColor?: T;
+  secondaryColor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1499,21 +1505,45 @@ export interface ClustersSelect<T extends boolean = true> {
  * via the `definition` "artworks_select".
  */
 export interface ArtworksSelect<T extends boolean = true> {
-  title?: T;
   nid?: T;
+  title?: T;
+  slug?: T;
   mainImage?: T;
-  category?: T;
-  status?: T;
-  price?: T;
-  gallery?:
+  detailGallery?:
     | T
     | {
         image?: T;
         id?: T;
       };
-  description?: T;
-  generateSlug?: T;
+  executionMethod?: T;
+  support?: T;
+  creationDate?: T;
+  originalDimensions?: T;
+  availability?: T;
+  priceInfo?: T;
+  subcluster?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "signals_select".
+ */
+export interface SignalsSelect<T extends boolean = true> {
+  title?: T;
   slug?: T;
+  eventDate?: T;
+  description?: T;
+  previewImage?: T;
+  detailImages?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  eventCTA?: T;
+  sortOrder?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1852,6 +1882,74 @@ export interface Footer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hero-settings".
+ */
+export interface HeroSetting {
+  id: number;
+  /**
+   * Il testo provocatorio che ruota attorno all'occhio nella Hero page.
+   */
+  warningText: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "calendar-settings".
+ */
+export interface CalendarSetting {
+  id: number;
+  /**
+   * Testo provocatorio / invito visibile nella pagina calendario.
+   */
+  calendarCTA: string;
+  /**
+   * CTA di fallback per i dettagli evento. Usato se l'evento non ha un CTA proprio.
+   */
+  defaultEventCTA: string;
+  /**
+   * Icone stile linktree visibili nella pagina calendario.
+   */
+  socialLinks?:
+    | {
+        icon: number | Media;
+        url: string;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cart-settings".
+ */
+export interface CartSetting {
+  id: number;
+  /**
+   * Messaggio visibile nel form di comunicazione / carrello. Spiega come funzionano spedizioni e pagamenti.
+   */
+  shippingPaymentNotice: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
@@ -1892,6 +1990,45 @@ export interface FooterSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hero-settings_select".
+ */
+export interface HeroSettingsSelect<T extends boolean = true> {
+  warningText?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "calendar-settings_select".
+ */
+export interface CalendarSettingsSelect<T extends boolean = true> {
+  calendarCTA?: T;
+  defaultEventCTA?: T;
+  socialLinks?:
+    | T
+    | {
+        icon?: T;
+        url?: T;
+        label?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cart-settings_select".
+ */
+export interface CartSettingsSelect<T extends boolean = true> {
+  shippingPaymentNotice?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

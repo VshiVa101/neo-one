@@ -1,4 +1,5 @@
-import { sqliteAdapter } from '@payloadcms/db-sqlite'
+import { postgresAdapter } from '@payloadcms/db-postgres'
+import { payloadCloudinaryPlugin as cloudinaryStorage } from '@jhb.software/payload-cloudinary-plugin'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -7,12 +8,17 @@ import { fileURLToPath } from 'url'
 import { Artworks } from './collections/Artworks'
 import { Categories } from './collections/Categories'
 import { Clusters } from './collections/Clusters'
+import { Signals } from './collections/Signals'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
+import { HeroSettings } from './globals/HeroSettings'
+import { CalendarSettings } from './globals/CalendarSettings'
+import { CartSettings } from './globals/CartSettings'
+// import { InquirySettings } from './globals/InquirySettings' // Replaced by CartSettings
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -59,15 +65,30 @@ export default buildConfig({
   },
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
-  db: sqliteAdapter({
-    client: {
-      url: process.env.DATABASE_URL || '',
+  db: postgresAdapter({
+    pool: {
+      connectionString: process.env.DATABASE_URI,
     },
   }),
-  collections: [Pages, Posts, Media, Categories, Users, Clusters, Artworks],
+  collections: [Pages, Posts, Media, Categories, Users, Clusters, Artworks, Signals],
   cors: [getServerSideURL()].filter(Boolean),
-  globals: [Header, Footer],
-  plugins,
+  globals: [Header, Footer, HeroSettings, CalendarSettings, CartSettings],
+  plugins: [
+    ...plugins,
+    cloudinaryStorage({
+      collections: {
+        media: true,
+      },
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
+      credentials: {
+        apiKey: process.env.CLOUDINARY_API_KEY || '',
+        apiSecret: process.env.CLOUDINARY_API_SECRET || '',
+      },
+      folder: 'uploads',
+      clientUploads: false,
+      useFilename: true,
+    }),
+  ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {

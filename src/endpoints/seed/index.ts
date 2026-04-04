@@ -14,15 +14,20 @@ const collections: CollectionSlug[] = [
   'categories',
   'clusters',
   'artworks',
+  'signals',
   'media',
   'pages',
   'posts',
-  'forms',
-  'form-submissions',
-  'search',
+  'users',
 ]
 
-const globals: GlobalSlug[] = ['header', 'footer']
+const globals: GlobalSlug[] = [
+  'header',
+  'footer',
+  'hero-settings',
+  'calendar-settings',
+  'inquiry-settings',
+]
 
 const categories = ['Technology', 'News', 'Finance', 'Design', 'Software', 'Engineering']
 
@@ -50,9 +55,7 @@ export const seed = async ({
     globals.map((global) =>
       payload.updateGlobal({
         slug: global,
-        data: {
-          navItems: [],
-        },
+        data: {}, // Empty update to satisfy the type but avoid invalid fields
         depth: 0,
         context: {
           disableRevalidate: true,

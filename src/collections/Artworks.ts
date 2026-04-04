@@ -1,35 +1,45 @@
 import type { CollectionConfig } from 'payload'
-import { anyone } from '../access/anyone'
-import { authenticated } from '../access/authenticated'
-import { slugField } from 'payload'
 
 export const Artworks: CollectionConfig = {
   slug: 'artworks',
-  access: {
-    create: authenticated,
-    delete: authenticated,
-    read: anyone,
-    update: authenticated,
-  },
+  labels: { singular: 'Opera', plural: 'Opere' },
   admin: {
-    useAsTitle: 'title',
-    defaultColumns: ['title', 'nid', 'status', 'cluster', 'updatedAt'],
+    useAsTitle: 'nid',
+    defaultColumns: ['nid', 'title', 'subcluster', 'availability', 'updatedAt'],
+    group: 'CONTENUTI ART HUB',
+  },
+  access: {
+    read: () => true,
+    create: ({ req: { user } }) => Boolean(user),
+    update: ({ req: { user } }) => Boolean(user),
+    delete: ({ req: { user } }) => Boolean(user),
   },
   fields: [
     {
-      name: 'title',
-      type: 'text',
-      required: true,
-    },
-    {
       name: 'nid',
-      label: 'N.ID',
+      label: 'N.ID (Codice Neo)',
       type: 'text',
       required: true,
       unique: true,
       admin: {
-        description: 'Identificativo univoco dell\'opera (es. N.01)',
+        description: 'Codice numerico unico dell\'opera.',
       },
+    },
+    {
+      name: 'title',
+      label: 'Titolo (opzionale)',
+      type: 'text',
+      admin: {
+        description: 'Neo spesso usa solo il N.ID.',
+      },
+    },
+    {
+      name: 'slug',
+      label: 'Slug',
+      type: 'text',
+      unique: true,
+      index: true,
+      admin: { position: 'sidebar' },
     },
     {
       name: 'mainImage',
@@ -39,51 +49,82 @@ export const Artworks: CollectionConfig = {
       required: true,
     },
     {
-      name: 'gallery',
+      name: 'detailGallery',
       label: 'Galleria Dettagli',
       type: 'array',
+      admin: {
+        description: 'Scatti extra, close-up, dettagli.',
+      },
       fields: [
         {
           name: 'image',
+          label: 'Immagine',
           type: 'upload',
           relationTo: 'media',
+          required: true,
         },
       ],
     },
     {
-      name: 'price',
-      label: 'Prezzo (€)',
-      type: 'number',
-      min: 0,
+      name: 'executionMethod',
+      label: 'Metodo di Esecuzione',
+      type: 'text',
+      admin: { placeholder: 'es. Acrilico su tela, Digitale...' },
     },
     {
-      name: 'status',
-      label: 'Stato',
-      type: 'select',
-      defaultValue: 'available',
-      options: [
-        { label: 'Available', value: 'available' },
-        { label: 'Sold', value: 'sold' },
-        { label: 'Reserved', value: 'reserved' },
-        { label: 'Coming Soon', value: 'coming_soon' },
-      ],
-      required: true,
+      name: 'support',
+      label: 'Supporto',
+      type: 'text',
+      admin: { placeholder: 'es. Tela, Carta 300g, Tavola...' },
     },
     {
-      name: 'category',
-      label: 'Sottogruppo (Subcluster)',
-      type: 'relationship',
-      relationTo: 'categories',
-      required: true,
+      name: 'creationDate',
+      label: 'Data Creazione',
+      type: 'text',
       admin: {
-        description: 'Seleziona il Sottogruppo di appartenenza di questa opera (es: Selezione 2024).',
+        placeholder: 'es. 2023, Marzo 2024...',
+        description: 'Testo libero.',
       },
     },
     {
-      name: 'description',
-      label: 'Descrizione Opera',
-      type: 'richText',
+      name: 'originalDimensions',
+      label: 'Dimensioni Originali',
+      type: 'text',
+      admin: { placeholder: 'es. 70×100 cm' },
     },
-    slugField(),
+    {
+      name: 'availability',
+      label: 'Disponibilità',
+      type: 'select',
+      required: true,
+      defaultValue: 'non_disponibile',
+      options: [
+        { label: 'Comprabile', value: 'comprabile' },
+        { label: 'Ordinabile', value: 'ordinabile' },
+        { label: 'Non disponibile', value: 'non_disponibile' },
+      ],
+    },
+    {
+      name: 'priceInfo',
+      label: 'Info Prezzo',
+      type: 'textarea',
+      admin: {
+        description: 'Testo libero: prezzo originale, prezzo stampe, su richiesta, ecc.',
+      },
+    },
+    {
+      name: 'subcluster',
+      label: 'Sottocluster (Mazzo)',
+      type: 'relationship',
+      relationTo: 'categories',
+      required: true,
+    },
+    {
+      name: 'sortOrder',
+      label: 'Ordine nel Mazzo',
+      type: 'number',
+      defaultValue: 0,
+      admin: { position: 'sidebar' },
+    },
   ],
 }
