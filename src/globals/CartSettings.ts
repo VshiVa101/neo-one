@@ -1,3 +1,4 @@
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import type { GlobalConfig } from 'payload'
 
 export const CartSettings: GlobalConfig = {
@@ -12,6 +13,7 @@ export const CartSettings: GlobalConfig = {
       label: 'Avviso Shipping & Pagamenti',
       type: 'richText',
       required: true,
+      editor: lexicalEditor({}),
       admin: {
         description: 'Messaggio visibile nel form di comunicazione / carrello. Spiega come funzionano spedizioni e pagamenti.',
       },
