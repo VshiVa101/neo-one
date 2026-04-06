@@ -139,12 +139,19 @@ Il sito deve sentirsi:
 
 ## 8. IA / UX Structure
 
-- `/` → Entry hero con 3D eye + testo circolare provocatorio
-- `/home` → Cluster hub
-- `/cluster/[slug]` → Subcluster page
-- `/artwork/[slug]` → Artwork detail
-- `/calendar` → Release / signal board
-- `/calendar/[slug]` → Single event / release detail
+Il sito ha **4 stati principali** gestiti da URL e **2 sovrapposizioni** gestite come overlay:
+
+| Stato | URL | Note |
+|---|---|---|
+| Hero | `/` | Solo prima visita. Poi redirect auto a `/home` |
+| Home + Cluster Expanded | `/home` | Stessa pagina, due stati interni React |
+| Artwork Detail | `/artwork/[nid]` | Pagina propria |
+| Calendar | `/calendar` | Pagina propria |
+| Event Detail | `/calendar/[slug]` | Pagina propria |
+| 404 | `/404` | Pagina custom con minigioco (service worker) |
+
+**Overlay globali (non sono pagine, non hanno URL):**
+- **Cart/Form** — si apre sopra qualsiasi vista quando si tocca l'icona carrello
 
 Il sito NON è:
 - un normale ecommerce
@@ -167,16 +174,20 @@ Non rimuoverlo, sostituirlo o neutralizzarlo mai.
 
 ---
 
-## 10. Routing
+## 10. Routing — Definitivo
 
-- `/` → Entry / Hero
-- `/home` → Cluster Hub
-- `/cluster/[slug]` → Subcluster page
-- `/artwork/[slug]` → Artwork detail
-- `/calendar` → Calendar overview
-- `/calendar/[slug]` → Event / release detail
+```
+/                    → Hero (solo prima visita via localStorage)
+/home                → Home  ← cluster expansion avviene QUI, nessun URL change
+/artwork/[nid]       → Artwork Detail
+/calendar            → Calendar Overview
+/calendar/[slug]     → Event Detail
+/404                 → Custom 404 + minigioco
+```
 
-Anche se alcune route hanno scaffold, NON sono automaticamente "done".
+**NON esiste `/cluster/[slug]`** — il subcluster view è uno stato interno della Home.
+
+⚠️ Lo slug nei cluster e nelle categories esiste nel CMS come chiave interna, ma NON genera pagine navigabili via URL.
 
 ---
 
@@ -329,6 +340,10 @@ db: postgresAdapter({
 | `eventCTA` | text | ❌ |
 | `sortOrder` | number default 0 | sidebar |
 
+**Uso nel frontend Event Detail:**
+- Desktop: `previewImage` (slot 1) + `detailImages[0]` (slot 2). Se `detailImages` è vuoto → immagine default con badge **"Stupidi gadget iN OmaggiO!"**
+- Mobile: solo `previewImage` (slot 1)
+
 ---
 
 ## 15. Cluster Reali MVP
@@ -349,16 +364,18 @@ db: postgresAdapter({
 
 | Area | Route | File | Stato |
 |---|---|---|---|
-| Hero | `/` | `src/app/(frontend)/page.tsx` | ✅ Stabile |
-| Home | `/home` | `src/components/home/ClusterLayout.tsx` | 🔴 HARDCODED |
-| Subcluster | `/cluster/[slug]` | `src/app/(frontend)/cluster/[slug]/page.tsx` | 🟡 Scaffold |
-| Artwork detail | `/artwork/[slug]` | — | 🔴 Da costruire |
+| Hero | `/` | `src/app/(frontend)/page.tsx` | ✅ Stabile. Manca: localStorage first-visit check |
+| Home | `/home` | `src/components/home/ClusterLayout.tsx` | 🔴 Logica navigazione ✅ — Dati HARDCODED |
+| Artwork detail | `/artwork/[nid]` | — | 🔴 Da costruire |
 | Calendar | `/calendar` | — | 🔴 Da costruire |
 | Event detail | `/calendar/[slug]` | — | 🔴 Da costruire |
-| Inquiry form | — | — | 🔴 Da costruire |
+| Cart/Form overlay | globale | — | 🔴 Da costruire |
+| 404 custom | `/404` | — | 🔴 Da costruire (post-MVP) |
 
-**Limitazione critica attuale:**
-La Home legge ancora dati hardcoded da `ClusterLayout.tsx`. Aggiungere un cluster in Payload NON lo fa apparire automaticamente in Home. Questo è il prossimo milestone tecnico.
+**Nota: `/cluster/[slug]` ELIMINATA dalla roadmap.** La subcluster view è uno stato interno di `/home`.
+
+**Prossimo sblocco critico:**
+Connettere `ClusterLayout.tsx` alla Local API di Payload (sostituire `CLUSTERS` hardcoded con dati reali da Neon).
 
 ---
 
@@ -467,20 +484,21 @@ Se il contesto si perde, chiedere a Leo:
 | 3 | Configurare Cloudinary storage adapter | ✅ DONE |
 | 4 | Aggiornare schema Payload al definitivo | ✅ DONE |
 | 5 | Pulire payload.config.ts dai residui template | ✅ DONE |
-| 6 | Verificare `/admin` funziona con Neon | ✅ DONE |
-| 7 | Fix richText field in CartSettings & DB Cleanup | ✅ DONE |
-| 8 | Popolare i 5 cluster reali via `/admin` | 🔴 IN CORSO |
-| 9 | Collegare Home a Payload (ClusterLayout dinamico) | ⬜ |
-| 10 | Verificare Home con dati reali | ⬜ |
-| 11 | Costruire subcluster page | ⬜ |
-| 12 | Costruire artwork detail page | ⬜ |
-| 13 | Costruire calendar page | ⬜ |
-| 14 | Costruire event detail page | ⬜ |
-| 15 | Costruire inquiry form | ⬜ |
-| 16 | Fix `clientUploads: true` per Vercel | ⬜ prima del deploy |
-| 17 | Deploy su Vercel | ⬜ |
-| 18 | Collegare dominio di Neo | ⬜ |
-| 19 | Test finale online | ⬜ |
+| 6 | DB Reset → schema pulito, admin funzionante | ✅ DONE |
+| 7 | Fix richText fields + verifica upload Cloudinary | ✅ DONE |
+| 8 | Conferma architettura definitiva da wireframe | ✅ DONE |
+| 9 | Popolare i 5 cluster reali via `/admin` | 🔴 PROSSIMO |
+| 10 | Collegare Home a Payload (ClusterLayout dinamico) | ⬜ |
+| 11 | Aggiungere Hero first-visit logic (localStorage) | ⬜ |
+| 12 | Costruire Artwork Detail `/artwork/[nid]` | ⬜ |
+| 13 | Costruire Calendar `/calendar` | ⬜ |
+| 14 | Costruire Event Detail `/calendar/[slug]` | ⬜ |
+| 15 | Costruire Cart/Form overlay globale | ⬜ |
+| 16 | Costruire 404 custom + minigioco | ⬜ post-MVP |
+| 17 | Fix `clientUploads: true` per Vercel | ⬜ pre-deploy |
+| 18 | Deploy su Vercel | ⬜ |
+| 19 | Collegare dominio di Neo | ⬜ |
+| 20 | Test finale online | ⬜ |
 
 ---
 
@@ -500,27 +518,54 @@ Se il contesto si perde, chiedere a Leo:
 
 ---
 
-## 25. Stato Attuale — Momento Identificato
+## 25. Chiarimenti Tecnici Permanenti
 
-**Data sessione:** Aprile 2025
+### Users Collection
+È la collezione di autenticazione di Payload — serve **solo** per accedere a `/admin`. I visitatori del sito pubblico non la vedono mai. Utenti attuali: Leo (NFO-WEB). Eventuale accesso futuro per Neo verrebbe aggiunto qui.
 
-**Ultimo commit stabile:** `92d48892...`
-`feat: configure cloudinary storage adapter via jhb.software plugin, switch to neon postgres`
+### Slug nei Cluster/Categories
+Lo slug **esiste nel CMS** come chiave interna unica. **Non genera pagine navigabili via URL.** Viene usato in React come `key` per componenti e come identificatore nelle query.
+
+### Scalabilità del Database
+Il progetto è scalabile per design:
+- **Aggiungere campos**: safe, i dati esistenti non vengono toccati
+- **Aggiungere collections**: safe, nuova tabella, vecchie intatte
+- **Rimuovere campi**: distruttivo solo per quel campo, tutto il resto rimane
+- In locale: Payload sincronizza automaticamente lo schema all'avvio
+- In produzione: sistema di migration files (versionate in Git, eseguite al deploy)
+
+### Cluster Navigation System (già implementato)
+File: `src/components/home/ClusterLayout.tsx`
+- `navState`: `{ left, right, next, pool }` — traccia i due cluster in focus e il prossimo da mostrare
+- Wheel mouse **fuori** footer → swappa cluster (giù = rimpiazza sx, su = rimpiazza dx)
+- Wheel mouse **sopra** footer → non trigga swap, lascia scroll il footer
+- Drag footer → scorri la strip orizzontalmente
+- Click cluster nel footer → `replaceCluster(i)` → rimpiazza il lato "next" (alterna L/R)
+- Cluster attivi in footer: dimmed (0.4 opacity) per distinzione visiva
+
+---
+
+## 26. Stato Attuale — Sessione Aprile 2026
+
+**Ultimo commit stabile:** `db469cb`
+`feat: db reset and schema cleanup, fix 500 error on payload boot`
 
 **Cosa funziona:**
-- ✅ Neon Postgres connesso e operativo
-- ✅ Cloudinary storage adapter installato e funzionante (`clientUploads: false`)
-- ✅ Upload immagini verificato — le immagini arrivano su Cloudinary
-- ✅ Payload admin raggiungibile a `/admin`
-- ✅ Schema collections e globals aggiornato al definitivo
-- ✅ Residui template (Pages, Posts, Header, Footer, plugins spread) rimossi da payload.config.ts
+- ✅ Neon Postgres connesso, schema pulito, admin avviabile senza errori
+- ✅ Cloudinary storage operativo (`clientUploads: false`), upload verificato
+- ✅ Payload admin a `localhost:3001/admin` — collezioni corrette visibili
+- ✅ `Users`: 1 utente (NFO-WEB / Leo)
+- ✅ Architettura definitiva del sito confermata da wireframe e codice esistente
+- ✅ `ClusterLayout.tsx`: logica navigazione cluster già corretta, dati ancora hardcoded
 
-**Cosa è in corso:**
-- 🔴 Popolare i 5 cluster reali via `/admin` (Punto 8)
-
-**Prossimo step immediato:**
-Creare i 5 cluster tramite CMS. Successivamente, inizieremo il refactoring della Home (`ClusterLayout.tsx`) per fargli leggere i dati in modo dinamico dalla Local API di Payload invece che usare dati hardcoded.
-
-**Agente corrente:** Devstral-2-123B-Instruct-2512 via OpenCode
+**Prossimo step immediato (Step 9):**
+Popolare i 5 cluster reali in `/admin`, poi connettere `ClusterLayout.tsx` alla Local API di Payload.
 
 **Branch attivo:** `feature/home-clusters`
+
+**Resume check:**
+1. Admin raggiungibile localmente? → `localhost:3001/admin`
+2. Upload immagini → Cloudinary funziona?
+3. I 5 cluster reali sono stati inseriti in admin?
+4. `ClusterLayout.tsx` legge da Payload o ancora hardcoded?
+5. Qual è l'ultimo commit Git?
