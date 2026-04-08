@@ -487,9 +487,9 @@ Se il contesto si perde, chiedere a Leo:
 | 6 | DB Reset → schema pulito, admin funzionante | ✅ DONE |
 | 7 | Fix richText fields + verifica upload Cloudinary | ✅ DONE |
 | 8 | Conferma architettura definitiva da wireframe | ✅ DONE |
-| 9 | Popolare i 5 cluster reali via `/admin` | 🔴 PROSSIMO |
-| 10 | Collegare Home a Payload (ClusterLayout dinamico) | ⬜ |
-| 11 | Aggiungere Hero first-visit logic (localStorage) | ⬜ |
+| 9 | Popolare i 5 cluster reali via `/admin` | ✅ DONE |
+| 10 | Collegare Home a Payload (ClusterLayout dinamico) | ✅ DONE |
+| 11 | Aggiungere Hero first-visit logic (localStorage) | 🔴 PROSSIMO |
 | 12 | Costruire Artwork Detail `/artwork/[nid]` | ⬜ |
 | 13 | Costruire Calendar `/calendar` | ⬜ |
 | 14 | Costruire Event Detail `/calendar/[slug]` | ⬜ |
@@ -556,10 +556,11 @@ File: `src/components/home/ClusterLayout.tsx`
 - ✅ Payload admin a `localhost:3001/admin` — collezioni corrette visibili
 - ✅ `Users`: 1 utente (NFO-WEB / Leo)
 - ✅ Architettura definitiva del sito confermata da wireframe e codice esistente
-- ✅ `ClusterLayout.tsx`: logica navigazione cluster già corretta, dati ancora hardcoded
+- ✅ `ClusterLayout.tsx`: logica navigazione cluster DINAMICA (Payload Local API)
+- ✅ `home/page.tsx`: fetch dei dati da database con fallback robusto per immagini Cloudinary
 
-**Prossimo step immediato (Step 9):**
-Popolare i 5 cluster reali in `/admin`, poi connettere `ClusterLayout.tsx` alla Local API di Payload.
+**Prossimo step immediato (Step 11):**
+Aggiungere la logica di "First Visit" nella Hero (localStorage) per reindirizzare automaticamente a `/home` le visite successive.
 
 **Branch attivo:** `feature/home-clusters`
 
