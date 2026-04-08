@@ -27,12 +27,12 @@ const createMockDeck = (title: string, idPrefix: string) => ({
 })
 
 const MOCK_SUBCLUSTERS = [
-  createMockDeck('NeON Alfa', 'n-a'),
-  createMockDeck('NeON Beta', 'n-b'),
-  createMockDeck('NeON Gamma', 'n-c'),
-  createMockDeck('NeON Delta', 'n-d'),
-  createMockDeck('NeON Sigma', 'n-e'),
-  createMockDeck('NeON Omega', 'n-f'),
+  createMockDeck('Alfa BN', 'a'),
+  createMockDeck('Beta BN', 'b'),
+  createMockDeck('Gamma BN', 'c'),
+  createMockDeck('Delta BN', 'd'),
+  createMockDeck('Sigma BN', 'e'),
+  createMockDeck('Omega BN', 'f'),
 ]
 
 export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
