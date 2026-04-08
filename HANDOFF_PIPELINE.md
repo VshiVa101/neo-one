@@ -117,5 +117,14 @@ Questi sono i task rimanenti per portare il sito live. L'utente ti chiederà di 
 ### Step 18 & 19: Deploy su Vercel (Payload clientUploads Bypass)
 **Status:** ⚪ Da Fare | **Difficoltà:** 🔴 Estrema
 
-> **⚠️ ESCALATION OBBLIGATORIA A MODELLO PRO:**
 > *Utente, il passaggio da Payload Locale a Payload Globale su serverless richiede configurazione specifica per Vercel a livello di DB pool, edge handlers e specialmente upload size limit handling in `payload.config.ts`. DEVI usare Gemini Pro per questo passaggio o rischi un sito online ma rotto nell'admin.*
+
+---
+
+## ⚠️ ISTRUZIONI DI EMERGENZA PER GEMINI FLASH (FASE DATA WIRING) ⚠️
+Se prendi in carico il progetto in questo punto, L'UTENTE HA POPOLATO IL DATABASE (Clusters, Categories, Artworks).
+Il tuo primo task è **Sostituire i Mock Data della Home** (`ClusterLayout.tsx` e `home/page.tsx`).
+1. **IN `home/page.tsx`:** Mappa `clustersData`, e per ognuno fai fetch delle `categories` collegate e dei loro `artworks`. Ritorna la struttura cablata dentro l'array `clusters` passandola a `ClusterLayout`.
+2. **CASO SPECIALE NeON**: Se `cluster.slug === 'neon'`, assicurati di appendergli artificialmente i `MOCK_SUBCLUSTERS` generati in `ClusterLayout.tsx` per mostrare un effetto *placeholder di scalabilità e sviluppo futuro*! Per gli altri cluster (es. `b-n`), fa' renderizzare **solo** i sottocluster estratti dal DB!
+3. **IMMAGINI CLOUDINARY:** Quando estrai la URL dell'immagine di un artwork, usa lo script regex di Cloudinary presente in questa pipeline per ottenere `/f_auto,q_auto/` ed evitare crash 404 e URL non validi.
+4. **Artwork Detail (Step 13):** Dopo il Wiring, crea `/home/artwork/[nid]` o `/artwork/[nid]`. Deve mostrare i nuovi campi audio creati in `Artworks.ts` (`audioSnippetUrl` e `fullAudioUrl`). Usa Payload Local API per trovare l'opera via `nid`.
