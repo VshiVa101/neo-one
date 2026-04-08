@@ -126,5 +126,23 @@ export const Artworks: CollectionConfig = {
       defaultValue: 0,
       admin: { position: 'sidebar' },
     },
+    {
+      name: 'audioSnippetUrl',
+      label: 'URL Sample Audio',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+        description: 'URL a un file audio breve (es. MP3 su Dropbox/Drive). Perfetto per il cluster Rumore.',
+      },
+    },
+    {
+      name: 'fullAudioUrl',
+      label: 'Link Audio Completo',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+        description: 'Link al sito dove ascoltare la traccia estesa (es. Spotify, Bandcamp).',
+      },
+    },
   ],
 }

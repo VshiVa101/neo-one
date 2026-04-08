@@ -362,6 +362,14 @@ export interface Artwork {
   priceInfo?: string | null;
   subcluster: number | Category;
   sortOrder?: number | null;
+  /**
+   * URL a un file audio breve (es. MP3 su Dropbox/Drive). Perfetto per il cluster Rumore.
+   */
+  audioSnippetUrl?: string | null;
+  /**
+   * Link al sito dove ascoltare la traccia estesa (es. Spotify, Bandcamp).
+   */
+  fullAudioUrl?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -664,6 +672,8 @@ export interface ArtworksSelect<T extends boolean = true> {
   priceInfo?: T;
   subcluster?: T;
   sortOrder?: T;
+  audioSnippetUrl?: T;
+  fullAudioUrl?: T;
   updatedAt?: T;
   createdAt?: T;
 }

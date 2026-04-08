@@ -490,8 +490,8 @@ Se il contesto si perde, chiedere a Leo:
 | 9 | Popolare i 5 cluster reali via `/admin` | ✅ DONE |
 | 10 | Collegare Home a Payload (ClusterLayout dinamico) | ✅ DONE |
 | 11 | Aggiungere Hero first-visit logic (localStorage) | ✅ DONE |
-| 12 | Home: Costruire stato "Expanded Cluster" (Mostrare Subclusters e Artworks) | 🔴 PROSSIMO |
-| 13 | Costruire Artwork Detail `/artwork/[nid]` | ⬜ |
+| 12 | Home: Costruire stato "Expanded Cluster" (Mostrare Subclusters e Artworks) | ✅ DONE |
+| 13 | Costruire Artwork Detail `/artwork/[nid]` | 🔴 PROSSIMO |
 | 14 | Costruire Calendar `/calendar` | ⬜ |
 | 15 | Costruire Event Detail `/calendar/[slug]` | ⬜ |
 | 16 | Costruire Cart/Form overlay globale (Zustand/Context) | ⬜ |
@@ -560,9 +560,11 @@ File: `src/components/home/ClusterLayout.tsx`
 - ✅ `ClusterLayout.tsx`: logica navigazione cluster DINAMICA (Payload Local API)
 - ✅ `home/page.tsx`: fetch dei dati da database con fallback robusto per immagini Cloudinary
 - ✅ `HeroClient.tsx`: logica di "First Visit" completata tramite localStorage
+- ✅ **Carousel Espanso**: creato l'overlay con slider 3D orizzontale e scrolling cartesiano.
+- ✅ **CMS Artworks**: aggiunti campi Audio additive-safe per il cluster rumore.
 
-**Prossimo step immediato (Step 12):**
-Costruire l'**Espansione del Cluster** all'interno della riscrittura di `ClusterLayout.tsx` o `home/page.tsx`. Quando l'utente clicca su un cluster in primo piano, la sua view si espande coprendo la pagina per rivelare i relativi Subcluster (Categorie) e Artworks, con possibilità di chiuderla (back to home grid) o cliccare su un artwork.
+**Prossimo step immediato (Step 13):**
+Costruire la pagina `Artwork Detail` `/artwork/[nid]`, dove il click proveniente dal mazzo finalmente risolverà in una vista dedicata con l'opera. L'opera dovrà mostrare anche la preview e il link audio opzionale.
 
 **Branch attivo:** `feature/home-clusters`
 
