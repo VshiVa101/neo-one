@@ -4,99 +4,18 @@ import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { EyeScene } from '@/components/EyeScene'
 
-// ── Dati cluster mock ────────────────────────────────────────────
-const CLUSTERS = [
-  {
-    id: 'bn',
-    title: 'B/N',
-    desc: '- Opere in bianco e nero, per devastare l\'ipocrisia cromatica.',
-    image: '/images/drops/BN-cluster.png',
-    titleColor: '#768b1a',
-    descColor: '#fc5896',
-  },
-  {
-    id: 'neon',
-    title: 'NeON',
-    desc: '- Opere a colori per demolire il grigiume.',
-    image: '/images/drops/NeON-cluster.png',
-    titleColor: '#768b1a',
-    descColor: '#fc5896',
-  },
-  {
-    id: 'foto',
-    title: 'FOTO',
-    desc: '- Fotografia concettuale per documentare la decadenza.',
-    image: '/images/drops/fOtO-cluster.png',
-    titleColor: '#768b1a',
-    descColor: '#fc5896',
-  },
-  {
-    id: 'bn_alt',
-    title: 'DARK',
-    desc: '- L\'oscurità come unica forma di verità.',
-    image: '/images/drops/BN-cluster.png',
-    titleColor: '#768b1a',
-    descColor: '#fc5896',
-  },
-  {
-    id: 'neon_alt',
-    title: 'ACID',
-    desc: '- Colori acidi per allucinazioni collettive.',
-    image: '/images/drops/NeON-cluster.png',
-    titleColor: '#768b1a',
-    descColor: '#fc5896',
-  },
-  {
-    id: 'foto_alt',
-    title: 'RAW',
-    desc: '- Immagini grezze, senza filtri o pietà.',
-    image: '/images/drops/fOtO-cluster.png',
-    titleColor: '#768b1a',
-    descColor: '#fc5896',
-  },
-  {
-    id: 'neon_4',
-    title: 'GLOW',
-    desc: '- Luce artificiale, anima sintetica.',
-    image: '/images/drops/NeON-cluster.png',
-    titleColor: '#768b1a',
-    descColor: '#fc5896',
-  },
-  {
-    id: 'bn_3',
-    title: 'PUNK',
-    desc: '- Estetica sporca per menti pulite.',
-    image: '/images/drops/BN-cluster.png',
-    titleColor: '#768b1a',
-    descColor: '#fc5896',
-  },
-  {
-    id: 'foto_3',
-    title: 'LENS',
-    desc: '- Una lente diversa sulla realtà.',
-    image: '/images/drops/fOtO-cluster.png',
-    titleColor: '#768b1a',
-    descColor: '#fc5896',
-  },
-  {
-    id: 'neon_5',
-    title: 'POPP',
-    desc: '- Colore e rumore.',
-    image: '/images/drops/NeON-cluster.png',
-    titleColor: '#768b1a',
-    descColor: '#fc5896',
-  },
-  {
-    id: 'bn_4',
-    title: 'VOID',
-    desc: '- Il vuoto è solo l\'inizio.',
-    image: '/images/drops/BN-cluster.png',
-    titleColor: '#768b1a',
-    descColor: '#fc5896',
-  },
-]
+export interface ClusterData {
+  id: string
+  title: string
+  desc: string
+  image: string
+  titleColor: string
+  descColor: string
+}
 
-export const ClusterLayout = () => {
+export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
+  // Se non ci sono cluster o ce n'è solo 1, evitiamo errori nella destrutturazione in Home
+  if (!clusters || clusters.length < 2) return null;
   // Stato accorpato per la navigazione dei cluster
   const [navState, setNavState] = useState({
     left: 0,
@@ -139,15 +58,15 @@ export const ClusterLayout = () => {
       setTimeout(() => (isScrolling = false), 900)
 
       setNavState(prev => {
-        const nextIdx = prev.pool % CLUSTERS.length
+        const nextIdx = prev.pool % clusters.length
         if (e.deltaY > 0) {
           // Scroll giù -> rimpiazza SINISTRA
           if (nextIdx === prev.right) return prev
-          return { ...prev, left: nextIdx, next: 'right', pool: (prev.pool + 1) % CLUSTERS.length }
+          return { ...prev, left: nextIdx, next: 'right', pool: (prev.pool + 1) % clusters.length }
         } else if (e.deltaY < 0) {
           // Scroll su -> rimpiazza DESTRA
           if (nextIdx === prev.left) return prev
-          return { ...prev, right: nextIdx, next: 'left', pool: (prev.pool + 1) % CLUSTERS.length }
+          return { ...prev, right: nextIdx, next: 'left', pool: (prev.pool + 1) % clusters.length }
         }
         return prev
       })
@@ -155,13 +74,13 @@ export const ClusterLayout = () => {
 
     const handleKey = (e: KeyboardEvent) => {
       setNavState(prev => {
-        const nextIdx = prev.pool % CLUSTERS.length
+        const nextIdx = prev.pool % clusters.length
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
           if (nextIdx === prev.right) return prev
-          return { ...prev, left: nextIdx, next: 'right', pool: (prev.pool + 1) % CLUSTERS.length }
+          return { ...prev, left: nextIdx, next: 'right', pool: (prev.pool + 1) % clusters.length }
         } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
           if (nextIdx === prev.left) return prev
-          return { ...prev, right: nextIdx, next: 'left', pool: (prev.pool + 1) % CLUSTERS.length }
+          return { ...prev, right: nextIdx, next: 'left', pool: (prev.pool + 1) % clusters.length }
         }
         return prev
       })
@@ -176,11 +95,11 @@ export const ClusterLayout = () => {
   }, [isHoveringFooter])
 
   // I due cluster in primo piano (estratti dai due indici indipendenti)
-  const leftCluster = CLUSTERS[navState.left]
-  const rightCluster = CLUSTERS[navState.right]
+  const leftCluster = clusters[navState.left]
+  const rightCluster = clusters[navState.right]
 
   // Tutti i cluster che vanno nel footer (tutti meno i due attivi)
-  const footerClusters = CLUSTERS.filter((_, i) => i !== navState.left && i !== navState.right)
+  const footerClusters = clusters.filter((_, i) => i !== navState.left && i !== navState.right)
 
   return (
     <div className="w-full h-screen relative z-10 overflow-hidden">
@@ -299,7 +218,7 @@ export const ClusterLayout = () => {
           initial={{ x: -80 }}
           className="absolute left-0 flex justify-start items-center gap-[2.5vw] h-full pl-0 pr-[150px] w-max cursor-grab active:cursor-grabbing"
         >
-          {CLUSTERS.map((cluster, i) => (
+          {clusters.map((cluster, i) => (
             <motion.div
               key={cluster.id + '_footer_' + i}
               initial={{ opacity: 0, y: 30 }}
