@@ -1,4 +1,4 @@
-import { EyeScene } from '@/components/EyeScene'
+import HeroClient from './HeroClient'
 
 export const metadata = {
   title: 'Neo-One | Uncensored Art Hub',
@@ -6,19 +6,5 @@ export const metadata = {
 }
 
 export default function HeroPage() {
-  return (
-    <main className="w-full h-screen relative bg-black overflow-hidden flex flex-col items-center justify-center m-0 p-0 text-white">
-      {/* Background GIF */}
-      <img
-        src="/images/drops/bg-herosection.gif"
-        alt="Hero Background"
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-60 pointer-events-none"
-      />
-      
-      {/* The 3D Scene - con testo circolare solo qui nella Hero */}
-      <div className="fixed inset-0 z-10 w-full h-screen">
-        <EyeScene targetRoute="/home" showCircularText={true} />
-      </div>
-    </main>
-  )
+  return <HeroClient />
 }

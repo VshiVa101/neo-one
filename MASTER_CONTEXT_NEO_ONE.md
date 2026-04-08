@@ -489,8 +489,8 @@ Se il contesto si perde, chiedere a Leo:
 | 8 | Conferma architettura definitiva da wireframe | ✅ DONE |
 | 9 | Popolare i 5 cluster reali via `/admin` | ✅ DONE |
 | 10 | Collegare Home a Payload (ClusterLayout dinamico) | ✅ DONE |
-| 11 | Aggiungere Hero first-visit logic (localStorage) | 🔴 PROSSIMO |
-| 12 | Costruire Artwork Detail `/artwork/[nid]` | ⬜ |
+| 11 | Aggiungere Hero first-visit logic (localStorage) | ✅ DONE |
+| 12 | Costruire Artwork Detail `/artwork/[nid]` | 🔴 PROSSIMO |
 | 13 | Costruire Calendar `/calendar` | ⬜ |
 | 14 | Costruire Event Detail `/calendar/[slug]` | ⬜ |
 | 15 | Costruire Cart/Form overlay globale | ⬜ |
@@ -558,9 +558,10 @@ File: `src/components/home/ClusterLayout.tsx`
 - ✅ Architettura definitiva del sito confermata da wireframe e codice esistente
 - ✅ `ClusterLayout.tsx`: logica navigazione cluster DINAMICA (Payload Local API)
 - ✅ `home/page.tsx`: fetch dei dati da database con fallback robusto per immagini Cloudinary
+- ✅ `HeroClient.tsx`: logica di "First Visit" completata tramite localStorage
 
-**Prossimo step immediato (Step 11):**
-Aggiungere la logica di "First Visit" nella Hero (localStorage) per reindirizzare automaticamente a `/home` le visite successive.
+**Prossimo step immediato (Step 12):**
+Iniziare la costruzione della pagina **Artwork Detail** (`/artwork/[nid]`), che richiederà un layout immersivo con le info tecniche dell'opera e il tasto per aggiungerla al carrello.
 
 **Branch attivo:** `feature/home-clusters`
 
