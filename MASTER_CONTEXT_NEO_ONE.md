@@ -490,15 +490,16 @@ Se il contesto si perde, chiedere a Leo:
 | 9 | Popolare i 5 cluster reali via `/admin` | ✅ DONE |
 | 10 | Collegare Home a Payload (ClusterLayout dinamico) | ✅ DONE |
 | 11 | Aggiungere Hero first-visit logic (localStorage) | ✅ DONE |
-| 12 | Costruire Artwork Detail `/artwork/[nid]` | 🔴 PROSSIMO |
-| 13 | Costruire Calendar `/calendar` | ⬜ |
-| 14 | Costruire Event Detail `/calendar/[slug]` | ⬜ |
-| 15 | Costruire Cart/Form overlay globale | ⬜ |
-| 16 | Costruire 404 custom + minigioco | ⬜ post-MVP |
-| 17 | Fix `clientUploads: true` per Vercel | ⬜ pre-deploy |
-| 18 | Deploy su Vercel | ⬜ |
-| 19 | Collegare dominio di Neo | ⬜ |
-| 20 | Test finale online | ⬜ |
+| 12 | Home: Costruire stato "Expanded Cluster" (Mostrare Subclusters e Artworks) | 🔴 PROSSIMO |
+| 13 | Costruire Artwork Detail `/artwork/[nid]` | ⬜ |
+| 14 | Costruire Calendar `/calendar` | ⬜ |
+| 15 | Costruire Event Detail `/calendar/[slug]` | ⬜ |
+| 16 | Costruire Cart/Form overlay globale (Zustand/Context) | ⬜ |
+| 17 | Costruire 404 custom + minigioco | ⬜ post-MVP |
+| 18 | Fix `clientUploads: true` per Vercel | ⬜ pre-deploy |
+| 19 | Deploy su Vercel | ⬜ |
+| 20 | Collegare dominio di Neo | ⬜ |
+| 21 | Test finale online | ⬜ |
 
 ---
 
@@ -561,7 +562,7 @@ File: `src/components/home/ClusterLayout.tsx`
 - ✅ `HeroClient.tsx`: logica di "First Visit" completata tramite localStorage
 
 **Prossimo step immediato (Step 12):**
-Iniziare la costruzione della pagina **Artwork Detail** (`/artwork/[nid]`), che richiederà un layout immersivo con le info tecniche dell'opera e il tasto per aggiungerla al carrello.
+Costruire l'**Espansione del Cluster** all'interno della riscrittura di `ClusterLayout.tsx` o `home/page.tsx`. Quando l'utente clicca su un cluster in primo piano, la sua view si espande coprendo la pagina per rivelare i relativi Subcluster (Categorie) e Artworks, con possibilità di chiuderla (back to home grid) o cliccare su un artwork.
 
 **Branch attivo:** `feature/home-clusters`
 
