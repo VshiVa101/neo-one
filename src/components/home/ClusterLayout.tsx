@@ -5,6 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { EyeScene } from '@/components/EyeScene'
 import { ClusterDeck, MockArtwork } from '@/components/home/ClusterDeck'
 
+export interface SubclusterData {
+  id: string
+  title: string
+  artworks: MockArtwork[]
+}
+
 export interface ClusterData {
   id: string
   title: string
@@ -12,28 +18,8 @@ export interface ClusterData {
   image: string
   titleColor: string
   descColor: string
+  subclusters: SubclusterData[]
 }
-
-// Dati mock temporanei per testare il layout expanded
-const createMockDeck = (title: string, idPrefix: string) => ({
-  title,
-  artworks: [
-    { id: `${idPrefix}-1`, title: 'Fase 1', image: '/images/drops/BN-cluster.png' },
-    { id: `${idPrefix}-2`, title: 'Fase 2', image: '/images/drops/placeholder.png' },
-    { id: `${idPrefix}-3`, title: 'Fase 3', image: '/images/drops/BN-cluster.png' },
-    { id: `${idPrefix}-4`, title: 'Fase 4', image: '/images/drops/placeholder.png' },
-    { id: `${idPrefix}-5`, title: 'Fase 5', image: '/images/drops/BN-cluster.png' }
-  ]
-})
-
-const MOCK_SUBCLUSTERS = [
-  createMockDeck('Alfa BN', 'a'),
-  createMockDeck('Beta BN', 'b'),
-  createMockDeck('Gamma BN', 'c'),
-  createMockDeck('Delta BN', 'd'),
-  createMockDeck('Sigma BN', 'e'),
-  createMockDeck('Omega BN', 'f'),
-]
 
 export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   // Se non ci sono cluster o ce n'è solo 1, evitiamo errori nella destrutturazione in Home
@@ -52,15 +38,20 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   // Stato del Mock Cluster espanso (null = chiuso, 'id_del_cluster' = aperto)
   const [expandedClusterId, setExpandedClusterId] = useState<string | null>(null)
 
+  // Cluster correntemente aperto ed i suoi mazzi (sottocluster)
+  const expandedCluster = clusters.find(c => c.id === expandedClusterId)
+  const currentSubclusters = expandedCluster?.subclusters || []
+
   // Indice del mazzo (Subcluster) attivo visibile in primo piano
   const [activeDeckIndex, setActiveDeckIndex] = useState(0)
 
   // Seleziona automaticamente il mazzo centrale quando si apre l'espansione
+  // Se non si apre un mock list, il centro è la lunghezza // 2
   useEffect(() => {
     if (expandedClusterId) {
-      setActiveDeckIndex(Math.floor(MOCK_SUBCLUSTERS.length / 2))
+      setActiveDeckIndex(Math.floor(currentSubclusters.length / 2))
     }
-  }, [expandedClusterId])
+  }, [expandedClusterId, currentSubclusters.length])
   
   // Ref per il trascinamento del footer
   const footerRef = React.useRef<HTMLDivElement>(null)
@@ -345,8 +336,8 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={(e) => { e.stopPropagation(); setActiveDeckIndex(prev => Math.min(MOCK_SUBCLUSTERS.length - 1, prev + 1)) }}
-                className={`w-[60px] h-[60px] rounded-full border border-gray-600 flex items-center justify-center transition-colors ${activeDeckIndex < MOCK_SUBCLUSTERS.length - 1 ? 'text-gray-400 hover:text-white bg-black/50 hover:bg-[#F45390]/20 cursor-pointer' : 'opacity-20 pointer-events-none'}`}
+                onClick={(e) => { e.stopPropagation(); setActiveDeckIndex(prev => Math.min(currentSubclusters.length - 1, prev + 1)) }}
+                className={`w-[60px] h-[60px] rounded-full border border-gray-600 flex items-center justify-center transition-colors ${activeDeckIndex < currentSubclusters.length - 1 ? 'text-gray-400 hover:text-white bg-black/50 hover:bg-[#F45390]/20 cursor-pointer' : 'opacity-20 pointer-events-none'}`}
               >
                 <span className="text-2xl">→</span>
               </motion.button>
@@ -356,7 +347,9 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
             <div 
                className="relative w-full h-[70vh] flex items-center justify-center"
             >
-               {MOCK_SUBCLUSTERS.map((sub, idx) => {
+               {currentSubclusters.length === 0 ? (
+                 <div className="text-white font-neo tracking-widest opacity-50 uppercase">Mazzi Vuoti</div>
+               ) : currentSubclusters.map((sub, idx) => {
                  const offset = idx - activeDeckIndex;
                  
                  // Calcola rotazione, opacità e scaling in base alla distanza dal centro
