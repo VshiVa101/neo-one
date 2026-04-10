@@ -9,17 +9,15 @@ export default function HeroClient() {
   const [shouldRender, setShouldRender] = useState(false)
 
   useEffect(() => {
-    // Controllo se l'utente ha già visitato il sito
-    const hasVisited = localStorage.getItem('neo-one-visited')
-
-    if (hasVisited) {
-      // Se già visitato, reindirizza subito alla home
-      router.push('/home')
-    } else {
-      // Altrimenti, segna come visitato e mostra la Hero
-      localStorage.setItem('neo-one-visited', 'true')
-      setShouldRender(true)
-    }
+    // TODO: RIATTIVARE PRIMA DEL DEPLOY
+    // Logica first-visit disabilitata durante lo sviluppo
+    // const hasVisited = localStorage.getItem('neo-one-visited')
+    // if (hasVisited) {
+    //   router.push('/home')
+    // } else {
+    //   localStorage.setItem('neo-one-visited', 'true')
+    // }
+    setShouldRender(true)
   }, [router])
 
   // Mentre controlliamo il localStorage, non renderizziamo nulla (schermo nero)

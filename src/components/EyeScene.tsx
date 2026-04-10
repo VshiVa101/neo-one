@@ -25,8 +25,12 @@ const EyeModel = ({
     const { triggerTransition } = useTransition()
     const router = useRouter()
 
-    const pupilTexture = useTexture('/images/drops/new-neo-eye.png')
+    const [pupilTexture, scleraTexture] = useTexture([
+        '/occhio/pupa_pupilla.webp',
+        '/occhio/nervo_nervoso.webp'
+    ])
     pupilTexture.colorSpace = THREE.SRGBColorSpace
+    scleraTexture.colorSpace = THREE.SRGBColorSpace
 
 
 
@@ -63,7 +67,25 @@ const EyeModel = ({
                 onClick={handleClick}
             >
                 <sphereGeometry args={[0.75, 64, 64]} />
-                <meshStandardMaterial color="white" roughness={0.1} metalness={0.1} />
+                <meshStandardMaterial color="#e8e0d8" roughness={0.15} metalness={0.05} />
+                {/* Layer 1: Retina / Sclera — large Decal projection (no sphere UV stretching) */}
+                <Decal
+                    position={[0, 0, 0.75]}
+                    rotation={[0, 0, 0]}
+                    scale={1.7}
+                >
+                    <meshStandardMaterial
+                        map={scleraTexture}
+                        transparent={false}
+                        blending={THREE.MultiplyBlending}
+                        depthTest={true}
+                        depthWrite={false}
+                        polygonOffset={true}
+                        polygonOffsetFactor={-0.5}
+                        toneMapped={false}
+                    />
+                </Decal>
+                {/* Layer 2: Pupilla — sits on top, inside the retina hole */}
                 <Decal 
                     position={[0, 0, 0.75]} 
                     rotation={[0, 0, 0]} 

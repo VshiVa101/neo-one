@@ -29,7 +29,7 @@ const payload = await getPayload({ config });
 const data = await payload.find({ collection: 'nome', depth: 2 });
 ```
 
-### Snippet Salvavita Immagini (Cloudinary Fix)
+### Sneppet Salvavita Immagini (Cloudinary Fix)
 ```typescript
 let imageUrl = '/images/drops/placeholder.png';
 if (doc.mainImage && typeof doc.mainImage === 'object') {
@@ -39,6 +39,14 @@ if (doc.mainImage && typeof doc.mainImage === 'object') {
   }
 }
 ```
+
+### Regole Ottimizzazione Asset (WebP)
+Tutte le immagini devono essere preventivamente convertite in WebP (Qualità 85):
+- **SFONDI:** `1920x1080`
+- **OPERE:** `1920px` lato lungo
+- **CLUSTER / SIGNALS:** `1200px` lato lungo
+- **ICONE:** `256px` o `512px` (mantenere Alpha/Trasparenza)
+*Regola per l'Occhio 3D:* Il `nervo_nervoso` (Retina) è applicato tramite un `Decal` frontale (Scale 1.7) con `THREE.MultiplyBlending` per rendere invisibile il suo sfondo bianco senza stirare la mappa UV ai lati. La pupilla è un livello `Decal` sovrapposto.
 
 ---
 
