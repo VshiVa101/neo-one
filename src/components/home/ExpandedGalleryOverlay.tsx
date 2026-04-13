@@ -39,12 +39,12 @@ export const ExpandedGalleryOverlay = ({
             </div>
 
             <motion.button
-              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
               whileTap={{ scale: 0.9 }}
               onClick={onClose}
-              className="w-12 h-12 flex items-center justify-center border border-[#768b1a] text-[#768b1a] rounded-full hover:bg-[#768b1a] hover:text-black transition-all duration-300"
+              className="w-[60px] h-[60px] flex items-center justify-center bg-[#d99f9f] rounded-full hover:bg-opacity-80 transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-[#d99f9f]"
             >
-              <span className="text-2xl font-bold leading-none">✕</span>
+              <img src="/images/ui/esccc.webp" className="w-[60%] h-[60%] object-contain opacity-80" />
             </motion.button>
           </div>
 
