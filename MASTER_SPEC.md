@@ -10,8 +10,8 @@
 |---|---|---|---|
 | 1-11 | Setup Infra + Home Base | ✅ DONE | Neon, Cloudinary, Hero, Carousel 3D completati. |
 | 12 | Home: Expanded Cluster | ✅ DONE | Navigazione cluster, auto-expand sottocluster singolo, smart-exit, eye z-500, filtro cluster test. |
-| 13 | Artwork Detail `/artwork/[nid]` | 🔴 PROSSIMO | Fetch reale + layout + Player Audio. |
-| 14 | Calendar Overview `/calendar` | ⬜ | Lista segnali ordinata. |
+| 13 | Artwork Detail `/artwork/[nid]` | ✅ DONE | Layout wireframe, nav prev/next, CartContext, asset UI reali. |
+| 14 | Calendar Overview `/calendar` | 🔴 PROSSIMO | Lista segnali ordinata. |
 | 15 | Event Detail `/calendar/[slug]` | ⬜ | Layout 2-slot Punk. |
 | 16 | Cart/Form Overlay Globale | ⬜ | Context e UI di acquisto/info. |
 | 17-21 | Deploy & Finalize | ⬜ | Vercel e dominio Neo. |
