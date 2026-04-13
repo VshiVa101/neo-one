@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Html, useTexture, Decal } from '@react-three/drei'
+import { Html, useTexture, Decal, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import { useTransition } from '@/context/TransitionContext'
 import { useRouter } from 'next/navigation'
@@ -20,35 +20,67 @@ const EyeModel = ({
     globalTracking = false,
     externalMouse 
 }: EyeModelProps) => {
-    const eyeRef = useRef<THREE.Mesh>(null)
+    const eyeRef = useRef<THREE.Group>(null)
     const [hovered, setHovered] = useState(false)
     const { triggerTransition } = useTransition()
     const router = useRouter()
 
-    const [pupilTexture, scleraTexture] = useTexture([
-        '/occhio/pupa_pupilla.webp',
-        '/occhio/nervo_nervoso.webp'
-    ])
-    pupilTexture.colorSpace = THREE.SRGBColorSpace
-    scleraTexture.colorSpace = THREE.SRGBColorSpace
-
-
+    // Carichiamo la versione ottimizzata con supporto Draco
+    const { scene } = useGLTF('/occhione-opt.glb', 'https://www.gstatic.com/draco/versioned/decoders/1.5.7/')
 
     useFrame((state) => {
         if (!eyeRef.current) return
 
-        // Usa le coordinate esterne (gestite dal padre) se globalTracking è attivo
+        const time = state.clock.getElapsedTime()
+        
+        // --- 1. DEFINIZIONE TIMING ---
+        const flipInterval = 13
+        const flipDuration = 1.2
+        const flipTime = time % flipInterval
+        const isFlipping = flipTime < flipDuration
+
+        const jumpInterval = 4 
+        const jumpDuration = 0.15 
+        const isVibrating = !isFlipping && (time % jumpInterval) < jumpDuration
+
+        // --- 2. GESTIONE LOOK-AT (MOUSE) ---
         const pointerX = (globalTracking && externalMouse?.current) ? externalMouse.current.x : state.pointer.x
         const pointerY = (globalTracking && externalMouse?.current) ? externalMouse.current.y : state.pointer.y
 
-        const targetX = (pointerX * Math.PI) / 4
+        // LOGICA ORIGINALE DI PUNTAMENTO (PI/4 e lerp 0.1)
+        const rotationOffset = -Math.PI / 2 
+        const targetX = (pointerX * Math.PI) / 4 + rotationOffset
         const targetY = (pointerY * Math.PI) / 4
 
-        eyeRef.current.rotation.y = THREE.MathUtils.lerp(eyeRef.current.rotation.y, targetX, 0.1)
-        eyeRef.current.rotation.x = THREE.MathUtils.lerp(eyeRef.current.rotation.x, -targetY, 0.1)
+        // --- 3. CALCOLO MOVIMENTI SPECIALI ---
+        let flipX = 0
+        if (isFlipping) {
+            const progress = flipTime / flipDuration
+            const smoothProgress = (1 - Math.cos(progress * Math.PI)) / 2
+            flipX = smoothProgress * Math.PI * 2
+        } else {
+            // FIX DEFINITIVO: Resettiamo la rotazione interna di Three.js 
+            // per evitare che il lerp cerchi di "tornare indietro" da 360 gradi a 0.
+            // Lo facciamo solo nel primo frame dopo la fine del flipping.
+            if (eyeRef.current.rotation.x < -Math.PI) {
+                 eyeRef.current.rotation.x += Math.PI * 2
+            }
+        }
+
+        let vibrationX = 0
+        let vibrationY = 0
+        if (isVibrating) {
+            const frequency = 100 
+            const amplitude = 0.15
+            vibrationX = Math.sin(time * frequency) * amplitude
+            vibrationY = Math.cos(time * frequency) * amplitude
+        }
+
+        // --- 4. APPLICAZIONE ROTAZIONE UNIFICATA ---
+        eyeRef.current.rotation.y = THREE.MathUtils.lerp(eyeRef.current.rotation.y, targetX + vibrationX, 0.1)
+        eyeRef.current.rotation.x = THREE.MathUtils.lerp(eyeRef.current.rotation.x, -targetY + vibrationY - flipX, 0.1)
         
-        // Effetto "viene avanti" al hover
-        const targetScale = hovered ? 1.15 : 1.0
+        const targetScale = hovered ? 0.80 : 0.65
         eyeRef.current.scale.setScalar(THREE.MathUtils.lerp(eyeRef.current.scale.x, targetScale, 0.1))
     })
 
@@ -60,47 +92,15 @@ const EyeModel = ({
 
     return (
         <group>
-            <mesh
+            <primitive 
+                object={scene}
                 ref={eyeRef}
                 onPointerOver={() => { setHovered(true); document.body.style.cursor = 'pointer' }}
                 onPointerOut={() => { setHovered(false); document.body.style.cursor = 'auto' }}
                 onClick={handleClick}
-            >
-                <sphereGeometry args={[0.75, 64, 64]} />
-                <meshStandardMaterial color="#e8e0d8" roughness={0.15} metalness={0.05} />
-                {/* Layer 1: Retina / Sclera — large Decal projection (no sphere UV stretching) */}
-                <Decal
-                    position={[0, 0, 0.75]}
-                    rotation={[0, 0, 0]}
-                    scale={1.7}
-                >
-                    <meshStandardMaterial
-                        map={scleraTexture}
-                        transparent={false}
-                        blending={THREE.MultiplyBlending}
-                        depthTest={true}
-                        depthWrite={false}
-                        polygonOffset={true}
-                        polygonOffsetFactor={-0.5}
-                        toneMapped={false}
-                    />
-                </Decal>
-                {/* Layer 2: Pupilla — sits on top, inside the retina hole */}
-                <Decal 
-                    position={[0, 0, 0.75]} 
-                    rotation={[0, 0, 0]} 
-                    scale={1.5}
-                >
-                    <meshStandardMaterial
-                        map={pupilTexture}
-                        transparent={true}
-                        depthTest={true}
-                        depthWrite={false}
-                        polygonOffset={true}
-                        polygonOffsetFactor={-1}
-                    />
-                </Decal>
-            </mesh>
+                scale={0.65} 
+                position={[0, 0, 0]}
+            />
             
             {/* Testo circolare SOLO nella Hero Section */}
             {showCircularText && (
@@ -165,8 +165,11 @@ export const EyeScene = ({ targetRoute = '/home', showCircularText = false, glob
     return (
         <div ref={containerRef} className={`w-full h-full absolute inset-0 z-10 ${className}`}>
             <Canvas camera={{ position: [0, 0, 4.6], fov: 45 }}>
-                <ambientLight intensity={1} />
-                <directionalLight position={[5, 10, 5]} intensity={2.5} />
+                <ambientLight intensity={0.1} />
+                <directionalLight position={[5, 10, 5]} intensity={0.1} />
+                
+                {/* Luce Verde Acida da Sud - Potenziata */}
+                <pointLight position={[0, -5, 2]} intensity={120} color="#768b1a" distance={20} decay={2} />
                 
                 <EyeModel 
                     targetRoute={targetRoute} 
