@@ -25,10 +25,19 @@ export interface ClusterData {
 export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   // Se non ci sono cluster o ce n'è solo 1, evitiamo errori nella destrutturazione in Home
   if (!clusters || clusters.length < 2) return null;
+  // LOGICA DI PRIORITÀ FORZATA (Leo's View)
+  // Cerchiamo Neon e Bianconero negli indici per evitare i cluster di test
+  const initialLeft = clusters.findIndex(c => c.slug?.toLowerCase().includes('neon') || c.title?.toLowerCase().includes('neon'))
+  const initialRight = clusters.findIndex(c => c.slug?.toLowerCase().includes('bn') || c.slug?.toLowerCase().includes('bianco') || c.title?.toLowerCase().includes('mix'))
+  
+  // Se non troviamo i preferiti, ripieghiamo sui primi due dell'array ordinato
+  const startLeft = initialLeft !== -1 ? initialLeft : 0
+  const startRight = initialRight !== -1 ? initialRight : (clusters.length > 1 ? 1 : 0)
+
   // Stato accorpato per la navigazione dei cluster
   const [navState, setNavState] = useState({
-    left: 0,
-    right: 1,
+    left: startLeft,
+    right: startRight,
     next: 'left' as 'left' | 'right',
     pool: 2
   })
@@ -75,7 +84,13 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       if (isMounted) {
         setCachedSubclusters(prev => ({ ...prev, [expandedClusterId]: data }))
         setIsLoadingExpanded(false)
-        setActiveDeckIndex(Math.floor(data.length / 2))
+        
+        // AUTO-EXPAND: se c'è solo un mazzo, vai diretto alla griglia
+        if (data.length === 1) {
+          setExpandedDeckIndex(0)
+        } else {
+          setActiveDeckIndex(Math.floor(data.length / 2))
+        }
       }
     }).catch(err => {
       console.error(err)
@@ -162,13 +177,16 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
     <div className="w-full h-screen relative z-10 overflow-hidden">
 
       {/* ── OCCHIO TOP CENTER (responsivo con vh) ── */}
-      <div className="absolute top-[4vh] left-1/2 -translate-x-1/2 w-[30vh] h-[30vh] z-30">
+      <div className="fixed top-[4vh] left-1/2 -translate-x-1/2 w-[30vh] h-[30vh] z-[500]">
         <EyeScene targetRoute="/home" showCircularText={false} globalTracking={true} />
-        {/* Intercettatore click sull'Occhio quando c'è l'overlay espanso */}
-        {expandedClusterId && (
+        {/* Intercettatore click sull'Occhio per resettare tutto lo stato */}
+        {(expandedClusterId || expandedDeckIndex !== null) && (
           <div 
-            className="absolute inset-0 z-50 cursor-pointer" 
-            onClick={() => setExpandedClusterId(null)} 
+            className="absolute inset-0 z-[501] cursor-pointer" 
+            onClick={() => {
+              setExpandedDeckIndex(null)
+              setExpandedClusterId(null)
+            }} 
           />
         )}
       </div>
@@ -441,7 +459,13 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       {/* ── EXPANDED GALLERY GRID OVERLAY ──────────────────── */}
       <ExpandedGalleryOverlay 
         isOpen={expandedDeckIndex !== null}
-        onClose={() => setExpandedDeckIndex(null)}
+        onClose={() => {
+          setExpandedDeckIndex(null)
+          // Se c'era un solo sottocluster, chiudi tutto e torna alla home principale
+          if (currentSubclusters.length === 1) {
+            setExpandedClusterId(null)
+          }
+        }}
         subclusterTitle={expandedDeckIndex !== null ? currentSubclusters[expandedDeckIndex].title : ''}
         artworks={expandedDeckIndex !== null ? currentSubclusters[expandedDeckIndex].artworks : []}
       />

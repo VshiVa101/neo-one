@@ -13,9 +13,10 @@ export interface MockArtwork {
 interface ClusterDeckProps {
   subclusterTitle: string
   artworks: MockArtwork[]
+  onExpand?: (artwork: MockArtwork) => void
 }
 
-export const ClusterDeck = ({ subclusterTitle, artworks }: ClusterDeckProps) => {
+export const ClusterDeck = ({ subclusterTitle, artworks, onExpand }: ClusterDeckProps) => {
   const router = useRouter()
   // Indice della carta correntemente selezionata (Main Card)
   const [activeIndex, setActiveIndex] = useState(0)
