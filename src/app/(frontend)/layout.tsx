@@ -16,6 +16,7 @@ import { getServerSideURL } from '@/utilities/getURL'
 // Transition Component & Context
 import { TransitionProvider } from '@/context/TransitionContext'
 import { TransitionOverlay } from '@/components/TransitionOverlay'
+import { CartProvider } from '@/contexts/CartContext'
 
 const mergedFontNeo = localFont({
   src: '../../../public/fonts/MergedFontNEO.otf', // adjust relative path from app/(frontend) to public/fonts/ if needed, or use full path. Actually next/font/local resolves relative to the file.
@@ -34,19 +35,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="font-neo bg-black text-white selection:bg-white selection:text-black">
         <Providers>
-          <TransitionProvider>
-            <AdminBar
-              adminBarProps={{
-                preview: isEnabled,
-              }}
-            />
-            
-            <TransitionOverlay />
-            
-            {/* Main Content Area */}
-            {children}
-            
-          </TransitionProvider>
+          <CartProvider>
+            <TransitionProvider>
+              <AdminBar
+                adminBarProps={{
+                  preview: isEnabled,
+                }}
+              />
+              
+              <TransitionOverlay />
+              
+              {/* Main Content Area */}
+              {children}
+              
+            </TransitionProvider>
+          </CartProvider>
         </Providers>
       </body>
     </html>

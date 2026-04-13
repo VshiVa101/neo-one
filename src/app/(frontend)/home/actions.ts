@@ -91,7 +91,6 @@ export async function fetchArtworkByNid(nid: string) {
 
   const art = docs[0]
 
-  // Metadati con Placeholder verosimili se mancanti (DNA Neo-One)
   return {
     id: art.id.toString(),
     nid: art.nid,
@@ -105,6 +104,31 @@ export async function fetchArtworkByNid(nid: string) {
     priceInfo: art.priceInfo || 'DISPONIBILITÀ SU RICHIESTA',
     audioSnippetUrl: art.audioSnippetUrl || null,
     fullAudioUrl: art.fullAudioUrl || null,
+    subclusterId: typeof art.subcluster === 'object' && art.subcluster !== null
+      ? (art.subcluster as any).id?.toString()
+      : art.subcluster?.toString() || null,
     gallery: (art.detailGallery || []).map((item: any) => getImageUrl(item.image, '/images/drops/placeholder.png'))
+  }
+}
+
+export async function fetchAdjacentArtworks(currentNid: string, subclusterId: string | null): Promise<{ prevNid: string | null; nextNid: string | null }> {
+  if (!subclusterId) return { prevNid: null, nextNid: null }
+
+  const payload = await getPayload({ config: configPromise })
+
+  const { docs } = await payload.find({
+    collection: 'artworks',
+    where: { subcluster: { equals: subclusterId } },
+    sort: 'nid',
+    depth: 0,
+    limit: 200,
+  })
+
+  const index = docs.findIndex(a => String(a.nid) === String(currentNid))
+  if (index === -1) return { prevNid: null, nextNid: null }
+
+  return {
+    prevNid: index > 0 ? String(docs[index - 1].nid) : null,
+    nextNid: index < docs.length - 1 ? String(docs[index + 1].nid) : null,
   }
 }
