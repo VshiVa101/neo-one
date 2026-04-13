@@ -71,15 +71,19 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   useEffect(() => {
     if (!expandedClusterId) return
     
-    // Se li abbiamo già scarcati per questo cluster in questa sessione, skippa
-    if (cachedSubclusters[expandedClusterId]) {
+    // Cache hit: dati già presenti
+    const cached = cachedSubclusters[expandedClusterId]
+    if (cached) {
+      // Anche con dati in cache, forziamo la Gallery View se il cluster ha un solo sottocluster
+      if (cached.length === 1) {
+        setExpandedDeckIndex(0)
+      }
       return
     }
 
     let isMounted = true
     setIsLoadingExpanded(true)
 
-    // Fetch tramite Server Action (Esegue solo payload.find sui dati di questo cluster)
     fetchClusterSubclusters(expandedClusterId).then((data) => {
       if (isMounted) {
         setCachedSubclusters(prev => ({ ...prev, [expandedClusterId]: data }))

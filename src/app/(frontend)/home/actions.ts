@@ -77,3 +77,34 @@ export async function fetchClusterSubclusters(clusterId: string): Promise<Subclu
 
   return subclusters
 }
+export async function fetchArtworkByNid(nid: string) {
+  const payload = await getPayload({ config: configPromise })
+
+  const { docs } = await payload.find({
+    collection: 'artworks',
+    where: { nid: { equals: nid } },
+    depth: 1,
+    limit: 1,
+  })
+
+  if (!docs || docs.length === 0) return null
+
+  const art = docs[0]
+
+  // Metadati con Placeholder verosimili se mancanti (DNA Neo-One)
+  return {
+    id: art.id.toString(),
+    nid: art.nid,
+    title: art.title || `OPERA ${art.nid}`,
+    image: getImageUrl(art.mainImage, '/images/drops/placeholder.png'),
+    method: art.executionMethod || 'TECNICA MISTA NEO-ONE',
+    support: art.support || 'SUPPORTO ORIGINALE',
+    dimensions: art.originalDimensions || 'DIMENSIONI VARIABILI',
+    year: art.creationDate || '2024',
+    availability: art.availability,
+    priceInfo: art.priceInfo || 'DISPONIBILITÀ SU RICHIESTA',
+    audioSnippetUrl: art.audioSnippetUrl || null,
+    fullAudioUrl: art.fullAudioUrl || null,
+    gallery: (art.detailGallery || []).map((item: any) => getImageUrl(item.image, '/images/drops/placeholder.png'))
+  }
+}
