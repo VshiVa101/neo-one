@@ -15,42 +15,42 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
 
   const { prevNid, nextNid } = await fetchAdjacentArtworks(params.nid, artwork.subclusterId ?? null)
 
+  // Estrarre il numero dal NID (es: NEO-040 -> 40 o 040, preferiamo lo scarto del NEO-)
+  const numericNidMatch = artwork.nid.match(/\d+/)
+  const numericNid = numericNidMatch ? parseInt(numericNidMatch[0], 10) : artwork.nid
+
   return (
-    <main className="relative w-full h-screen bg-[#0a0a0a] overflow-hidden flex items-center justify-center">
+    <main className="relative w-full h-screen overflow-hidden flex items-center justify-center">
 
-      {/* ── BACKGROUND ── */}
-      <img
-        src="/images/ui/web-bg.webp"
-        alt="Background"
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 brightness-50 pointer-events-none"
-      />
-
-      {/* ── OCCHIO (minimizzato, top center, z-500) ── */}
-      <div className="fixed top-[2vh] left-1/2 -translate-x-1/2 w-[12vh] h-[12vh] z-[500]">
-        <EyeScene targetRoute="/home" showCircularText={false} globalTracking={true} />
-      </div>
-
-      {/* ── NID (numero ID opera, verde, sotto l'occhio) ── */}
-      <div className="fixed top-[16vh] left-1/2 -translate-x-1/2 z-[500] pointer-events-none">
+      {/* ── BACKGROUND: Lasciamo trasparire quello globale della TransitionOverlay ── */}
+      
+      {/* ── AREA CENTRALE DELL'OPERA E TOP NAV ── */}
+      <div className="absolute inset-0 z-10 flex flex-col items-center pt-[4vh]">
+        {/* Occhio Minimizzato Top */}
+        <div className="relative w-[8vh] h-[8vh] z-[500] mb-2">
+          <EyeScene targetRoute="/home" showCircularText={false} globalTracking={true} />
+        </div>
+        
+        {/* Numero ID Verde (Stile testuale acid) */}
         <span
-          className="font-neo text-4xl tracking-widest font-bold leading-none"
-          style={{ color: '#768b1a', textShadow: '0 0 20px #768b1a' }}
+          className="font-neo text-3xl tracking-widest font-bold leading-none mb-[4vh]"
+          style={{ color: '#768b1a', textShadow: '0 0 10px rgba(118,139,26,0.6)' }}
         >
-          {artwork.nid}
+          {numericNid}
         </span>
+
+        {/* Opera Centrale: Nessun ritaglio, box massimizzato e soft glow */}
+        <div className="relative flex items-center justify-center w-[40vw] h-[65vh] bg-black rounded-lg p-2"
+             style={{ boxShadow: '0 0 40px rgba(0,0,0,0.8)' }}>
+          <img
+            src={artwork.image}
+            alt={`Opera ${artwork.nid}`}
+            className="w-full h-full object-contain"
+          />
+        </div>
       </div>
 
-      {/* ── OPERA CENTRALE (massima grandezza, nessun ritaglio) ── */}
-      <div className="relative z-10 flex items-center justify-center w-[56vw] h-[72vh]">
-        <img
-          src={artwork.image}
-          alt={`Opera ${artwork.nid}`}
-          className="max-w-full max-h-full object-contain"
-          style={{ filter: 'drop-shadow(0 0 40px rgba(0,0,0,0.8))' }}
-        />
-      </div>
-
-      {/* ── PANNELLI LATERALI + NAVIGAZIONE + BOTTOM BAR (Client) ── */}
+      {/* ── PANNELLI LATERALI + BOTTOM BAR (Client component gestisce Sidebars e Nav) ── */}
       <ArtworkDetailClient
         nid={String(artwork.nid)}
         title={artwork.title}
@@ -70,10 +70,10 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
         <AcidAudioPlayer url={artwork.audioSnippetUrl} title={`OPERA ${artwork.nid}`} />
       )}
 
-      {/* ── GLITCH WATERMARK ── */}
-      <div className="fixed bottom-24 left-4 z-20 pointer-events-none opacity-15">
-        <p className="font-neo text-[8px] tracking-[0.8em] uppercase text-white">
-          SYSTEM.ART_UNIT // 00{artwork.nid}
+      {/* ── GLITCH WATERMARK (opzionale) ── */}
+      <div className="fixed bottom-28 left-4 z-20 pointer-events-none opacity-20">
+        <p className="font-neo text-[7px] tracking-[0.8em] uppercase text-white">
+          SYSTEM.ART_UNIT // 00{numericNid}
         </p>
       </div>
     </main>

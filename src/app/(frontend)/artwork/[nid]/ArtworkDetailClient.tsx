@@ -51,71 +51,95 @@ export const ArtworkDetailClient = ({
 
   return (
     <>
-      {/* ── LEFT PANEL: Logo + Freccia Prev ── */}
-      <div className="fixed left-0 top-0 w-[22vw] h-full flex flex-col items-center justify-center gap-8 z-20 pointer-events-none">
-        {/* Logo Neo-One (ripetuto verticalmente per riempire) */}
-        <div className="flex flex-col items-center gap-6 opacity-60 select-none">
-          <img src="/images/ui/logo-neo-bianco.webp" alt="Neo-One" className="w-[14vw] object-contain" draggable={false} />
-          <img src="/images/ui/logo-neo-bianco-2.webp" alt="Neo-One" className="w-[14vw] object-contain" draggable={false} />
-          <img src="/images/ui/logo-neo-bianco.webp" alt="Neo-One" className="w-[14vw] object-contain opacity-40" draggable={false} />
+      {/* ── LEFT PANEL: Zebra + Logo + Prev ── */}
+      <div className="absolute left-0 top-0 w-[30vw] h-[100vh] z-20 flex flex-col items-center justify-center gap-12 pointer-events-none">
+        
+        {/* Zebra Background Strip */}
+        <div className="absolute inset-0 pointer-events-none -translate-x-[20%]">
+           <img src="/images/ui/pink-zebra-bg.webp" alt="bg" className="w-[120%] h-full object-cover" />
         </div>
 
-        {/* Freccia PREV */}
+        {/* Logo Neo-One (Masked Green) */}
+        <div className="relative z-10 w-[18vw] h-[6vw]">
+          <div 
+            className="w-full h-full bg-[#768b1a]" 
+            style={{ 
+              WebkitMaskImage: 'url(/images/ui/logo-neo-bianco.webp)', 
+              WebkitMaskSize: 'contain', 
+              WebkitMaskRepeat: 'no-repeat', 
+              WebkitMaskPosition: 'center' 
+            }} 
+          />
+        </div>
+
+        {/* Freccia PREV in cerchio rosa */}
         {prevNid && (
           <motion.button
-            className="pointer-events-auto cursor-pointer focus:outline-none"
-            style={{ transform: 'rotate(180deg)' }}
+            className="relative z-10 pointer-events-auto cursor-pointer focus:outline-none w-[6vw] h-[6vw] min-w-[60px] min-h-[60px] max-w-[80px] max-h-[80px] bg-[#d99f9f] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)]"
             onClick={() => router.push(`/artwork/${prevNid}`)}
             onMouseEnter={() => setPrevHovered(true)}
             onMouseLeave={() => setPrevHovered(false)}
-            whileHover={{ scale: 1.15 }}
+            whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
             whileTap={{ scale: 0.9 }}
           >
             <img
               src={prevHovered ? '/images/ui/direction-arrow-green.webp' : '/images/ui/direction-arrow-pink.webp'}
               alt="Opera precedente"
-              className="w-[5vw] object-contain transition-all duration-200"
+              className="w-[50%] object-contain rotate-180"
               draggable={false}
             />
           </motion.button>
         )}
       </div>
 
-      {/* ── RIGHT PANEL: Logo + Freccia Next ── */}
-      <div className="fixed right-0 top-0 w-[22vw] h-full flex flex-col items-center justify-center gap-8 z-20 pointer-events-none">
-        <div className="flex flex-col items-center gap-6 opacity-60 select-none">
-          <img src="/images/ui/logo-neo-bianco-2.webp" alt="Neo-One" className="w-[14vw] object-contain" draggable={false} />
-          <img src="/images/ui/logo-neo-bianco.webp" alt="Neo-One" className="w-[14vw] object-contain" draggable={false} />
-          <img src="/images/ui/logo-neo-bianco-2.webp" alt="Neo-One" className="w-[14vw] object-contain opacity-40" draggable={false} />
+      {/* ── RIGHT PANEL: Zebra + Logo + Next ── */}
+      <div className="absolute right-0 top-0 w-[30vw] h-[100vh] z-20 flex flex-col items-center justify-center gap-12 pointer-events-none">
+        
+        <div className="absolute inset-0 pointer-events-none translate-x-[20%]">
+           <img src="/images/ui/pink-zebra-bg.webp" alt="bg" className="w-[120%] h-full object-cover" />
+           <div className="absolute inset-0 bg-black/20" /> {/* Slight dark layer per profondità */}
+        </div>
+
+        {/* Logo Neo-One (Masked Green offset) */}
+        <div className="relative z-10 w-[18vw] h-[6vw]">
+          <div 
+            className="w-full h-full bg-[#768b1a]" 
+            style={{ 
+              WebkitMaskImage: 'url(/images/ui/logo-neo-bianco-2.webp)', 
+              WebkitMaskSize: 'contain', 
+              WebkitMaskRepeat: 'no-repeat', 
+              WebkitMaskPosition: 'center' 
+            }} 
+          />
         </div>
 
         {/* Freccia NEXT */}
         {nextNid && (
           <motion.button
-            className="pointer-events-auto cursor-pointer focus:outline-none"
+            className="relative z-10 pointer-events-auto cursor-pointer focus:outline-none w-[6vw] h-[6vw] min-w-[60px] min-h-[60px] max-w-[80px] max-h-[80px] bg-[#d99f9f] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)]"
             onClick={() => router.push(`/artwork/${nextNid}`)}
             onMouseEnter={() => setNextHovered(true)}
             onMouseLeave={() => setNextHovered(false)}
-            whileHover={{ scale: 1.15 }}
+            whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
             whileTap={{ scale: 0.9 }}
           >
             <img
               src={nextHovered ? '/images/ui/direction-arrow-green.webp' : '/images/ui/direction-arrow-pink.webp'}
               alt="Opera successiva"
-              className="w-[5vw] object-contain transition-all duration-200"
+              className="w-[50%] object-contain"
               draggable={false}
             />
           </motion.button>
         )}
       </div>
 
-      {/* ── BOTTOM BAR ── */}
-      <div className="fixed bottom-0 left-0 w-full z-30 bg-black/70 backdrop-blur-lg border-t border-white/10 px-[4vw] py-4 flex items-center justify-between gap-4">
-
-        {/* SINISTRA: Art Details */}
-        <div className="w-[30%] flex flex-col gap-1">
-          <span className="font-neo text-[#F45390] text-[10px] tracking-[0.4em] uppercase mb-1">art details</span>
-          <p className="font-neo text-white/80 text-[11px] tracking-widest uppercase leading-relaxed">
+      {/* ── BOTTOM BAR (Sopra zebre) ── */}
+      <div className="fixed bottom-0 left-0 w-full z-[100] bg-black/90 pointer-events-auto border-t border-white/5 py-4 px-12 flex flex-row items-center justify-between">
+        
+        {/* SINISTRA: Metadati */}
+        <div className="flex flex-col flex-1">
+          <span className="font-neo text-[#F45390] text-sm tracking-[0.2em] mb-1">art details</span>
+          <p className="font-neo text-white text-xs tracking-widest uppercase">
             {method} / {support}
           </p>
           <p className="font-neo text-white/50 text-[10px] tracking-widest uppercase">
@@ -123,87 +147,61 @@ export const ArtworkDetailClient = ({
           </p>
         </div>
 
-        {/* CENTRO: Bottone PRE-ORDER */}
-        <div className="flex flex-col items-center gap-2">
-          <motion.button
-            onClick={handlePurchase}
-            onMouseEnter={() => setPurchaseHovered(true)}
-            onMouseLeave={() => setPurchaseHovered(false)}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.93 }}
-            className="focus:outline-none cursor-pointer"
-          >
-            <AnimatePresence mode="wait">
-              <motion.img
-                key={addedToCart ? 'verde' : (purchaseHovered ? 'verde-hover' : 'rosa')}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.15 }}
-                src={purchaseHovered || addedToCart ? '/images/ui/pre-orderverde.webp' : '/images/ui/pre-orderrosa.webp'}
-                alt="Pre-Order / Purchase"
-                className="h-[60px] object-contain"
-                draggable={false}
-              />
-            </AnimatePresence>
-          </motion.button>
-          {addedToCart && (
-            <motion.p
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="font-neo text-[#768b1a] text-[9px] tracking-widest uppercase"
+        {/* CENTRO: PRE-ORDER BUTTON (Forma ellittica con icona) */}
+        <div className="flex-1 flex flex-col items-center justify-center">
+             <motion.button
+              onClick={handlePurchase}
+              onMouseEnter={() => setPurchaseHovered(true)}
+              onMouseLeave={() => setPurchaseHovered(false)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative outline-none"
             >
-              Aggiunto al carrello
-            </motion.p>
-          )}
+               <img 
+                 src={purchaseHovered || addedToCart ? '/images/ui/pre-orderverde.webp' : '/images/ui/pre-orderrosa.webp'}
+                 alt="Purchase"
+                 className="h-[60px] object-contain drop-shadow-[0_0_15px_rgba(244,83,144,0.3)] transition-all duration-300" 
+               />
+            </motion.button>
         </div>
 
-        {/* DESTRA: Status + Price + Icone */}
-        <div className="w-[30%] flex items-center justify-end gap-6">
-          <div className="flex flex-col gap-1 text-right">
-            <span className="font-neo text-[#768b1a] text-[10px] tracking-[0.3em] uppercase">status</span>
-            <p className="font-neo text-white text-[11px] tracking-widest uppercase">
-              {isAvailable ? 'ACQUISTABILE' : 'ARCHIVIO PRIVATO'}
-            </p>
-            <p className="font-neo text-white/60 text-[10px] tracking-widest uppercase">{priceInfo}</p>
-          </div>
-
-          {/* Icona Discard */}
-          <motion.button
-            whileHover={{ scale: 1.15 }}
-            whileTap={{ scale: 0.9 }}
-            className="cursor-pointer focus:outline-none"
-            title="Non disponibile"
-          >
-            <img src="/images/ui/esccc.webp" alt="Non disponibile" className="h-[48px] object-contain" draggable={false} />
-          </motion.button>
-
-          {/* Icona Carrello con Contatore */}
-          <motion.button
-            onMouseEnter={() => setCartHovered(true)}
-            onMouseLeave={() => setCartHovered(false)}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="cursor-pointer focus:outline-none relative"
-            title="Carrello"
-          >
-            <img
-              src={cartHovered ? '/images/ui/carrelloverde.webp' : '/images/ui/carrello.webp'}
-              alt="Carrello"
-              className="h-[48px] object-contain transition-all duration-200"
-              draggable={false}
-            />
-            {count > 0 && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-[#768b1a] text-black font-bold text-[10px] flex items-center justify-center shadow-[0_0_8px_#768b1a]"
-              >
-                {count}
-              </motion.span>
-            )}
-          </motion.button>
+        {/* DESTRA: Status & Controls */}
+        <div className="flex flex-1 flex-row items-center justify-end gap-8">
+           <div className="flex flex-col text-right">
+              <span className="font-neo text-[#F45390] text-sm tracking-[0.2em] mb-1">status</span>
+              <p className="font-neo text-white text-xs tracking-widest uppercase">
+                {isAvailable ? 'ACQUISTABILE' : 'ARCHIVIO PRIVATO'}
+              </p>
+              <p className="font-neo text-white/50 text-[10px] tracking-widest uppercase">
+                {priceInfo}
+              </p>
+           </div>
+           
+           {/* Carrello */}
+           <motion.button
+              onMouseEnter={() => setCartHovered(true)}
+              onMouseLeave={() => setCartHovered(false)}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="relative w-[50px] h-[50px] bg-[#d99f9f] rounded-full flex outline-none border border-[#d99f9f] hover:border-[#768b1a] overflow-hidden justify-center items-center cursor-pointer shadow-[0_0_10px_rgba(0,0,0,1)]"
+            >
+              <img src="/images/ui/carrello.webp" className="w-[60%] h-[60%] object-contain" />
+              {count > 0 && (
+                <span className="absolute inset-0 bg-transparent flex items-center justify-center font-neo text-xl text-[#768b1a] font-bold drop-shadow-[0_0_5px_black] group-hover:text-black z-20">
+                  {count}
+                </span>
+              )}
+           </motion.button>
+           
+           {/* Esc - Go Back (Ora dentro cerchio e rimosso hover verde se non supportato) */}
+           <motion.button
+              whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => router.back()}
+              className="w-[50px] h-[50px] bg-[#d99f9f] rounded-full flex items-center justify-center outline-none border border-[#d99f9f] shadow-[0_0_10px_rgba(0,0,0,1)] z-20"
+            >
+               <img src="/images/ui/esccc.webp" className="w-[60%] h-[60%] object-contain opacity-80" />
+           </motion.button>
         </div>
       </div>
     </>

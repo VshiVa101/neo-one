@@ -383,26 +383,32 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                </div>
             ) : (
               <>
-                {/* Frecce Direzionali */}
-                <div className="absolute top-1/2 left-4 -translate-y-1/2 z-[110]">
+                <div className="absolute top-1/2 left-8 -translate-y-1/2 z-[110]">
                   <motion.button
-                    whileHover={{ scale: 1.1 }}
+                    whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
                     whileTap={{ scale: 0.9 }}
                     onClick={(e) => { e.stopPropagation(); setActiveDeckIndex(prev => Math.max(0, prev - 1)) }}
-                    className={`w-[60px] h-[60px] rounded-full border border-gray-600 flex items-center justify-center transition-colors ${activeDeckIndex > 0 ? 'text-gray-400 hover:text-white bg-black/50 hover:bg-[#F45390]/20 cursor-pointer' : 'opacity-20 pointer-events-none'}`}
+                    className={`relative w-[6vw] h-[6vw] min-w-[60px] min-h-[60px] max-w-[80px] max-h-[80px] bg-[#d99f9f] rounded-full flex items-center justify-center transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.5)] ${activeDeckIndex > 0 ? 'cursor-pointer hover:shadow-[0_0_20px_rgba(118,139,26,0.8)] opacity-100' : 'opacity-30 pointer-events-none'}`}
                   >
-                    <span className="text-2xl">←</span>
+                    <div className="group w-full h-full rounded-full absolute inset-0 peer" />
+                    <img src="/images/ui/direction-arrow-pink.webp" className="w-[50%] h-[50%] object-contain rotate-180 drop-shadow-md z-10 transition-colors pointer-events-none [.group:hover_~_&]:content-['/images/ui/direction-arrow-green.webp']" style={{ content: 'var(--tw-content)' }} />
+                    <style>{`
+                      .peer:hover + img { content: url('/images/ui/direction-arrow-green.webp') !important; }
+                    `}</style>
+                    <img src="/images/ui/direction-arrow-pink.webp" className="absolute w-[50%] h-[50%] object-contain rotate-180 drop-shadow-md z-10 group-hover:opacity-0 transition-opacity" />
+                    <img src="/images/ui/direction-arrow-green.webp" className="absolute w-[50%] h-[50%] object-contain rotate-180 drop-shadow-md z-20 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </motion.button>
                 </div>
                 
-                <div className="absolute top-1/2 right-4 -translate-y-1/2 z-[110]">
+                <div className="absolute top-1/2 right-8 -translate-y-1/2 z-[110]">
                   <motion.button
-                    whileHover={{ scale: 1.1 }}
+                    whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
                     whileTap={{ scale: 0.9 }}
                     onClick={(e) => { e.stopPropagation(); setActiveDeckIndex(prev => Math.min(currentSubclusters.length - 1, prev + 1)) }}
-                    className={`w-[60px] h-[60px] rounded-full border border-gray-600 flex items-center justify-center transition-colors ${activeDeckIndex < currentSubclusters.length - 1 ? 'text-gray-400 hover:text-white bg-black/50 hover:bg-[#F45390]/20 cursor-pointer' : 'opacity-20 pointer-events-none'}`}
+                    className={`relative w-[6vw] h-[6vw] min-w-[60px] min-h-[60px] max-w-[80px] max-h-[80px] bg-[#d99f9f] rounded-full flex items-center justify-center transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.5)] ${activeDeckIndex < currentSubclusters.length - 1 ? 'cursor-pointer hover:shadow-[0_0_20px_rgba(118,139,26,0.8)] opacity-100 group' : 'opacity-30 pointer-events-none'}`}
                   >
-                    <span className="text-2xl">→</span>
+                    <img src="/images/ui/direction-arrow-pink.webp" className="w-[50%] h-[50%] object-contain drop-shadow-md z-10 group-hover:hidden" />
+                    <img src="/images/ui/direction-arrow-green.webp" className="w-[50%] h-[50%] object-contain drop-shadow-md z-20 hidden group-hover:block" />
                   </motion.button>
                 </div>
 
