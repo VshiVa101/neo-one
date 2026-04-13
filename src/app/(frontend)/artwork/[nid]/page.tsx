@@ -19,11 +19,17 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
   const numericNid = numericNidMatch ? parseInt(numericNidMatch[0], 10) : artwork.nid
 
   return (
-    <main className="relative w-full h-screen overflow-hidden flex flex-col justify-between pt-[2vh]">
+    <main className="relative w-full h-screen overflow-hidden flex flex-col justify-between pt-[2vh] bg-[#151515]">
+      {/* Background GIF - Desktop first */}
+      <img
+        src="/images/drops/bg-home.gif"
+        alt="Background"
+        className="absolute inset-0 w-screen h-screen object-cover z-0 opacity-40 brightness-75 scale-100 md:scale-105 pointer-events-none"
+      />
       
       {/* ── AREA TOP: Occhio e NID in alto, sfondo nero globale trasparisce ── */}
-      <div className="flex flex-col items-center flex-shrink-0 z-[500]">
-        <div className="relative w-[7vh] h-[7vh] mb-2">
+      <div className="flex flex-col items-center flex-shrink-0 z-[500] relative">
+        <div className="relative w-[14vh] h-[14vh] mb-2 drop-shadow-[0_0_20px_rgba(118,139,26,0.3)]">
           <EyeScene targetRoute="/home" showCircularText={false} globalTracking={true} />
         </div>
         <span
