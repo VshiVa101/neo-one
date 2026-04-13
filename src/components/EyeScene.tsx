@@ -17,8 +17,7 @@ interface EyeModelProps {
 
 // Carichiamo la versione ottimizzata con supporto Draco
 const DRACO_URL = 'https://www.gstatic.com/draco/versioned/decoders/1.5.7/'
-// Versionamento dinamico per forzare il refresh della memoria video ed evitare cache corrotta
-const GLB_URL = `/occhione-opt.glb?v=${Date.now()}`
+const GLB_URL = `/occhione-opt.glb`
 
 // PRELOAD AGGRESSIVO
 useGLTF.preload(GLB_URL, DRACO_URL)

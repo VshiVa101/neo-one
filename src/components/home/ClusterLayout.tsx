@@ -181,7 +181,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
     <div className="w-full h-screen relative z-10 overflow-hidden">
 
       {/* ── OCCHIO TOP CENTER (responsivo con vh) ── */}
-      <div className="fixed top-[4vh] left-1/2 -translate-x-1/2 w-[30vh] h-[30vh] z-[500]">
+      <div className="fixed top-[4vh] lg:top-[4vh] left-1/2 -translate-x-1/2 w-[20vh] h-[20vh] lg:w-[30vh] lg:h-[30vh] z-[500]">
         <EyeScene targetRoute="/home" showCircularText={false} globalTracking={true} />
         {/* Intercettatore click sull'Occhio per resettare tutto lo stato */}
         {(expandedClusterId || expandedDeckIndex !== null) && (
@@ -196,10 +196,10 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       </div>
 
       {/* ── MAIN STAGE: 2 cluster grandi + descrizioni (posizionato più in alto per dare respiro) ── */}
-      <div className="absolute top-[28vh] left-0 w-full h-[40vh] flex justify-center gap-[3vw] px-[5vw]">
+      <div className="absolute top-[28vh] lg:top-[28vh] left-0 w-full h-[55vh] lg:h-[40vh] flex flex-col lg:flex-row items-center lg:items-start justify-start lg:justify-center gap-6 lg:gap-[3vw] px-4 lg:px-[5vw]">
 
         {/* ── CLUSTER SINISTRO + descrizione ──── */}
-        <div className="flex items-start gap-[2vw]">
+        <div className="flex flex-row items-center lg:items-start gap-4 lg:gap-[2vw]">
           <AnimatePresence mode="wait">
             <motion.div
               key={leftCluster.id + '_main_left'}
@@ -209,7 +209,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               whileHover={{ scale: 1.05, rotate: -1, y: -5 }}
               transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
               onClick={() => setExpandedClusterId(leftCluster.id)}
-              className="w-[20vw] h-[20vw] flex-shrink-0 overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.7)] cursor-pointer"
+              className="w-[35vw] h-[35vw] lg:w-[20vw] lg:h-[20vw] max-w-[200px] max-h-[200px] lg:max-w-none lg:max-h-none flex-shrink-0 overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.7)] cursor-pointer"
             >
               <img
                 src={leftCluster.image}
@@ -227,16 +227,16 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 15 }}
               transition={{ duration: 0.4, delay: 0.3 }}
-              className="pt-[1vw] max-w-[14vw]"
+              className="pt-2 lg:pt-[1vw] max-w-[50vw] lg:max-w-[14vw]"
             >
               <h2
-                className="text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none"
+                className="text-xl md:text-3xl lg:text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none"
                 style={{ color: leftCluster.titleColor }}
               >
                 {leftCluster.title}
               </h2>
               <p
-                className="mt-2 font-neo text-[0.8vw] uppercase leading-relaxed tracking-wide"
+                className="mt-1 lg:mt-2 font-neo text-[10px] md:text-sm lg:text-[0.8vw] uppercase leading-relaxed tracking-wide truncate md:whitespace-normal"
                 style={{ color: leftCluster.descColor }}
               >
                 {leftCluster.desc}
@@ -246,7 +246,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         </div>
 
         {/* ── CLUSTER DESTRO + descrizione ──── */}
-        <div className="flex items-start gap-[2vw]">
+        <div className="flex flex-row items-center lg:items-start gap-4 lg:gap-[2vw]">
           <AnimatePresence mode="wait">
             <motion.div
               key={rightCluster.id + '_main_right'}
@@ -256,7 +256,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               whileHover={{ scale: 1.05, rotate: 1, y: -5 }}
               transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
               onClick={() => setExpandedClusterId(rightCluster.id)}
-              className="w-[20vw] h-[20vw] flex-shrink-0 overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.7)] cursor-pointer"
+              className="w-[35vw] h-[35vw] lg:w-[20vw] lg:h-[20vw] max-w-[200px] max-h-[200px] lg:max-w-none lg:max-h-none flex-shrink-0 overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.7)] cursor-pointer"
             >
               <img
                 src={rightCluster.image}
@@ -274,16 +274,16 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 15 }}
               transition={{ duration: 0.4, delay: 0.3 }}
-              className="pt-[1vw] max-w-[14vw]"
+              className="pt-2 lg:pt-[1vw] max-w-[50vw] lg:max-w-[14vw]"
             >
               <h2
-                className="text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none"
+                className="text-xl md:text-3xl lg:text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none"
                 style={{ color: rightCluster.titleColor }}
               >
                 {rightCluster.title}
               </h2>
               <p
-                className="mt-2 font-neo text-[0.8vw] uppercase leading-relaxed tracking-wide"
+                className="mt-1 lg:mt-2 font-neo text-[10px] md:text-sm lg:text-[0.8vw] uppercase leading-relaxed tracking-wide truncate md:whitespace-normal"
                 style={{ color: rightCluster.descColor }}
               >
                 {rightCluster.desc}
