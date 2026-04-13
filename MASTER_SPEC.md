@@ -9,8 +9,8 @@
 | # | Step | Stato | Note |
 |---|---|---|---|
 | 1-11 | Setup Infra + Home Base | ✅ DONE | Neon, Cloudinary, Hero, Carousel 3D completati. |
-| 12 | Home: Expanded Cluster | ✅ DONE | Logica di espansione e mazzi 3D funzionante. |
-| 13 | Artwork Detail `/artwork/[nid]` | 🔴 PROSSIMO | Fetch reale + Player Audio. |
+| 12 | Home: Expanded Cluster | ✅ DONE | Navigazione cluster, auto-expand sottocluster singolo, smart-exit, eye z-500, filtro cluster test. |
+| 13 | Artwork Detail `/artwork/[nid]` | 🔴 PROSSIMO | Fetch reale + layout + Player Audio. |
 | 14 | Calendar Overview `/calendar` | ⬜ | Lista segnali ordinata. |
 | 15 | Event Detail `/calendar/[slug]` | ⬜ | Layout 2-slot Punk. |
 | 16 | Cart/Form Overlay Globale | ⬜ | Context e UI di acquisto/info. |
@@ -75,4 +75,4 @@ Tutte le immagini devono essere preventivamente convertite in WebP (Qualità 85)
 - **Stack:** Next.js 15, Payload v3, Neon Postgres, Cloudinary.
 
 ---
-*Ultimo aggiornamento: 10 Aprile 2026 - Pulizia Trash Completata*
+*Ultimo aggiornamento: 13 Aprile 2026 - Step 12 completato con fix navigazione cluster singolo. Step 13 in preparazione.*
