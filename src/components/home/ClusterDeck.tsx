@@ -141,8 +141,11 @@ export const ClusterDeck = ({ subclusterTitle, artworks }: ClusterDeckProps) => 
                 className={`absolute w-full h-full border-2 border-[#1A1A1A] shadow-[0_15px_30px_rgba(0,0,0,0.8)] overflow-hidden bg-[#111] pointer-events-auto ${isActive ? 'cursor-pointer hover:border-[#F45390]' : ''}`}
                 onClick={() => {
                   if (isActive) {
-                    // Solo la Main Card è cliccabile per andare al dettaglio
-                    router.push(`/artwork/${artwork.id}`)
+                    if (onExpand) {
+                      onExpand(artwork)
+                    } else {
+                      router.push(`/artwork/${artwork.id}`)
+                    }
                   } else {
                     // Cliccando una carta visibile non principale, si potrebbe scorrere fino ad essa
                     // (Ma disabilitato per focus al finto scorrimento scroll wheel)

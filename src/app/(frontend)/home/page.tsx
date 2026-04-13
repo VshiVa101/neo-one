@@ -1,4 +1,4 @@
-import { ClusterLayout, ClusterData, SubclusterData } from '@/components/home/ClusterLayout'
+import { ClusterLayout, ClusterData } from '@/components/home/ClusterLayout'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 
@@ -7,7 +7,6 @@ const getImageUrl = (media: any, defaultUrl: string) => {
   let imageUrl = defaultUrl
   if (media && typeof media === 'object') {
     if (media.thumbnailURL && typeof media.thumbnailURL === 'string') {
-      // Forza il bypass del crop per mostrare qualità cruda di cloudinary (per preview/homepage)
       imageUrl = media.thumbnailURL.replace(/\/upload\/[^\/]+\//, '/upload/f_auto,q_auto/')
     } else if (media.url) {
       imageUrl = media.url
@@ -28,66 +27,23 @@ const getImageUrl = (media: any, defaultUrl: string) => {
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
   
-  // 1. Fetch Clusters
+  // Fetch VELOCE E LEGGERO: Solo i Cluster centrali (6-7 elementi)
   const { docs: clusters } = await payload.find({
     collection: 'clusters',
     sort: 'sortOrder',
     limit: 100, 
   })
 
-  // 2. Fetch Categories (Sottocluster / Mazzi)
-  const { docs: allCategories } = await payload.find({
-    collection: 'categories',
-    limit: 100,
-    depth: 0 // Recupera solo ID del cluster padre
-  })
-
-  // 3. Fetch Artworks 
-  const { docs: allArtworks } = await payload.find({
-    collection: 'artworks',
-    limit: 500, // Recuperiamo tutto l'arsenale per la navigazione fluida
-    depth: 1    // depth 1 per recuperare i path del file Media in mainImage
-  })
-
-  // Assembling
+  // Assembling ultraleggero
   const mappedClusters: ClusterData[] = clusters.map((doc) => {
-    
-    // Trova i mazzi (sottocluster) appartenenti a questo Cluster
-    const clusterCategories = allCategories.filter(cat => cat.cluster === doc.id)
-
-    const subclusters: SubclusterData[] = clusterCategories.map(cat => {
-      // Trova le opere collegate a questo mazzo
-      const catArtworks = allArtworks.filter(art => {
-        // depth: 1 rende art.subcluster un oggetto se esiste, o ID se stringa
-        const artSubclusterId = typeof art.subcluster === 'object' && art.subcluster !== null 
-                                ? art.subcluster.id 
-                                : art.subcluster
-        return artSubclusterId === cat.id
-      })
-
-      const mappedArtworks = catArtworks.map(art => {
-        return {
-          id: art.nid || art.id.toString(), // L'NID viene usato per la navigazione router (es. 'NEO-001')
-          title: art.title || 'Senza Titolo',
-          image: getImageUrl(art.mainImage, '/images/drops/placeholder.png')
-        }
-      })
-
-      return {
-        id: cat.id.toString(),
-        title: cat.title,
-        artworks: mappedArtworks
-      }
-    })
-
     return {
-      id: doc.slug || doc.id.toString(),
+      id: doc.id.toString(), // Usiamo l'ID REALE del database per il fetch dei sottocluster
       title: doc.title,
+      slug: doc.slug, // Salviamo lo slug se serve per altro
       desc: doc.manifesto,
       image: getImageUrl(doc.coverImage, '/images/drops/BN-cluster.png'),
       titleColor: doc.primaryColor || '#768b1a',
       descColor: doc.secondaryColor || '#fc5896',
-      subclusters: subclusters
     }
   })
 

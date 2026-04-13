@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect, Suspense } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Html, useTexture, Decal, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
@@ -12,21 +12,39 @@ interface EyeModelProps {
     showCircularText?: boolean
     globalTracking?: boolean
     externalMouse?: React.RefObject<{ x: number, y: number }>
+    onReady?: () => void
 }
+
+// Carichiamo la versione ottimizzata con supporto Draco
+const DRACO_URL = 'https://www.gstatic.com/draco/versioned/decoders/1.5.7/'
+// Versionamento dinamico per forzare il refresh della memoria video ed evitare cache corrotta
+const GLB_URL = `/occhione-opt.glb?v=${Date.now()}`
+
+// PRELOAD AGGRESSIVO
+useGLTF.preload(GLB_URL, DRACO_URL)
 
 const EyeModel = ({ 
     targetRoute = '/home', 
     showCircularText = false, 
     globalTracking = false,
-    externalMouse 
+    externalMouse,
+    onReady
 }: EyeModelProps) => {
     const eyeRef = useRef<THREE.Group>(null)
     const [hovered, setHovered] = useState(false)
     const { triggerTransition } = useTransition()
     const router = useRouter()
 
-    // Carichiamo la versione ottimizzata con supporto Draco
-    const { scene } = useGLTF('/occhione-opt.glb', 'https://www.gstatic.com/draco/versioned/decoders/1.5.7/')
+    const { scene } = useGLTF(GLB_URL, DRACO_URL)
+
+    // Segnaliamo che l'occhio è pronto appena il componente viene montato con la scena
+    useEffect(() => {
+        if (scene && onReady) {
+            // Piccolo timeout per assicurarci che il renderer abbia allocato il contesto
+            const timer = setTimeout(onReady, 100)
+            return () => clearTimeout(timer)
+        }
+    }, [scene, onReady])
 
     useFrame((state) => {
         if (!eyeRef.current) return
@@ -139,9 +157,16 @@ interface EyeSceneProps {
     showCircularText?: boolean
     globalTracking?: boolean
     className?: string
+    onReady?: () => void
 }
 
-export const EyeScene = ({ targetRoute = '/home', showCircularText = false, globalTracking = false, className = "" }: EyeSceneProps) => {
+export const EyeScene = ({ 
+    targetRoute = '/home', 
+    showCircularText = false, 
+    globalTracking = false, 
+    className = "",
+    onReady 
+}: EyeSceneProps) => {
     const containerRef = useRef<HTMLDivElement>(null)
     const globalMouse = useRef({ x: 0, y: 0 })
 
@@ -171,12 +196,15 @@ export const EyeScene = ({ targetRoute = '/home', showCircularText = false, glob
                 {/* Luce Verde Acida da Sud - Potenziata */}
                 <pointLight position={[0, -5, 2]} intensity={120} color="#768b1a" distance={20} decay={2} />
                 
-                <EyeModel 
-                    targetRoute={targetRoute} 
-                    showCircularText={showCircularText} 
-                    globalTracking={globalTracking} 
-                    externalMouse={globalMouse} 
-                />
+                <Suspense fallback={null}>
+                    <EyeModel 
+                        targetRoute={targetRoute} 
+                        showCircularText={showCircularText} 
+                        globalTracking={globalTracking} 
+                        externalMouse={globalMouse} 
+                        onReady={onReady}
+                    />
+                </Suspense>
             </Canvas>
         </div>
     )

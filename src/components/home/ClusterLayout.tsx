@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { EyeScene } from '@/components/EyeScene'
 import { ClusterDeck, MockArtwork } from '@/components/home/ClusterDeck'
+import { fetchClusterSubclusters } from '@/app/(frontend)/home/actions'
+import { ExpandedGalleryOverlay } from '@/components/home/ExpandedGalleryOverlay'
 
 export interface SubclusterData {
   id: string
@@ -18,7 +20,6 @@ export interface ClusterData {
   image: string
   titleColor: string
   descColor: string
-  subclusters: SubclusterData[]
 }
 
 export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
@@ -38,20 +39,53 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   // Stato del Mock Cluster espanso (null = chiuso, 'id_del_cluster' = aperto)
   const [expandedClusterId, setExpandedClusterId] = useState<string | null>(null)
 
-  // Cluster correntemente aperto ed i suoi mazzi (sottocluster)
-  const expandedCluster = clusters.find(c => c.id === expandedClusterId)
-  const currentSubclusters = expandedCluster?.subclusters || []
+  // Cache dei sottocluster caricati in lazy load
+  const [cachedSubclusters, setCachedSubclusters] = useState<Record<string, SubclusterData[]>>({})
+  const [isLoadingExpanded, setIsLoadingExpanded] = useState(false)
 
   // Indice del mazzo (Subcluster) attivo visibile in primo piano
   const [activeDeckIndex, setActiveDeckIndex] = useState(0)
 
-  // Seleziona automaticamente il mazzo centrale quando si apre l'espansione
-  // Se non si apre un mock list, il centro è la lunghezza // 2
+  // STATO PER LA GALLERIA ESPANSA
+  const [expandedDeckIndex, setExpandedDeckIndex] = useState<number | null>(null)
+
+  // Disabilita lo scroll del body quando la galleria è aperta
   useEffect(() => {
-    if (expandedClusterId) {
-      setActiveDeckIndex(Math.floor(currentSubclusters.length / 2))
+    if (expandedDeckIndex !== null) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
     }
-  }, [expandedClusterId, currentSubclusters.length])
+  }, [expandedDeckIndex])
+
+  // Observer per fetching on-demand
+  useEffect(() => {
+    if (!expandedClusterId) return
+    
+    // Se li abbiamo già scarcati per questo cluster in questa sessione, skippa
+    if (cachedSubclusters[expandedClusterId]) {
+      return
+    }
+
+    let isMounted = true
+    setIsLoadingExpanded(true)
+
+    // Fetch tramite Server Action (Esegue solo payload.find sui dati di questo cluster)
+    fetchClusterSubclusters(expandedClusterId).then((data) => {
+      if (isMounted) {
+        setCachedSubclusters(prev => ({ ...prev, [expandedClusterId]: data }))
+        setIsLoadingExpanded(false)
+        setActiveDeckIndex(Math.floor(data.length / 2))
+      }
+    }).catch(err => {
+      console.error(err)
+      if (isMounted) setIsLoadingExpanded(false)
+    })
+
+    return () => { isMounted = false }
+  }, [expandedClusterId, cachedSubclusters])
+
+  const currentSubclusters = expandedClusterId ? (cachedSubclusters[expandedClusterId] || []) : []
   
   // Ref per il trascinamento del footer
   const footerRef = React.useRef<HTMLDivElement>(null)
@@ -124,15 +158,12 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   const leftCluster = clusters[navState.left]
   const rightCluster = clusters[navState.right]
 
-  // Tutti i cluster che vanno nel footer (tutti meno i due attivi)
-  const footerClusters = clusters.filter((_, i) => i !== navState.left && i !== navState.right)
-
   return (
     <div className="w-full h-screen relative z-10 overflow-hidden">
 
       {/* ── OCCHIO TOP CENTER (responsivo con vh) ── */}
       <div className="absolute top-[4vh] left-1/2 -translate-x-1/2 w-[30vh] h-[30vh] z-30">
-        <EyeScene targetRoute="/calendar" showCircularText={false} globalTracking={true} />
+        <EyeScene targetRoute="/home" showCircularText={false} globalTracking={true} />
         {/* Intercettatore click sull'Occhio quando c'è l'overlay espanso */}
         {expandedClusterId && (
           <div 
@@ -319,80 +350,101 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
             >
               ✕
             </motion.button>
-            
-            {/* Frecce Direzionali */}
-            <div className="absolute top-1/2 left-4 -translate-y-1/2 z-[110]">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={(e) => { e.stopPropagation(); setActiveDeckIndex(prev => Math.max(0, prev - 1)) }}
-                className={`w-[60px] h-[60px] rounded-full border border-gray-600 flex items-center justify-center transition-colors ${activeDeckIndex > 0 ? 'text-gray-400 hover:text-white bg-black/50 hover:bg-[#F45390]/20 cursor-pointer' : 'opacity-20 pointer-events-none'}`}
-              >
-                <span className="text-2xl">←</span>
-              </motion.button>
-            </div>
-            
-            <div className="absolute top-1/2 right-4 -translate-y-1/2 z-[110]">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={(e) => { e.stopPropagation(); setActiveDeckIndex(prev => Math.min(currentSubclusters.length - 1, prev + 1)) }}
-                className={`w-[60px] h-[60px] rounded-full border border-gray-600 flex items-center justify-center transition-colors ${activeDeckIndex < currentSubclusters.length - 1 ? 'text-gray-400 hover:text-white bg-black/50 hover:bg-[#F45390]/20 cursor-pointer' : 'opacity-20 pointer-events-none'}`}
-              >
-                <span className="text-2xl">→</span>
-              </motion.button>
-            </div>
 
-            {/* Striscia Orizzontale dei Mazzi di Subcluster in Stile Coverflow */}
-            <div 
-               className="relative w-full h-[70vh] flex items-center justify-center"
-            >
-               {currentSubclusters.length === 0 ? (
-                 <div className="text-white font-neo tracking-widest opacity-50 uppercase">Mazzi Vuoti</div>
-               ) : currentSubclusters.map((sub, idx) => {
-                 const offset = idx - activeDeckIndex;
-                 
-                 // Calcola rotazione, opacità e scaling in base alla distanza dal centro
-                 const absOffset = Math.abs(offset);
-                 const isActive = offset === 0;
-                 
-                 // Seleziona la traslazione orizzontale in VW
-                 const xTranslation = offset * 20; // Ogni mazzo è scostato di 20vw
-                 
-                 // Effetto prospettico
-                 const scale = isActive ? 1 : Math.max(0.7, 1 - absOffset * 0.15);
-                 const opacity = isActive ? 1 : Math.max(0, 1 - absOffset * 0.4);
-                 // Sfuma gradualmente le carte non centrali
-                 const rotateY = offset > 0 ? -15 : offset < 0 ? 15 : 0;
-                 // Mantiene i cloni laterali bassi e il clone centrale alto
-                 const zIndex = 60 - absOffset * 10;
+            {isLoadingExpanded ? (
+               // SPINNER NEO-1
+               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-[120]">
+                  <h1 className="font-neo text-[#F45390] text-2xl tracking-widest uppercase opacity-80 animate-pulse">
+                     Sincronizzazione Archivi...
+                  </h1>
+                  <div className="w-[10vw] h-[2px] mt-4 bg-gradient-to-r from-transparent via-[#768b1a] to-transparent animate-pulse" />
+               </div>
+            ) : (
+              <>
+                {/* Frecce Direzionali */}
+                <div className="absolute top-1/2 left-4 -translate-y-1/2 z-[110]">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={(e) => { e.stopPropagation(); setActiveDeckIndex(prev => Math.max(0, prev - 1)) }}
+                    className={`w-[60px] h-[60px] rounded-full border border-gray-600 flex items-center justify-center transition-colors ${activeDeckIndex > 0 ? 'text-gray-400 hover:text-white bg-black/50 hover:bg-[#F45390]/20 cursor-pointer' : 'opacity-20 pointer-events-none'}`}
+                  >
+                    <span className="text-2xl">←</span>
+                  </motion.button>
+                </div>
+                
+                <div className="absolute top-1/2 right-4 -translate-y-1/2 z-[110]">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={(e) => { e.stopPropagation(); setActiveDeckIndex(prev => Math.min(currentSubclusters.length - 1, prev + 1)) }}
+                    className={`w-[60px] h-[60px] rounded-full border border-gray-600 flex items-center justify-center transition-colors ${activeDeckIndex < currentSubclusters.length - 1 ? 'text-gray-400 hover:text-white bg-black/50 hover:bg-[#F45390]/20 cursor-pointer' : 'opacity-20 pointer-events-none'}`}
+                  >
+                    <span className="text-2xl">→</span>
+                  </motion.button>
+                </div>
 
-                 return (
-                    <motion.div 
-                      key={'deck-wrapper-' + idx} 
-                      animate={{
-                         x: `${xTranslation}vw`,
-                         scale: scale,
-                         opacity: opacity,
-                         rotateY: rotateY,
-                         zIndex: zIndex
-                      }}
-                      transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
-                      style={{ perspective: 1000 }}
-                      className={`absolute ${isActive ? 'pointer-events-auto' : 'pointer-events-none'}`}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <ClusterDeck 
-                          subclusterTitle={sub.title}
-                          artworks={sub.artworks}
-                      />
-                    </motion.div>
-                 )
-               })}
-            </div>
+                {/* Striscia Orizzontale dei Mazzi di Subcluster in Stile Coverflow */}
+                <div 
+                   className="relative w-full h-[70vh] flex items-center justify-center"
+                >
+                   {currentSubclusters.length === 0 ? (
+                     <div className="text-white font-neo tracking-widest opacity-50 uppercase">Nessuna Opera Trovata</div>
+                   ) : currentSubclusters.map((sub, idx) => {
+                     const offset = idx - activeDeckIndex;
+                     
+                     // Calcola rotazione, opacità e scaling in base alla distanza dal centro
+                     const absOffset = Math.abs(offset);
+                     const isActive = offset === 0;
+                     
+                     // Seleziona la traslazione orizzontale in VW
+                     const xTranslation = offset * 20; // Ogni mazzo è scostato di 20vw
+                     
+                     // Effetto prospettico
+                     const scale = isActive ? 1 : Math.max(0.7, 1 - absOffset * 0.15);
+                     const opacity = isActive ? 1 : Math.max(0, 1 - absOffset * 0.4);
+                     // Sfuma gradualmente le carte non centrali
+                     const rotateY = offset > 0 ? -15 : offset < 0 ? 15 : 0;
+                     // Mantiene i cloni laterali bassi e il clone centrale alto
+                     const zIndex = 60 - absOffset * 10;
+
+                     return (
+                        <motion.div 
+                          key={'deck-wrapper-' + idx} 
+                          animate={{
+                             x: `${xTranslation}vw`,
+                             scale: scale,
+                             opacity: opacity,
+                             rotateY: rotateY,
+                             zIndex: zIndex
+                          }}
+                          transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
+                          style={{ perspective: 1000 }}
+                          className={`absolute ${isActive ? 'pointer-events-auto' : 'pointer-events-none'}`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ClusterDeck 
+                              subclusterTitle={sub.title}
+                              artworks={sub.artworks}
+                              onExpand={() => setExpandedDeckIndex(idx)}
+                          />
+                        </motion.div>
+                     )
+                   })}
+                </div>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ── EXPANDED GALLERY GRID OVERLAY ──────────────────── */}
+      <ExpandedGalleryOverlay 
+        isOpen={expandedDeckIndex !== null}
+        onClose={() => setExpandedDeckIndex(null)}
+        subclusterTitle={expandedDeckIndex !== null ? currentSubclusters[expandedDeckIndex].title : ''}
+        artworks={expandedDeckIndex !== null ? currentSubclusters[expandedDeckIndex].artworks : []}
+      />
 
     </div>
   )
