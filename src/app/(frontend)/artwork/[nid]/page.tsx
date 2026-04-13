@@ -7,7 +7,8 @@ import { ArtworkDetailClient } from './ArtworkDetailClient'
 
 export const dynamic = 'force-dynamic'
 
-export default async function ArtworkDetailPage({ params }: { params: { nid: string } }) {
+export default async function ArtworkDetailPage(props: { params: Promise<{ nid: string }> }) {
+  const params = await props.params
   const artwork = await fetchArtworkByNid(params.nid)
 
   if (!artwork) return notFound()
