@@ -35,6 +35,25 @@ const EyeModel = ({
     const router = useRouter()
 
     const { scene } = useGLTF(GLB_URL, DRACO_URL)
+    const { viewport } = useThree()
+    
+    // Audio Refs per la gestione dei suoni
+    const dashAudio = useRef<HTMLAudioElement | null>(null)
+    const returnAudio = useRef<HTMLAudioElement | null>(null)
+
+    useEffect(() => {
+        dashAudio.current = new Audio('/media/return.mp3')
+        returnAudio.current = new Audio('/media/return.mp3')
+        dashAudio.current.volume = 0.8 // Leggermente più alto per l'ingresso
+        returnAudio.current.volume = 0.5
+    }, [])
+
+    // Calcoliamo una scala base basata sull'area minima visibile (vmin)
+    // Usiamo 0.10 come base e un moltiplicatore di 3.8x per l'hover.
+    // Questo spinge l'occhio al massimo senza superare la scritta.
+    const baseScale = Math.min(viewport.width, viewport.height) * 0.10
+    const currentTarget = hovered ? baseScale * 3.8 : baseScale
+
 
     // Segnaliamo che l'occhio è pronto appena il componente viene montato con la scena
     useEffect(() => {
@@ -97,8 +116,8 @@ const EyeModel = ({
         eyeRef.current.rotation.y = THREE.MathUtils.lerp(eyeRef.current.rotation.y, targetX + vibrationX, 0.1)
         eyeRef.current.rotation.x = THREE.MathUtils.lerp(eyeRef.current.rotation.x, -targetY + vibrationY - flipX, 0.1)
         
-        const targetScale = hovered ? 0.80 : 0.65
-        eyeRef.current.scale.setScalar(THREE.MathUtils.lerp(eyeRef.current.scale.x, targetScale, 0.1))
+        const currentTarget = hovered ? baseScale * 4.2 : baseScale
+        eyeRef.current.scale.setScalar(THREE.MathUtils.lerp(eyeRef.current.scale.x, currentTarget, 0.15))
     })
 
     const handleClick = () => {
@@ -115,34 +134,50 @@ const EyeModel = ({
             <primitive 
                 object={scene}
                 ref={eyeRef}
-                onPointerOver={() => { setHovered(true); document.body.style.cursor = 'pointer' }}
-                onPointerOut={() => { setHovered(false); document.body.style.cursor = 'auto' }}
+                onPointerOver={() => { 
+                    setHovered(true)
+                    document.body.style.cursor = 'pointer'
+                    if (dashAudio.current) {
+                        returnAudio.current?.pause()
+                        dashAudio.current.currentTime = 0
+                        dashAudio.current.play().catch(() => {}) 
+                    }
+                }}
+                onPointerOut={() => { 
+                    setHovered(false)
+                    document.body.style.cursor = 'auto'
+                    if (returnAudio.current) {
+                        dashAudio.current?.pause()
+                        returnAudio.current.currentTime = 0
+                        returnAudio.current.play().catch(() => {}) 
+                    }
+                }}
                 onClick={handleClick}
-                scale={0.65} 
+                scale={baseScale} 
                 position={[0, 0, 0]}
             />
             
             {/* Testo circolare SOLO nella Hero Section */}
             {showCircularText && (
                 <Html center zIndexRange={[10, 0]} className="pointer-events-none">
-                    <div className="w-[300px] h-[300px] md:w-[450px] md:h-[450px] animate-[spin_15s_linear_infinite] flex items-center justify-center">
+                    <div className="w-[90vmin] h-[90vmin] md:w-[80vmin] md:h-[80vmin] max-w-[550px] max-h-[550px] animate-[spin_20s_linear_infinite] flex items-center justify-center">
                         
                         {/* Testo Desktop */}
                         <svg viewBox="0 0 200 200" className="w-full h-full hidden md:block">
-                            <path id="desktopCurve" d="M 100, 100 m -85, 0 a 85,85 0 1,1 170,0 a 85,85 0 1,1 -170,0" fill="transparent" />
-                            <text className="font-neo text-[#768b1a] fill-current uppercase tracking-wider" style={{ fontSize: '11px', letterSpacing: '2px' }}>
-                                <textPath href="#desktopCurve" startOffset="0" textLength="500">
-                                    QUI dio non vede e tua madre NON c&apos;è     entra ma sono cazzi tuoi    
+                            <path id="desktopCurve" d="M 100, 100 m -94, 0 a 94,94 0 1,1 188,0 a 94,94 0 1,1 -188,0" fill="transparent" />
+                            <text className="font-neo text-[#768b1a] fill-current uppercase tracking-widest" style={{ fontSize: '9px', letterSpacing: '3.5px' }}>
+                                <textPath href="#desktopCurve" startOffset="0">
+                                    nessuna paura...nessuna censura.... nessuna paura...nessuna censura.... nessuna paura...nessuna censura....
                                 </textPath>
                             </text>
                         </svg>
 
                         {/* Testo Mobile */}
                         <svg viewBox="0 0 200 200" className="w-full h-full block md:hidden">
-                            <path id="mobileCurve" d="M 100, 100 m -70, 0 a 70,70 0 1,1 140,0 a 70,70 0 1,1 -140,0" fill="transparent" />
-                            <text className="font-neo text-[#768b1a] fill-current uppercase tracking-widest text-center" style={{ fontSize: '16px' }}>
-                                <textPath href="#mobileCurve" startOffset="50%" textAnchor="middle">
-                                    Tua mamma non vuole OCCHIO!
+                            <path id="mobileCurve" d="M 100, 100 m -94, 0 a 94,94 0 1,1 188,0 a 94,94 0 1,1 -188,0" fill="transparent" />
+                            <text className="font-neo text-[#768b1a] fill-current uppercase tracking-[0.2em] text-center" style={{ fontSize: '10px' }}>
+                                <textPath href="#mobileCurve" startOffset="0">
+                                    nessuna paura...nessuna censura.... nessuna paura...nessuna censura.... nessuna paura...nessuna censura....
                                 </textPath>
                             </text>
                         </svg>
