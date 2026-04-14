@@ -330,6 +330,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                 }}
                 whileHover={{ scale: 1.05, rotate: 2, y: -5 }}
                 transition={{ duration: 0.4 }}
+                onClick={() => replaceCluster(i)}
                 className="w-[14vw] h-[14vw] md:w-[12vw] md:h-[12vw] flex-shrink-0 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-[#111] cursor-pointer border border-gray-700/30"
               >
                 <img
@@ -378,12 +379,12 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
              {/* Il tasto Chiudi (X) è rimosso. Si chiude tramite la gesture sull'Occhio centrale */}
 
             {isLoadingExpanded ? (
-               // SPINNER NEO-1
-               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-[120]">
-                  <h1 className="font-neo text-[#F45390] text-2xl tracking-widest uppercase opacity-80 animate-pulse">
+               // SPINNER NEO-1 - Forzato al centro assoluto dello schermo
+               <div className="fixed inset-0 flex flex-col items-center justify-center pointer-events-none z-[120] pb-[10vh]">
+                  <h2 className="font-neo text-[#F45390] text-3xl md:text-4xl tracking-[0.3em] uppercase opacity-90 animate-pulse text-center px-4">
                      Sincronizzazione Archivi...
-                  </h1>
-                  <div className="w-[10vw] h-[2px] mt-4 bg-gradient-to-r from-transparent via-[#768b1a] to-transparent animate-pulse" />
+                  </h2>
+                  <div className="w-[40vw] max-w-[400px] h-[1px] mt-6 bg-gradient-to-r from-transparent via-[#768b1a] to-transparent animate-pulse" />
                </div>
             ) : (
               <>

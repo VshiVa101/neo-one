@@ -168,13 +168,13 @@ const EyeModel = ({
             
             {/* Testo circolare SOLO nella Hero Section */}
             {showCircularText && (
-                <Html center zIndexRange={[10, 0]} className="pointer-events-none">
-                    <div className="w-[90vmin] h-[90vmin] md:w-[80vmin] md:h-[80vmin] max-w-[550px] max-h-[550px] animate-[spin_20s_linear_infinite] flex items-center justify-center">
+                <Html center zIndexRange={[10, 0]} className="pointer-events-none neo-skip-branding" data-neo-skip="true">
+                    <div className="w-[90vmin] h-[90vmin] md:w-[80vmin] md:h-[80vmin] max-w-[550px] max-h-[550px] animate-[spin_20s_linear_infinite] flex items-center justify-center neo-skip-branding" data-neo-skip="true">
                         
                         {/* Testo Desktop */}
                         <svg viewBox="0 0 200 200" className="w-full h-full hidden md:block">
                             <path id="desktopCurve" d="M 100, 100 m -94, 0 a 94,94 0 1,1 188,0 a 94,94 0 1,1 -188,0" fill="transparent" />
-                            <text className="font-neo text-[#768b1a] fill-current uppercase tracking-widest" style={{ fontSize: '9px', letterSpacing: '3.5px' }}>
+                            <text className="font-neo text-[#809829] fill-current uppercase tracking-widest" style={{ fontSize: '9px', letterSpacing: '3.5px' }}>
                                 <textPath href="#desktopCurve" startOffset="0">
                                     nessuna paura...nessuna censura.... nessuna paura...nessuna censura.... nessuna paura...nessuna censura....
                                 </textPath>
@@ -184,7 +184,7 @@ const EyeModel = ({
                         {/* Testo Mobile */}
                         <svg viewBox="0 0 200 200" className="w-full h-full block md:hidden">
                             <path id="mobileCurve" d="M 100, 100 m -94, 0 a 94,94 0 1,1 188,0 a 94,94 0 1,1 -188,0" fill="transparent" />
-                            <text className="font-neo text-[#768b1a] fill-current uppercase tracking-[0.2em] text-center" style={{ fontSize: '10px' }}>
+                            <text className="font-neo text-[#809829] fill-current uppercase tracking-[0.2em] text-center" style={{ fontSize: '10px' }}>
                                 <textPath href="#mobileCurve" startOffset="0">
                                     nessuna paura...nessuna censura.... nessuna paura...nessuna censura.... nessuna paura...nessuna censura....
                                 </textPath>

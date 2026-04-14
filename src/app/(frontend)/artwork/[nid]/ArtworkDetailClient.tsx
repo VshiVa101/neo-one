@@ -187,12 +187,12 @@ export const ArtworkDetailClient = ({
           {/* Riga Testuale Mobile (Nascosta in Desktop) */}
           <div className="w-full flex lg:hidden justify-between px-2">
             <div className="flex flex-col text-left">
-              <span className="font-neo text-[#F45390] text-[10px] tracking-[0.2em] mb-1">art details</span>
+              <h2 className="font-neo text-[#F45390] text-xl tracking-[0.2em] mb-1">art details</h2>
               <p className="font-neo text-white text-[9px] tracking-widest uppercase truncate max-w-[45vw]">{method} / {support}</p>
               <p className="font-neo text-white/50 text-[8px] tracking-widest uppercase truncate max-w-[45vw]">{dimensions} — {year}</p>
             </div>
             <div className="flex flex-col text-right">
-              <span className="font-neo text-[#F45390] text-[10px] tracking-[0.2em] mb-1">status</span>
+              <h2 className="font-neo text-[#F45390] text-xl tracking-[0.2em] mb-1">status</h2>
               <p className="font-neo text-white text-[9px] tracking-widest uppercase">{isAvailable ? 'ACQUISTABILE' : 'ARCHIVIO'}</p>
               <p className="font-neo text-white/50 text-[8px] tracking-widest uppercase">{priceInfo}</p>
             </div>
@@ -200,9 +200,9 @@ export const ArtworkDetailClient = ({
 
           {/* Colonna Sinistra / Metadati (Solo Desktop) */}
           <div className="hidden lg:flex flex-col flex-1 pl-4">
-            <span className="font-neo text-[#F45390] text-base tracking-[0.2em] mb-1">art details</span>
-            <p className="font-neo text-white text-sm tracking-widest uppercase">{method} / {support}</p>
-            <p className="font-neo text-white/50 text-xs tracking-widest uppercase">{dimensions} — {year}</p>
+            <h2 className="font-neo text-[#F45390] text-3xl lg:text-4xl tracking-[0.2em] mb-2 uppercase">art details</h2>
+            <p className="font-neo text-white text-base tracking-widest uppercase">{method} / {support}</p>
+            <p className="font-neo text-white/50 text-sm tracking-widest uppercase">{dimensions} — {year}</p>
           </div>
 
           {/* ── SEZIONE TASTI CENTRALE / MOBILE-ROW ── */}
@@ -255,9 +255,9 @@ export const ArtworkDetailClient = ({
 
           {/* Colonna Destra / Actions (Solo Desktop) */}
           <div className="hidden lg:flex flex-col flex-1 text-right pr-4">
-             <span className="font-neo text-[#F45390] text-base tracking-[0.2em] mb-1">status</span>
-             <p className="font-neo text-white text-sm tracking-widest uppercase">{isAvailable ? 'ACQUISTABILE' : 'ARCHIVIO'}</p>
-             <p className="font-neo text-white/50 text-xs tracking-widest uppercase">{priceInfo}</p>
+             <h2 className="font-neo text-[#F45390] text-3xl lg:text-4xl tracking-[0.2em] mb-2 uppercase">status</h2>
+             <p className="font-neo text-white text-base tracking-widest uppercase">{isAvailable ? 'ACQUISTABILE' : 'ARCHIVIO'}</p>
+             <p className="font-neo text-white/50 text-sm tracking-widest uppercase">{priceInfo}</p>
           </div>
         </div>
       </div>

@@ -210,10 +210,49 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground min-h-[100vh] flex flex-col;
+    @apply bg-background text-foreground min-h-[100vh] flex flex-col uppercase;
     cursor: none !important;
-    text-transform: lowercase;
-    color: white;
+  }
+
+  /* Default Typography Sizes (Readable & Impactful) */
+  h1 { font-size: clamp(2.5rem, 8vw, 4.5rem) !important; line-height: 1.1; margin-bottom: 0.5em; }
+  h2 { font-size: clamp(1.8rem, 5vw, 2.8rem) !important; line-height: 1.2; margin-bottom: 0.5em; }
+  h3 { font-size: clamp(1.4rem, 4vw, 2rem) !important; line-height: 1.3; }
+  p { font-size: 1.15rem !important; line-height: 1.6; opacity: 0.9; }
+
+  /* Absolute Branded Typography Enforcement */
+  *:not(.neo-skip-branding):not(.neo-skip-branding *):not([class^="neo-"]) {
+    text-transform: lowercase !important;
+    color: white !important;
+  }
+
+  /* Exception for Hero / Technical elements - FORCED ACID GREEN & UPPERCASE */
+  [data-neo-skip] text, 
+  [data-neo-skip] span,
+  .neo-skip-branding text,
+  .neo-skip-branding span {
+    text-transform: uppercase !important;
+    color: #809829 !important;
+    fill: #809829 !important;
+  }
+
+  .neo-O { 
+    color: #F45390 !important; 
+    text-transform: uppercase !important;
+    font-weight: bold;
+    display: inline-block;
+  }
+  .neo-N { 
+    color: #809829 !important; 
+    text-transform: uppercase !important;
+    font-weight: bold;
+    display: inline-block;
+  }
+  .neo-E { 
+    color: #FF82B2 !important; 
+    text-transform: uppercase !important;
+    font-weight: bold;
+    display: inline-block;
   }
   
   a, button, [role="button"], input, textarea, select {

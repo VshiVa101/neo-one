@@ -8,23 +8,28 @@ const GREEN = '#809829'
 const STYLES = {
   O: `color: #F45390; text-transform: uppercase; font-weight: bold;`,
   N: `color: #809829; text-transform: uppercase; font-weight: bold;`,
-  E: `color: #B3828B; text-transform: uppercase; font-weight: bold;`,
+  E: `color: #FF82B2; text-transform: uppercase; font-weight: bold;`,
 }
 
 export function NeoBrandingObserver() {
   useEffect(() => {
-    const processNode = (node: Node) => {
+    const processNode = (node: Node): boolean => {
       // Evita di processare nodi già marcati o elementi tecnici
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        const el = node as HTMLElement
-        if (el.dataset.neoProcessed || ['SCRIPT', 'STYLE', 'SVG', 'IMG', 'CANVAS', 'VIDEO'].includes(el.tagName)) {
+      const parentElement = node.nodeType === Node.ELEMENT_NODE ? (node as HTMLElement) : node.parentElement
+      
+      if (parentElement) {
+        if (
+          parentElement.dataset.neoProcessed || 
+          parentElement.dataset.neoSkip || 
+          parentElement.closest('[data-neo-skip]') || // Controllo risalendo l'albero
+          ['SCRIPT', 'STYLE', 'SVG', 'IMG', 'CANVAS', 'VIDEO'].includes(parentElement.tagName)
+        ) {
           return false
         }
       }
 
       if (node.nodeType === Node.TEXT_NODE && node.nodeValue?.trim()) {
         const text = node.nodeValue
-        // Regex per trovare O, N, E (case insensitive)
         const regex = /([one])/gi
         
         if (regex.test(text)) {
@@ -32,32 +37,38 @@ export function NeoBrandingObserver() {
           let lastIndex = 0
           let match
 
-          // Resetta l'indice della regex per l'esecuzione
           regex.lastIndex = 0
           
           while ((match = regex.exec(text)) !== null) {
-            // Testo prima del match
+            // Testo prima del match (forzato in minuscolo)
             if (match.index > lastIndex) {
-              fragment.appendChild(document.createTextNode(text.substring(lastIndex, match.index)))
+              fragment.appendChild(document.createTextNode(text.substring(lastIndex, match.index).toLowerCase()))
             }
 
             const char = match[0].toUpperCase()
             const span = document.createElement('span')
             span.textContent = char
-            span.style.cssText = STYLES[char as keyof typeof STYLES] || ''
+            span.className = `neo-${char}` // neo-O, neo-N, neo-E
             span.setAttribute('data-neo-processed', 'true')
             fragment.appendChild(span)
 
             lastIndex = regex.lastIndex
           }
 
-          // Testo rimanente dopo l'ultimo match
+          // Testo rimanente (forzato in minuscolo)
           if (lastIndex < text.length) {
-            fragment.appendChild(document.createTextNode(text.substring(lastIndex)))
+            fragment.appendChild(document.createTextNode(text.substring(lastIndex).toLowerCase()))
           }
 
           if (node.parentNode) {
             node.parentNode.replaceChild(fragment, node)
+            return true
+          }
+        } else {
+          // Se non ci sono lettere O-N-E, ci assicuriamo comunque che sia minuscolo
+          const lowerText = text.toLowerCase()
+          if (text !== lowerText) {
+            node.nodeValue = lowerText
             return true
           }
         }
