@@ -9,7 +9,8 @@
 | # | Step | Stato | Note |
 |---|---|---|---|
 | 1-11 | Setup Infra + Home Base | ✅ DONE | Neon, Cloudinary, Hero, Carousel 3D completati. |
-| 12 | Home: Expanded Cluster | ✅ DONE | Navigazione cluster, auto-expand sottocluster singolo, smart-exit, eye z-500, filtro cluster test. |
+| 12 | Home: Interactive Gateway | ✅ DONE | Implementato gateway cinematico Matrix ("NEO-ONE" -> "O-N") con silent priming. |
+| 12.5 | Home: Expanded Cluster | ✅ DONE | Navigazione cluster, auto-expand sottocluster singolo, smart-exit, eye z-500. |
 | 13 | Artwork Detail `/artwork/[nid]` | ✅ DONE | Layout wireframe, nav prev/next, CartContext, asset UI reali. |
 | 13.5 | Responsive & Zoom Modal | 🟡 IN CORSO | Adattamento mobile globale e visualizzazione Opera a schermo intero con Zoom. |
 | 14 | Calendar Overview `/calendar` | 🔴 PROSSIMO | Lista segnali ordinata. |
@@ -49,6 +50,13 @@ Tutte le immagini devono essere preventivamente convertite in WebP (Qualità 85)
 - **ICONE:** `256px` o `512px` (mantenere Alpha/Trasparenza)
 *Regola per l'Occhio 3D:* Il `nervo_nervoso` (Retina) è applicato tramite un `Decal` frontale (Scale 1.7) con `THREE.MultiplyBlending` per rendere invisibile il suo sfondo bianco senza stirare la mappa UV ai lati. La pupilla è un livello `Decal` sovrapposto.
 
+### Autoplay Audio Policy (Interaction Gateway)
+Per sbloccare l'audio nei browser moderni senza rovinare l'estetica:
+1. Usa un **Interaction Gateway** (Overlay "ON").
+2. **Silent Priming**: Al click, esegui un `new Audio("data:audio/wav;base64,...")` muto per attivare il contesto senza suoni udibili.
+3. **Pointer Events**: Il layer Hero deve avere `pointer-events: auto` in `page.tsx`.
+4. **Logic Lock**: Disabilita `onClick` sui componenti 3D finché `isUnlocked` non è true per evitare navigazioni accidentali.
+
 ---
 
 ## 3. Manuale Operativo Step Immediati
@@ -76,4 +84,4 @@ Tutte le immagini devono essere preventivamente convertite in WebP (Qualità 85)
 - **Stack:** Next.js 15, Payload v3, Neon Postgres, Cloudinary.
 
 ---
-*Ultimo aggiornamento: 13 Aprile 2026 - Step 12 completato con fix navigazione cluster singolo. Step 13 in preparazione.*
+*Ultimo aggiornamento: 14 Aprile 2026 - Implementato Gateway interattivo ON, fix audio silenzioso e sblocco layout master.*

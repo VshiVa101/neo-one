@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
+import { MatrixGateway } from '@/components/MatrixGateway'
 import { EyeScene } from '@/components/EyeScene'
 import { useTransition } from '@/context/TransitionContext'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -49,19 +50,7 @@ export default function HeroClient() {
     <>
       <AnimatePresence>
         {!isUnlocked && (
-          <motion.div
-            key="unlock-layer"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-            className={`fixed inset-0 z-[999] bg-black flex items-center justify-center cursor-pointer pointer-events-auto ${isFading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-1000`}
-            onClick={handleUnlock}
-          >
-            <h1 className="text-[15vw] font-bold leading-none select-none flex gap-[0.2em] font-sans">
-              <span className="text-[#FF2D55]">O</span>
-              <span className="text-[#A3FF12]">N</span>
-            </h1>
-          </motion.div>
+          <MatrixGateway onClick={handleUnlock} isFading={isFading} />
         )}
       </AnimatePresence>
 
