@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { NeoText } from '@/components/NeoText'
 
 const CHARS = 'ONE'
 
@@ -157,7 +158,7 @@ export function MatrixGateway({ onClick, isFading }: MatrixGatewayProps) {
           transition={{ repeat: Infinity, duration: 2.5 }}
           className="absolute bottom-[25%] text-[10px] sm:text-[12px] tracking-[1.5em] text-white/50 uppercase font-sans pointer-events-none select-none"
         >
-          TOCCAMI
+          <NeoText>TOCCAMI</NeoText>
         </motion.div>
       )}
     </div>

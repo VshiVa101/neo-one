@@ -17,6 +17,7 @@ import { getServerSideURL } from '@/utilities/getURL'
 import { TransitionProvider } from '@/context/TransitionContext'
 import { TransitionOverlay } from '@/components/TransitionOverlay'
 import { CartProvider } from '@/contexts/CartContext'
+import { CustomCursor } from '@/components/CustomCursor'
 
 const mergedFontNeo = localFont({
   src: '../../../public/fonts/MergedFontNEO.otf', // adjust relative path from app/(frontend) to public/fonts/ if needed, or use full path. Actually next/font/local resolves relative to the file.
@@ -43,6 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 }}
               />
               
+              <CustomCursor />
               <TransitionOverlay />
               
               {/* Main Content Area */}

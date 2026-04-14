@@ -211,6 +211,13 @@
   }
   body {
     @apply bg-background text-foreground min-h-[100vh] flex flex-col;
+    cursor: none !important;
+    text-transform: lowercase;
+    color: white;
+  }
+  
+  a, button, [role="button"], input, textarea, select {
+    cursor: none !important;
   }
 }
 
