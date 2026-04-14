@@ -18,7 +18,8 @@ export default function HeroClient() {
   }, [])
 
   // Se siamo già in /home o altre rotte, non renderizzare l'overlay Hero
-  if (!shouldRender || pathname !== '/') {
+  // Se però stiamo transizionando, rimaniamo montati per completare il fade-out
+  if (!shouldRender || (pathname !== '/' && !isTransitioning)) {
     return null
   }
 

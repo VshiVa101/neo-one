@@ -30,26 +30,17 @@ export const ExpandedGalleryOverlay = ({
           className="fixed inset-0 z-[200] bg-black/90 overflow-y-auto overflow-x-hidden custom-scrollbar"
         >
           {/* Header Galleria */}
-          <div className="sticky top-0 left-0 w-full p-8 flex justify-between items-center z-[210] bg-gradient-to-b from-black via-black/80 to-transparent">
-            <div className="flex flex-col">
-              <h2 className="font-neo text-[#F45390] text-3xl tracking-[0.2em] uppercase drop-shadow-[0_0_10px_rgba(244,83,144,0.5)]">
+          <div className="sticky top-0 left-0 w-full p-8 flex flex-col items-start z-[210] pt-[28vh] md:pt-8 bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none">
+            <div className="flex flex-col w-full pb-8 pointer-events-auto">
+              <h2 className="font-neo text-[#F45390] text-3xl md:text-5xl tracking-[0.2em] uppercase drop-shadow-[0_0_10px_rgba(244,83,144,0.5)]">
                 {subclusterTitle}
               </h2>
-              <div className="h-0.5 w-24 bg-[#768b1a] mt-2 shadow-[0_0_10px_#768b1a]" />
+              <div className="h-0.5 w-24 md:w-48 bg-[#768b1a] mt-2 md:mt-4 shadow-[0_0_10px_#768b1a]" />
             </div>
-
-            <motion.button
-              whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
-              whileTap={{ scale: 0.9 }}
-              onClick={onClose}
-              className="w-[60px] h-[60px] flex items-center justify-center bg-[#d99f9f] rounded-full hover:bg-opacity-80 transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-[#d99f9f]"
-            >
-              <img src="/images/ui/esccc.webp" className="w-[60%] h-[60%] object-contain opacity-80" />
-            </motion.button>
           </div>
 
           {/* Griglia Opere */}
-          <div className="max-w-7xl mx-auto px-8 pb-24 mt-[25vh]">
+          <div className="max-w-7xl mx-auto px-8 pb-24 mt-[30vh]">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {artworks.map((artwork, i) => (
                 <motion.div

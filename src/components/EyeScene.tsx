@@ -104,7 +104,10 @@ const EyeModel = ({
     const handleClick = () => {
         if (hovered) setHovered(false)
         triggerTransition()
-        router.push(targetRoute)
+        // Ritardiamo la navigazione reale per permettere la transizione fluida di 1.5s
+        setTimeout(() => {
+            router.push(targetRoute)
+        }, 1500)
     }
 
     return (
@@ -188,14 +191,26 @@ export const EyeScene = ({
 
     return (
         <div ref={containerRef} className={`w-full h-full absolute inset-0 z-10 ${className}`}>
-            <Canvas camera={{ position: [0, 0, 4.6], fov: 45 }}>
+            <Canvas 
+                camera={{ position: [0, 0, 4.6], fov: 45 }}
+                gl={{ 
+                    antialias: true, 
+                    alpha: true, 
+                    powerPreference: "high-performance",
+                    preserveDrawingBuffer: false
+                }}
+            >
                 <ambientLight intensity={0.1} />
                 <directionalLight position={[5, 10, 5]} intensity={0.1} />
                 
                 {/* Luce Verde Acida da Sud - Potenziata */}
                 <pointLight position={[0, -5, 2]} intensity={120} color="#768b1a" distance={20} decay={2} />
                 
-                <Suspense fallback={null}>
+                <Suspense fallback={
+                    <Html center>
+                        <div className="w-4 h-4 rounded-full bg-[#768b1a] blur-md animate-pulse" />
+                    </Html>
+                }>
                     <EyeModel 
                         targetRoute={targetRoute} 
                         showCircularText={showCircularText} 

@@ -6,6 +6,8 @@ import { EyeScene } from '@/components/EyeScene'
 import { ClusterDeck, MockArtwork } from '@/components/home/ClusterDeck'
 import { fetchClusterSubclusters } from '@/app/(frontend)/home/actions'
 import { ExpandedGalleryOverlay } from '@/components/home/ExpandedGalleryOverlay'
+import { usePathname } from 'next/navigation'
+import { useTransition } from '@/context/TransitionContext'
 
 export interface SubclusterData {
   id: string
@@ -23,6 +25,13 @@ export interface ClusterData {
 }
 
 export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
+  const pathname = usePathname()
+  const { isTransitioning } = useTransition()
+
+  // Se siamo nella landing page (/), montiamo l'occhio dello sfondo SOLO quando inizia la transizione.
+  // Questo evita di avere 2 Canvas WebGL contemporaneamente al caricamento iniziale.
+  const shouldRenderBackgroundEye = pathname !== '/' || isTransitioning
+
   // Se non ci sono cluster o ce n'è solo 1, evitiamo errori nella destrutturazione in Home
   if (!clusters || clusters.length < 2) return null;
   // LOGICA DI PRIORITÀ FORZATA (Leo's View)
@@ -181,8 +190,12 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
     <div className="w-full h-screen relative z-10 overflow-hidden">
 
       {/* ── OCCHIO TOP CENTER (responsivo con vh) ── */}
-      <div className="fixed top-[4vh] lg:top-[4vh] left-1/2 -translate-x-1/2 w-[20vh] h-[20vh] lg:w-[30vh] lg:h-[30vh] z-[500]">
-        <EyeScene targetRoute="/home" showCircularText={false} globalTracking={true} />
+      <div className="fixed top-[3vh] lg:top-[4vh] left-1/2 -translate-x-1/2 w-[14vh] h-[14vh] lg:w-[30vh] lg:h-[30vh] z-[500]">
+        {shouldRenderBackgroundEye ? (
+          <EyeScene targetRoute="/home" showCircularText={false} globalTracking={true} />
+        ) : (
+          <div className="w-full h-full bg-transparent" />
+        )}
         {/* Intercettatore click sull'Occhio per resettare tutto lo stato */}
         {(expandedClusterId || expandedDeckIndex !== null) && (
           <div 
@@ -196,7 +209,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       </div>
 
       {/* ── MAIN STAGE: 2 cluster grandi + descrizioni (posizionato più in alto per dare respiro) ── */}
-      <div className="absolute top-[28vh] lg:top-[28vh] left-0 w-full h-[55vh] lg:h-[40vh] flex flex-col lg:flex-row items-center lg:items-start justify-start lg:justify-center gap-6 lg:gap-[3vw] px-4 lg:px-[5vw]">
+      <div className="absolute top-[24vh] lg:top-[28vh] left-0 w-full h-[55vh] lg:h-[40vh] flex flex-col lg:flex-row items-center lg:items-start justify-start lg:justify-center gap-6 lg:gap-[3vw] px-4 lg:px-[5vw]">
 
         {/* ── CLUSTER SINISTRO + descrizione ──── */}
         <div className="flex flex-row items-center lg:items-start gap-4 lg:gap-[2vw]">
@@ -317,8 +330,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                 }}
                 whileHover={{ scale: 1.05, rotate: 2, y: -5 }}
                 transition={{ duration: 0.4 }}
-                onClick={() => replaceCluster(i)}
-                className="w-[12vw] h-[12vw] flex-shrink-0 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-[#111] cursor-pointer border border-gray-700/30"
+                className="w-[14vw] h-[14vw] md:w-[12vw] md:h-[12vw] flex-shrink-0 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-[#111] cursor-pointer border border-gray-700/30"
               >
                 <img
                   src={cluster.image}
@@ -336,7 +348,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
           whileTap={{ scale: 0.9 }}
           onMouseEnter={() => setCartHovered(true)}
           onMouseLeave={() => setCartHovered(false)}
-          className="w-[70px] h-[70px] cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
+          className="w-[35px] h-[35px] md:w-[50px] md:h-[50px] cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
           style={{ 
             backgroundColor: cartHovered ? '#F45390' : '#B3828B',
             boxShadow: cartHovered ? '0 0 20px rgba(244, 83, 144, 0.5)' : '0 0 10px rgba(0,0,0,0.3)' 
@@ -360,18 +372,10 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-25 bg-black/80 backdrop-blur-md flex flex-col pt-[23vh] overflow-hidden"
+            className="fixed inset-0 z-25 bg-black/80 backdrop-blur-md flex flex-col pt-[26vh] overflow-hidden"
             onClick={() => setExpandedClusterId(null)} // Click outside closes overlay
           >
-            {/* Tasto Chiudi */}
-            <motion.button
-              whileHover={{ scale: 1.1, rotate: 90 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setExpandedClusterId(null)}
-              className="absolute top-10 right-10 z-[110] text-[#F45390] text-5xl font-neo cursor-pointer focus:outline-none"
-            >
-              ✕
-            </motion.button>
+             {/* Il tasto Chiudi (X) è rimosso. Si chiude tramite la gesture sull'Occhio centrale */}
 
             {isLoadingExpanded ? (
                // SPINNER NEO-1
@@ -383,7 +387,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                </div>
             ) : (
               <>
-                <div className="absolute top-1/2 left-8 -translate-y-1/2 z-[110]">
+                <div className="absolute top-1/2 left-8 -translate-y-1/2 z-[110] hidden lg:block">
                   <motion.button
                     whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
                     whileTap={{ scale: 0.9 }}
@@ -400,7 +404,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                   </motion.button>
                 </div>
                 
-                <div className="absolute top-1/2 right-8 -translate-y-1/2 z-[110]">
+                <div className="absolute top-1/2 right-8 -translate-y-1/2 z-[110] hidden lg:block">
                   <motion.button
                     whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
                     whileTap={{ scale: 0.9 }}
