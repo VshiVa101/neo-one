@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState, Suspense, lazy } from 'react'
 import type { Page } from '@/payload-types'
-import { NeoText } from '@/components/NeoText'
 
 // Lazy load ThreeEye to avoid SSR issues
 const ThreeEye = lazy(() => import('@/components/ThreeEye'))
@@ -446,7 +445,7 @@ export const NeoUncensoredHero: React.FC<HeroProps> = () => {
               marginBottom: '20px',
             }}
           >
-            <NeoText>NEO ONE</NeoText>
+            NEO ONE
           </h1>
           <p style={{ opacity: 0.7 }}>Galleria cluster in arrivo...</p>
         </div>
