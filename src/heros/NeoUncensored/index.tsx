@@ -141,7 +141,7 @@ export const NeoUncensoredHero: React.FC<HeroProps> = () => {
   const reducedMotion = usePrefersReducedMotion()
 
   const EXPLOSION_MS = 980
-
+  
   const [introVisible, setIntroVisible] = useState(true)
   const [closing, setClosing] = useState(false)
   const [showHome, setShowHome] = useState(false)

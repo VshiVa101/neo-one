@@ -14,7 +14,7 @@ export default async function IndexPage() {
       <HomePage />
       
       {/* HeroPage sovrapposta (Layer 1) - svanirà al click */}
-      <div className="absolute inset-0 z-50 pointer-events-none">
+      <div className="absolute inset-0 z-50 pointer-events-auto">
          <HeroClient />
       </div>
     </div>

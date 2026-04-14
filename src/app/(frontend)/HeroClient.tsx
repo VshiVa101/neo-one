@@ -12,6 +12,28 @@ export default function HeroClient() {
   const { isTransitioning } = useTransition()
   const [shouldRender, setShouldRender] = useState(false)
   const [isEyeReady, setIsEyeReady] = useState(false)
+  const [isUnlocked, setIsUnlocked] = useState(false)
+  const [isFading, setIsFading] = useState(false)
+
+  const handleUnlock = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
+
+    // Sblocco audio totalmente silenzioso (buffer vuoto base64)
+    // Questo attiva il contesto audio del browser senza emettere alcun suono udibile.
+    const silentAudio = new Audio(
+      'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA',
+    )
+    silentAudio
+      .play()
+      .then(() => silentAudio.pause())
+      .catch(() => {})
+
+    setIsFading(true)
+    setTimeout(() => {
+      setIsUnlocked(true)
+    }, 1000)
+  }
 
   useEffect(() => {
     setShouldRender(true)
@@ -24,12 +46,31 @@ export default function HeroClient() {
   }
 
   return (
-    <motion.main 
-      initial={{ opacity: 1 }}
-      animate={{ opacity: isTransitioning ? 0 : 1 }}
-      transition={{ duration: 1.5, ease: "easeInOut" }}
-      className="fixed inset-0 w-full h-screen relative bg-black overflow-hidden flex flex-col items-center justify-center m-0 p-0 text-white z-50 transition-opacity"
-    >
+    <>
+      <AnimatePresence>
+        {!isUnlocked && (
+          <motion.div
+            key="unlock-layer"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1 }}
+            className={`fixed inset-0 z-[999] bg-black flex items-center justify-center cursor-pointer pointer-events-auto ${isFading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-1000`}
+            onClick={handleUnlock}
+          >
+            <h1 className="text-[15vw] font-bold leading-none select-none flex gap-[0.2em] font-sans">
+              <span className="text-[#FF2D55]">O</span>
+              <span className="text-[#A3FF12]">N</span>
+            </h1>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.main 
+        initial={{ opacity: 1 }}
+        animate={{ opacity: isTransitioning ? 0 : 1 }}
+        transition={{ duration: 1.5, ease: "easeInOut" }}
+        className="fixed inset-0 w-full h-screen relative bg-black overflow-hidden flex flex-col items-center justify-center m-0 p-0 text-white z-50 transition-opacity"
+      >
       {/* Background GIF - Appare solo quando l'occhio è pronto */}
       <AnimatePresence>
         {isEyeReady && (
@@ -51,6 +92,7 @@ export default function HeroClient() {
           targetRoute="/home" 
           showCircularText={isEyeReady} 
           onReady={() => setIsEyeReady(true)}
+          isUnlocked={isUnlocked}
         />
       </div>
 
@@ -61,5 +103,6 @@ export default function HeroClient() {
         </div>
       )}
     </motion.main>
+    </>
   )
 }

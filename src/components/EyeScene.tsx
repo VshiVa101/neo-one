@@ -13,6 +13,7 @@ interface EyeModelProps {
     globalTracking?: boolean
     externalMouse?: React.RefObject<{ x: number, y: number }>
     onReady?: () => void
+    isUnlocked?: boolean
 }
 
 // Carichiamo la versione ottimizzata con supporto Draco
@@ -27,7 +28,8 @@ const EyeModel = ({
     showCircularText = false, 
     globalTracking = false,
     externalMouse,
-    onReady
+    onReady,
+    isUnlocked = false
 }: EyeModelProps) => {
     const eyeRef = useRef<THREE.Group>(null)
     const [hovered, setHovered] = useState(false)
@@ -52,37 +54,6 @@ const EyeModel = ({
 
         dashAudio.current = loadAudio('/media/return.mp3', 0.8)
         returnAudio.current = loadAudio('/media/return.mp3', 0.5)
-
-        // Funzione per sbloccare l'audio sui browser (Autoplay policy)
-        // Molti browser bloccano l'audio finché l'utente non interagisce.
-        const unlock = () => {
-            const dash = dashAudio.current
-            const ret = returnAudio.current
-            
-            if (dash) {
-                dash.play().then(() => {
-                    dash.pause()
-                    dash.currentTime = 0
-                }).catch(() => {})
-            }
-            if (ret) {
-                ret.play().then(() => {
-                    ret.pause()
-                    ret.currentTime = 0
-                }).catch(() => {})
-            }
-            
-            window.removeEventListener('pointerdown', unlock)
-            window.removeEventListener('keydown', unlock)
-        }
-
-        window.addEventListener('pointerdown', unlock)
-        window.addEventListener('keydown', unlock)
-
-        return () => {
-            window.removeEventListener('pointerdown', unlock)
-            window.removeEventListener('keydown', unlock)
-        }
     }, [])
 
     // Calcoliamo una scala base basata sull'area minima visibile (vmin)
@@ -158,6 +129,7 @@ const EyeModel = ({
     })
 
     const handleClick = () => {
+        if (!isUnlocked) return // Impedisce l'attivazione se il lock è attivo
         if (hovered) setHovered(false)
         triggerTransition()
         // Ritardiamo la navigazione reale per permettere la transizione fluida di 1.5s
@@ -232,6 +204,7 @@ interface EyeSceneProps {
     globalTracking?: boolean
     className?: string
     onReady?: () => void
+    isUnlocked?: boolean
 }
 
 export const EyeScene = ({ 
@@ -239,7 +212,8 @@ export const EyeScene = ({
     showCircularText = false, 
     globalTracking = false, 
     className = "",
-    onReady 
+    onReady,
+    isUnlocked = false
 }: EyeSceneProps) => {
     const containerRef = useRef<HTMLDivElement>(null)
     const globalMouse = useRef({ x: 0, y: 0 })
@@ -289,6 +263,7 @@ export const EyeScene = ({
                         globalTracking={globalTracking} 
                         externalMouse={globalMouse} 
                         onReady={onReady}
+                        isUnlocked={isUnlocked}
                     />
                 </Suspense>
             </Canvas>
