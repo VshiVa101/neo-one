@@ -151,6 +151,20 @@ export const NeoUncensoredHero: React.FC<HeroProps> = () => {
   const [explosionOrigin, setExplosionOrigin] = useState({ x: 0, y: 0 })
   const [explosionActive, setExplosionActive] = useState(false)
   const eyeContainerRef = useRef<HTMLDivElement>(null)
+  
+  // Audio per la reazione a catena
+  const triggerChainExplosion = () => {
+    const playSound = (volume: number) => {
+      const audio = new Audio('/media/explosion-arcade.mp3')
+      audio.volume = volume
+      audio.play().catch(() => {})
+    }
+
+    // Sequenza di esplosioni "sulle esplosioni"
+    playSound(0.8)
+    setTimeout(() => playSound(0.6), 150)
+    setTimeout(() => playSound(0.4), 320)
+  }
 
   const handleEyeClick = () => {
     if (!introVisible || closing) return
@@ -163,6 +177,7 @@ export const NeoUncensoredHero: React.FC<HeroProps> = () => {
     setExplosionEyeTrigger((t) => t + 1)
     setExplosionBorderTrigger((t) => t + 1)
     setClosing(true)
+    triggerChainExplosion()
 
     // Trigger explosion GIFs
     window.setTimeout(() => {

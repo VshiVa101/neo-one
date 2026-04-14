@@ -11,7 +11,11 @@ export const TransitionOverlay = () => {
 
     useEffect(() => {
         if (isTransitioning) {
-            // Avvio transizione
+            // Avvio transizione sonora (Arcade Explosion)
+            const audio = new Audio('/media/explosion-arcade.mp3')
+            audio.volume = 0.6
+            audio.play().catch(() => {})
+
             setRenderGifs(true)
             setIsVisible(true)
 
