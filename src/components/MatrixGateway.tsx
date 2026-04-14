@@ -13,13 +13,13 @@ interface MatrixGatewayProps {
 // Configurazione dei caratteri per NEO-ONE
 // Indici: 0:N, 1:E, 2:O, 3:-, 4:O, 5:N, 6:E
 const MATRIX_TEXT = [
-  { id: 0, target: 'N', initialColor: '#FF2D55', finalColor: '', type: 'exit', canScramble: true },
-  { id: 1, target: 'E', initialColor: '#A3FF12', finalColor: '', type: 'exit', canScramble: true },
-  { id: 2, target: 'O', initialColor: '#F45390', finalColor: '#FF2D55', type: 'remain', canScramble: true },
+  { id: 0, target: 'N', initialColor: '#F45390', finalColor: '', type: 'exit', canScramble: true },
+  { id: 1, target: 'E', initialColor: '#809829', finalColor: '', type: 'exit', canScramble: true },
+  { id: 2, target: 'O', initialColor: '#B3828B', finalColor: '#F45390', type: 'remain', canScramble: true },
   { id: 3, target: '-', initialColor: '#FFFFFF', finalColor: '#FFFFFF', type: 'remain', canScramble: false },
-  { id: 4, target: 'O', initialColor: '#F45390', finalColor: '', type: 'exit', canScramble: true },
-  { id: 5, target: 'N', initialColor: '#FF2D55', finalColor: '#A3FF12', type: 'remain', canScramble: true },
-  { id: 6, target: 'E', initialColor: '#A3FF12', finalColor: '', type: 'exit', canScramble: true },
+  { id: 4, target: 'O', initialColor: '#B3828B', finalColor: '', type: 'exit', canScramble: true },
+  { id: 5, target: 'N', initialColor: '#F45390', finalColor: '#809829', type: 'remain', canScramble: true },
+  { id: 6, target: 'E', initialColor: '#809829', finalColor: '', type: 'exit', canScramble: true },
 ]
 
 // Ordine di sparizione sequenziale (una alla volta, alternata dai lati)

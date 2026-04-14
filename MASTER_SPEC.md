@@ -80,7 +80,7 @@ Per sbloccare l'audio nei browser moderni senza rovinare l'estetica:
 ## 4. Identità e Decisioni Strategiche
 - **No standard ecommerce:** L'acquisto è una richiesta via form (Inquiry).
 - **Eye Motif:** L'occhio è l'ancora di navigazione, mai rimuoverlo.
-- **Colori:** Pink `#F45390`, Soft-pink `#B3828B`.
+- **Colori:** Pink `#F45390`, Soft-pink `#B3828B`, Green `#809829`.
 - **Stack:** Next.js 15, Payload v3, Neon Postgres, Cloudinary.
 
 ---
