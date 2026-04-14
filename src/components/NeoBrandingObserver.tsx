@@ -6,9 +6,9 @@ const PINK = '#F45390'
 const GREEN = '#809829'
 
 const STYLES = {
-  O: `color: ${PINK}; text-transform: uppercase; font-weight: bold;`,
-  N: `color: ${GREEN}; text-transform: uppercase; font-weight: bold;`,
-  E: `color: ${GREEN}; text-transform: uppercase; font-weight: bold;`,
+  O: `color: #F45390; text-transform: uppercase; font-weight: bold;`,
+  N: `color: #809829; text-transform: uppercase; font-weight: bold;`,
+  E: `color: #B3828B; text-transform: uppercase; font-weight: bold;`,
 }
 
 export function NeoBrandingObserver() {
