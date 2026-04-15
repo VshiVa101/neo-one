@@ -13,27 +13,21 @@ export const Header: GlobalConfig = {
       label: 'Navigation Links',
       fields: [
         {
-          name: 'link',
-          type: 'group',
-          fields: [
-            {
-              name: 'label',
-              type: 'text',
-              label: 'Link Label',
-              required: true,
-            },
-            {
-              name: 'url',
-              type: 'text',
-              label: 'URL',
-              required: true,
-            },
-            {
-              name: 'newTab',
-              type: 'checkbox',
-              label: 'Open in new tab',
-            },
-          ],
+          name: 'label',
+          type: 'text',
+          label: 'Link Label',
+          required: true,
+        },
+        {
+          name: 'url',
+          type: 'text',
+          label: 'URL',
+          required: true,
+        },
+        {
+          name: 'newTab',
+          type: 'checkbox',
+          label: 'Open in new tab',
         },
       ],
     },

@@ -847,11 +847,9 @@ export interface Header {
   id: number;
   navItems?:
     | {
-        link: {
-          label: string;
-          url: string;
-          newTab?: boolean | null;
-        };
+        label: string;
+        url: string;
+        newTab?: boolean | null;
         id?: string | null;
       }[]
     | null;
@@ -922,13 +920,9 @@ export interface HeaderSelect<T extends boolean = true> {
   navItems?:
     | T
     | {
-        link?:
-          | T
-          | {
-              label?: T;
-              url?: T;
-              newTab?: T;
-            };
+        label?: T;
+        url?: T;
+        newTab?: T;
         id?: T;
       };
   updatedAt?: T;
