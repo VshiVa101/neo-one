@@ -1,5 +1,10 @@
 # Payload Website Template
 
+## Release v1.1.0 (2026-04-15)
+
+- Updated documentation and onboarding for Neo. See `CHANGELOG.md` and `docs/NEO_ONBOARDING.md` for details.
+
+
 This is the official [Payload Website Template](https://github.com/payloadcms/payload/blob/main/templates/website). Use it to power websites, blogs, or portfolios from small to enterprise. This repo includes a fully-working backend, enterprise-grade admin panel, and a beautifully designed, production-ready website.
 
 This template is right for you if you are working on:

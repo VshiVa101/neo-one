@@ -1,5 +1,12 @@
 # 🚀 Neo-One Vercel Deployment Checklist
 
+**Release:** v1.1.0
+**Status:** Deployed
+**Date:** April 15, 2026
+**GitHub Repo:** https://github.com/VshiVa101/neo-one.git
+
+# 🚀 Neo-One Vercel Deployment Checklist
+
 **Status:** Ready for deployment
 **Date:** April 15, 2026
 **GitHub Repo:** https://github.com/VshiVa101/neo-one.git
@@ -82,6 +89,12 @@ PREVIEW_SECRET = your-preview-secret
 ## 🔄 Post-Deployment
 
 Dopo il deploy:
+
+### Post-release checklist (azione raccomandata)
+
+- Eseguire `pnpm run generate:types` e poi `pnpm exec tsc --noEmit` in locale per ripristinare la validazione TypeScript.
+- Rimuovere la regola temporanea `typescript.ignoreBuildErrors` in `next.config.ts` e pushare le correzioni.
+- Verificare che tutte le immagini principali siano nella cartella `public/media` e che i file WebP siano correttamente serviti.
 
 1. **Continua con Step 13.5** (Responsive mobile)
    - Lavora in locale con `pnpm dev`

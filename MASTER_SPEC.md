@@ -1,5 +1,7 @@
 # Neo-One Art Hub — MASTER SPEC (Roadmap & Management)
 
+**Release:** v1.1.0
+
 > **DIRETTIVA PER L'AGENTE:** Questo è l'unico file di riferimento per lo stato del progetto e i prossimi step. Leggi questo prima di iniziare.
 
 ---
@@ -86,4 +88,4 @@ Per sbloccare l'audio nei browser moderni senza rovinare l'estetica:
 - **Stack:** Next.js 15, Payload v3, Neon Postgres, Cloudinary.
 
 ---
-*Ultimo aggiornamento: 14 Aprile 2026 - Implementato Gateway interattivo ON, fix audio silenzioso e sblocco layout master.*
+*Ultimo aggiornamento: 15 Aprile 2026 - Release v1.1.0 — aggiornati onboarding e documentazione. Prossimo passo: completare la responsività mobile (Step 13.5).* 
