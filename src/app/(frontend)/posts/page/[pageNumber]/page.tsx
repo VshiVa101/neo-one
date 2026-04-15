@@ -24,14 +24,26 @@ export default async function Page({ params: paramsPromise }: Args) {
   const sanitizedPageNumber = Number(pageNumber)
 
   if (!Number.isInteger(sanitizedPageNumber)) notFound()
+  let posts
 
-  const posts = await payload.find({
-    collection: 'posts',
-    depth: 1,
-    limit: 12,
-    page: sanitizedPageNumber,
-    overrideAccess: false,
-  })
+  try {
+    posts = await payload.find({
+      collection: 'posts',
+      depth: 1,
+      limit: 12,
+      page: sanitizedPageNumber,
+      overrideAccess: false,
+    })
+  } catch (err) {
+    // If 'posts' collection doesn't exist, treat as not found / empty.
+    posts = {
+      docs: [],
+      totalDocs: 0,
+      totalPages: 0,
+      page: sanitizedPageNumber,
+      limit: 12,
+    }
+  }
 
   return (
     <div className="pt-24 pb-24">
@@ -71,18 +83,24 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
-  const { totalDocs } = await payload.count({
-    collection: 'posts',
-    overrideAccess: false,
-  })
 
-  const totalPages = Math.ceil(totalDocs / 10)
+  try {
+    const { totalDocs } = await payload.count({
+      collection: 'posts',
+      overrideAccess: false,
+    })
 
-  const pages: { pageNumber: string }[] = []
+    const totalPages = Math.ceil(totalDocs / 10)
 
-  for (let i = 1; i <= totalPages; i++) {
-    pages.push({ pageNumber: String(i) })
+    const pages: { pageNumber: string }[] = []
+
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push({ pageNumber: String(i) })
+    }
+
+    return pages
+  } catch (err) {
+    // If posts collection is missing, no paged routes.
+    return []
   }
-
-  return pages
 }
