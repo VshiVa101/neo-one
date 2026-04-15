@@ -105,11 +105,13 @@ export interface Config {
     'hero-settings': HeroSetting;
     'calendar-settings': CalendarSetting;
     'cart-settings': CartSetting;
+    footer: Footer;
   };
   globalsSelect: {
     'hero-settings': HeroSettingsSelect<false> | HeroSettingsSelect<true>;
     'calendar-settings': CalendarSettingsSelect<false> | CalendarSettingsSelect<true>;
     'cart-settings': CartSettingsSelect<false> | CartSettingsSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
   };
   locale: null;
   widgets: {
@@ -820,6 +822,23 @@ export interface CartSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer".
+ */
+export interface Footer {
+  id: number;
+  navItems?:
+    | {
+        label: string;
+        url: string;
+        newTab?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "hero-settings_select".
  */
 export interface HeroSettingsSelect<T extends boolean = true> {
@@ -853,6 +872,23 @@ export interface CalendarSettingsSelect<T extends boolean = true> {
  */
 export interface CartSettingsSelect<T extends boolean = true> {
   shippingPaymentNotice?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  navItems?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        newTab?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

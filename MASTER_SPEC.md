@@ -66,10 +66,10 @@ Per sbloccare l'audio nei browser moderni senza rovinare l'estetica:
 ### Step 13: Artwork Detail (`/artwork/[nid]`)
 - **Route:** `src/app/(frontend)/artwork/[nid]/page.tsx`.
 - **Logic:** Fetch `artworks` dove `nid` (o slug) == params.nid.
-- **UI:** 
+- **UI:**
   - Foto principale (Cloudinary snippet).
   - Metadati (supporto, data, dimensioni).
-  - **Player Audio:** Se `audioSnippetUrl` è presente, mostra player HTML5 `<audio>`. 
+  - **Player Audio:** Se `audioSnippetUrl` è presente, mostra player HTML5 `<audio>`.
   - Link audio completo (Spotify/Bandcamp).
 
 ### Step 14: Calendar (`/calendar`)
