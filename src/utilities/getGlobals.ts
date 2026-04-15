@@ -2,10 +2,10 @@ import type { Config } from 'src/payload-types'
 import type {
   Header,
   Footer,
-  HeroSettings,
-  CalendarSettings,
-  CartSettings,
-} from '@/payload-types'
+  HeroSetting,
+  CalendarSetting,
+  CartSetting,
+} from 'src/payload-types'
 
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
@@ -17,9 +17,9 @@ type Global = keyof Config['globals']
 type GlobalTypeMap = {
   header: Header
   footer: Footer
-  'hero-settings': HeroSettings
-  'calendar-settings': CalendarSettings
-  'cart-settings': CartSettings
+  'hero-settings': HeroSetting
+  'calendar-settings': CalendarSetting
+  'cart-settings': CartSetting
 }
 
 async function getGlobal<TSlug extends Global>(

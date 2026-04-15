@@ -10,15 +10,16 @@ import { usePathname } from 'next/navigation'
 import { useTransition } from '@/context/TransitionContext'
 
 export interface SubclusterData {
-  id: string
+  id: number | string
   title: string
   artworks: MockArtwork[]
 }
 
 export interface ClusterData {
-  id: string
+  id: number | string
   title: string
   desc: string
+  slug?: string | null
   image: string
   titleColor: string
   descColor: string
@@ -55,7 +56,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   const [isHoveringFooter, setIsHoveringFooter] = useState(false)
   
   // Stato del Mock Cluster espanso (null = chiuso, 'id_del_cluster' = aperto)
-  const [expandedClusterId, setExpandedClusterId] = useState<string | null>(null)
+  const [expandedClusterId, setExpandedClusterId] = useState<number | string | null>(null)
 
   // Cache dei sottocluster caricati in lazy load
   const [cachedSubclusters, setCachedSubclusters] = useState<Record<string, SubclusterData[]>>({})
@@ -93,7 +94,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
     let isMounted = true
     setIsLoadingExpanded(true)
 
-    fetchClusterSubclusters(expandedClusterId).then((data) => {
+    fetchClusterSubclusters(String(expandedClusterId)).then((data) => {
       if (isMounted) {
         setCachedSubclusters(prev => ({ ...prev, [expandedClusterId]: data }))
         setIsLoadingExpanded(false)

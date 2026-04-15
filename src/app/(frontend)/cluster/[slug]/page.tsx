@@ -58,9 +58,9 @@ export default async function SubclusterPage({ params: paramsPromise }: Args) {
           <h1 className="text-[5vw] font-neo tracking-widest leading-none text-[#768b1a] uppercase">
             {subcluster.title}
           </h1>
-          {subcluster.description && (
+          {subcluster.mood && (
             <p className="mt-4 text-[1.2vw] font-neo text-[#fc5896] max-w-2xl uppercase leading-relaxed">
-              {subcluster.description}
+              {subcluster.mood}
             </p>
           )}
         </div>
@@ -73,7 +73,7 @@ export default async function SubclusterPage({ params: paramsPromise }: Args) {
                 <img
                    // @ts-ignore - Assuming Media is populated
                   src={typeof art.mainImage !== 'string' ? art.mainImage?.url : ''}
-                  alt={art.title}
+                  alt={art.title ?? undefined}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
                 />
               </div>
@@ -83,11 +83,11 @@ export default async function SubclusterPage({ params: paramsPromise }: Args) {
                   <p className="text-[0.8vw] font-mono text-[#a0a0a0]">{art.nid}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[1vw] font-neo text-[#768b1a]">{art.price}€</p>
+                  <p className="text-[1vw] font-neo text-[#768b1a]">{art.priceInfo ?? ''}</p>
                   <p className={`text-[0.6vw] uppercase px-2 py-1 rounded inline-block mt-1 ${
-                    art.status === 'available' ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'
+                    art.availability === 'comprabile' ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'
                   }`}>
-                    {art.status}
+                    {art.availability === 'comprabile' ? 'Disponibile' : art.availability === 'ordinabile' ? 'Ordinabile' : 'Non disponibile'}
                   </p>
                 </div>
               </div>

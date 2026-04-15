@@ -12,6 +12,9 @@ import { Clusters } from './collections/Clusters'
 import { Categories } from './collections/Categories'
 import { Artworks } from './collections/Artworks'
 import { Signals } from './collections/Signals'
+import { Pages } from './collections/Pages'
+import { Posts } from './collections/Posts'
+import { plugins as projectPlugins } from './plugins'
 
 import { HeroSettings } from './globals/HeroSettings'
 import { CalendarSettings } from './globals/CalendarSettings'
@@ -42,6 +45,8 @@ export default buildConfig({
     Categories,
     Artworks,
     Signals,
+    Pages,
+    Posts,
   ],
   globals: [
     HeroSettings,
@@ -64,6 +69,8 @@ export default buildConfig({
       clientUploads: false,
       useFilename: true,
     }),
+    // project-defined plugins (forms, seo, redirects, search...)
+    ...(projectPlugins || []),
   ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,

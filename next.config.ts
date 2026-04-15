@@ -37,9 +37,7 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   typescript: {
-    // Temporary: allow builds to succeed while resolving type mismatches
-    // Remove this once TypeScript errors are addressed
-    ignoreBuildErrors: true,
+    // Enforce type-checking in CI
   },
   redirects,
   turbopack: {

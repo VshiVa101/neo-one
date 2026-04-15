@@ -26,7 +26,6 @@ const globals: GlobalSlug[] = [
   'footer',
   'hero-settings',
   'calendar-settings',
-  'inquiry-settings',
 ]
 
 const categories = ['Technology', 'News', 'Finance', 'Design', 'Software', 'Engineering']
@@ -141,8 +140,8 @@ export const seed = async ({
     data: {
       title: 'General',
       slug: 'general',
-      description: 'General cluster for seeded categories',
-      image: imageHomeDoc.id,
+      manifesto: 'General cluster for seeded categories',
+      coverImage: imageHomeDoc.id,
     },
   })
 
@@ -153,10 +152,10 @@ export const seed = async ({
         data: {
           title: category,
           slug: category,
-          parentCluster: generalCluster.id,
+          cluster: generalCluster.id,
         },
       }),
-    ),
+  )
   )
 
   payload.logger.info(`— Seeding posts...`)
@@ -243,23 +242,8 @@ export const seed = async ({
       slug: 'header',
       data: {
         navItems: [
-          {
-            link: {
-              type: 'custom',
-              label: 'Posts',
-              url: '/posts',
-            },
-          },
-          {
-            link: {
-              type: 'reference',
-              label: 'Contact',
-              reference: {
-                relationTo: 'pages',
-                value: contactPage.id,
-              },
-            },
-          },
+          { label: 'Posts', url: '/posts' },
+          { label: 'Contact', url: '/contact' },
         ],
       },
     }),
@@ -267,29 +251,9 @@ export const seed = async ({
       slug: 'footer',
       data: {
         navItems: [
-          {
-            link: {
-              type: 'custom',
-              label: 'Admin',
-              url: '/admin',
-            },
-          },
-          {
-            link: {
-              type: 'custom',
-              label: 'Source Code',
-              newTab: true,
-              url: 'https://github.com/payloadcms/payload/tree/main/templates/website',
-            },
-          },
-          {
-            link: {
-              type: 'custom',
-              label: 'Payload',
-              newTab: true,
-              url: 'https://payloadcms.com/',
-            },
-          },
+          { label: 'Admin', url: '/admin' },
+          { label: 'Source Code', url: 'https://github.com/payloadcms/payload/tree/main/templates/website', newTab: true },
+          { label: 'Payload', url: 'https://payloadcms.com/', newTab: true },
         ],
       },
     }),
