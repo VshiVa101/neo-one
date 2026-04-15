@@ -13,6 +13,11 @@ public/media/
 public/robots.txt
 public/sitemap*.xml
 
+# Allow tracking small audio effects needed by the client UI
+!public/media/explosion-arcade.mp3
+!public/media/dash.mp3
+!public/media/return.mp3
+
 
 # Playwright
 node_modules/

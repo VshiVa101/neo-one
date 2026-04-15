@@ -14,7 +14,12 @@ export const TransitionOverlay = () => {
             // Avvio transizione sonora (Arcade Explosion)
             const audio = new Audio('/media/explosion-arcade.mp3')
             audio.volume = 0.6
-            audio.play().catch(() => {})
+            audio.play().catch((err) => {
+                // Log play errors to help debugging on production
+                // (e.g. network 404 or autoplay blocked)
+                // eslint-disable-next-line no-console
+                console.warn('Audio play failed', err)
+            })
 
             setRenderGifs(true)
             setIsVisible(true)
