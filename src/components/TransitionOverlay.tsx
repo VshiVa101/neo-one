@@ -45,7 +45,7 @@ export const TransitionOverlay = () => {
     if (!renderGifs) return null
 
     return (
-        <div 
+        <div
             className={`fixed inset-0 z-[100] pointer-events-none flex items-center justify-center transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
         >
             {/* Sfondo extra scuro se vuoi nascondere lo stacco brutale, opzionale */}
@@ -53,18 +53,18 @@ export const TransitionOverlay = () => {
 
             {/* Explosion 1: Eyes al centro */}
             <div className="absolute inset-0 flex items-center justify-center z-10 w-full h-full">
-                <img 
-                    src="/images/drops/eye-explosion.gif" 
-                    alt="Eye Explosion" 
+                <img
+                    src="/images/drops/eye-explosion.gif"
+                    alt="Eye Explosion"
                     className="w-[80vw] h-auto max-w-[800px] object-contain mix-blend-screen"
                 />
             </div>
 
             {/* Explosion 2: Borders ai lati */}
             <div className="absolute inset-0 z-20 pointer-events-none w-full h-full">
-                <img 
-                    src="/images/drops/border-flames.gif" 
-                    alt="Border Flames" 
+                <img
+                    src="/images/drops/border-flames.gif"
+                    alt="Border Flames"
                     className="w-full h-full object-cover mix-blend-screen opacity-90"
                 />
             </div>
