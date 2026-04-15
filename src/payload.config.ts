@@ -17,6 +17,7 @@ import { HeroSettings } from './globals/HeroSettings'
 import { CalendarSettings } from './globals/CalendarSettings'
 import { CartSettings } from './globals/CartSettings'
 import { Footer } from './globals/Footer'
+import { Header } from './globals/Header'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -47,6 +48,7 @@ export default buildConfig({
     CalendarSettings,
     CartSettings,
     Footer,
+    Header,
   ],
   plugins: [
     cloudinaryStorage({
