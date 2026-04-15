@@ -16,7 +16,9 @@
 | 14 | Calendar Overview `/calendar` | 🔴 PROSSIMO | Lista segnali ordinata. |
 | 15 | Event Detail `/calendar/[slug]` | ⬜ | Layout 2-slot Punk. |
 | 16 | Cart/Form Overlay Globale | ⬜ | Context e UI di acquisto/info. |
-| 17-21 | Deploy & Finalize | ⬜ | Vercel e dominio Neo. |
+| 17 | Deploy Vercel | ✅ DONE | Repo su GitHub, deploy automatico Vercel, env vars configurate. |
+| 18 | Neo Account & Access | ✅ DONE | Account Payload creato per Neo. Credenziali pronte. |
+| 19-21 | Domain Custom & Polish | ⬜ | Dominio Neo (quando disponibile), finalize. |
 
 ---
 
