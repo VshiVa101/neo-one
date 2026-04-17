@@ -88,4 +88,4 @@ Per sbloccare l'audio nei browser moderni senza rovinare l'estetica:
 - **Stack:** Next.js 15, Payload v3, Neon Postgres, Cloudinary.
 
 ---
-*Ultimo aggiornamento: 15 Aprile 2026 - Release v1.1.0 — aggiornati onboarding e documentazione. Prossimo passo: completare la responsività mobile (Step 13.5).* 
+*Ultimo aggiornamento: 15 Aprile 2026 - Release v1.1.0 — aggiornati onboarding e documentazione. Prossimo passo: completare la responsività mobile (Step 13.5).*

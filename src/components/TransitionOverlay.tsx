@@ -8,6 +8,21 @@ export const TransitionOverlay = () => {
     const { isTransitioning, onTransitionComplete } = useTransition()
     const [isVisible, setIsVisible] = useState(false)
     const [renderGifs, setRenderGifs] = useState(false)
+    const [renderCRT, setRenderCRT] = useState(false)
+
+    // Decide if we should use the CRT effect: prefer on pointer:fine and devices with some memory
+    const [useCRT, setUseCRT] = useState(false)
+
+    useEffect(() => {
+        try {
+            const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            const pointerFine = window.matchMedia('(pointer: fine)').matches
+            const memory = (navigator as any).deviceMemory || 4
+            setUseCRT(!prefersReduced && pointerFine && memory >= 2)
+        } catch (e) {
+            setUseCRT(false)
+        }
+    }, [])
 
     useEffect(() => {
         if (isTransitioning) {
@@ -21,8 +36,26 @@ export const TransitionOverlay = () => {
                 console.warn('Audio play failed', err)
             })
 
-            setRenderGifs(true)
             setIsVisible(true)
+
+            if (useCRT) {
+                setRenderCRT(true)
+
+                // CRT: durata breve e diretta
+                const fadeTimer = setTimeout(() => setIsVisible(false), 1200)
+                const endTimer = setTimeout(() => {
+                    setRenderCRT(false)
+                    onTransitionComplete()
+                }, 1600)
+
+                return () => {
+                    clearTimeout(fadeTimer)
+                    clearTimeout(endTimer)
+                }
+            }
+
+            // Fallback: gif-based explosion
+            setRenderGifs(true)
 
             // Dopo 2 secondi (tempo dell'esplosione), dissolvi l'overlay
             const fadeTimer = setTimeout(() => {
@@ -42,7 +75,7 @@ export const TransitionOverlay = () => {
         }
     }, [isTransitioning, onTransitionComplete])
 
-    if (!renderGifs) return null
+    if (!renderGifs && !renderCRT) return null
 
     return (
         <div
@@ -51,23 +84,33 @@ export const TransitionOverlay = () => {
             {/* Sfondo extra scuro se vuoi nascondere lo stacco brutale, opzionale */}
             <div className="absolute inset-0 bg-black opacity-80" />
 
-            {/* Explosion 1: Eyes al centro */}
-            <div className="absolute inset-0 flex items-center justify-center z-10 w-full h-full">
-                <img
-                    src="/images/drops/eye-explosion.gif"
-                    alt="Eye Explosion"
-                    className="w-[80vw] h-auto max-w-[800px] object-contain mix-blend-screen"
-                />
-            </div>
+            {renderCRT && (
+                <div className="absolute inset-0 flex items-center justify-center z-10 w-full h-full">
+                    <div className="crt-screen w-full h-full" aria-hidden />
+                </div>
+            )}
 
-            {/* Explosion 2: Borders ai lati */}
-            <div className="absolute inset-0 z-20 pointer-events-none w-full h-full">
-                <img
-                    src="/images/drops/border-flames.gif"
-                    alt="Border Flames"
-                    className="w-full h-full object-cover mix-blend-screen opacity-90"
-                />
-            </div>
+            {renderGifs && (
+                <>
+                    {/* Explosion 1: Eyes al centro */}
+                    <div className="absolute inset-0 flex items-center justify-center z-10 w-full h-full">
+                        <img
+                            src="/images/drops/eye-explosion.gif"
+                            alt="Eye Explosion"
+                            className="w-[80vw] h-auto max-w-[800px] object-contain mix-blend-screen"
+                        />
+                    </div>
+
+                    {/* Explosion 2: Borders ai lati */}
+                    <div className="absolute inset-0 z-20 pointer-events-none w-full h-full">
+                        <img
+                            src="/images/drops/border-flames.gif"
+                            alt="Border Flames"
+                            className="w-full h-full object-cover mix-blend-screen opacity-90"
+                        />
+                    </div>
+                </>
+            )}
         </div>
     )
 }

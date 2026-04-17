@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const CHARS = 'ONE'
@@ -25,14 +25,14 @@ const MATRIX_TEXT = [
 // Ordine di sparizione sequenziale (una alla volta, alternata dai lati)
 const EXIT_SEQUENCE = [6, 0, 4, 1]
 
-const ScrambleChar = ({ 
-  target, 
+const ScrambleChar = ({
+  target,
   isScrambling,
   canScramble,
   color,
   scrambleInterval,
-}: { 
-  target: string, 
+}: {
+  target: string,
   isScrambling: boolean,
   canScramble: boolean,
   color: string,
@@ -55,8 +55,8 @@ const ScrambleChar = ({
   }, [isScrambling, canScramble, target, scrambleInterval])
 
   return (
-    <motion.span 
-      animate={{ 
+    <motion.span
+      animate={{
         color: color,
         textShadow: isScrambling && canScramble ? `0 0 10px ${color}88` : `0 0 15px ${color}44`
       }}
@@ -71,6 +71,8 @@ export function MatrixGateway({ onClick, isFading }: MatrixGatewayProps) {
   const [stage, setStage] = useState<'initial' | 'scrambling' | 'shrinking' | 'final'>('initial')
   const [visibleIndices, setVisibleIndices] = useState(new Set([0, 1, 2, 3, 4, 5, 6]))
   const [scrambleInterval, setScrambleInterval] = useState(100)
+  const [showTouch, setShowTouch] = useState(false)
+  const lettersRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     // 1. Inizio statico (neo-one)
@@ -81,16 +83,21 @@ export function MatrixGateway({ onClick, isFading }: MatrixGatewayProps) {
     // 2. Dopo lo svarione, inizia a rimuovere caratteri e rallentare
     const shrinkTimer = setTimeout(() => {
       setStage('shrinking')
-      
+
       let currentExitIndex = 0
       const exitInterval = setInterval(() => {
-        if (currentExitIndex >= EXIT_SEQUENCE.length) {
-          clearInterval(exitInterval)
-          setStage('final') 
-          setScrambleInterval(100) // Reset per sicurezza ma stage final lo blocca
-          return
-        }
-        
+          if (currentExitIndex >= EXIT_SEQUENCE.length) {
+            clearInterval(exitInterval)
+            setStage('final')
+            setScrambleInterval(100) // Reset per sicurezza ma stage final lo blocca
+
+            // Mostriamo la scritta TOCCAMI solo dopo che la sequenza di uscita si è stabilizzata.
+            // Ritardo breve per lasciare completare le animazioni di exit.
+            setTimeout(() => setShowTouch(true), 600)
+
+            return
+          }
+
         // Rallenta lo svarione man mano che spariscono le lettere
         setScrambleInterval(prev => prev + 100)
 
@@ -112,54 +119,65 @@ export function MatrixGateway({ onClick, isFading }: MatrixGatewayProps) {
     }
   }, [])
 
+  // Puliamo lo stato della scritta quando il componente viene smontato
+  useEffect(() => {
+    return () => setShowTouch(false)
+  }, [])
+
   return (
-    <div 
+    <div
       className={`fixed inset-0 z-[1000] bg-black flex items-start justify-center pt-[20vh] cursor-pointer pointer-events-auto transition-opacity duration-1000 ${isFading ? 'opacity-0' : 'opacity-100'}`}
       onClick={onClick}
     >
-      <div className="flex gap-[0.05em] scale-100 md:scale-110">
-        <AnimatePresence mode="popLayout">
-          {MATRIX_TEXT.map((char) => {
-            if (!visibleIndices.has(char.id)) return null
+      <div ref={lettersRef} className="flex flex-col items-center gap-6">
+        <div className="flex gap-[0.05em] scale-100 md:scale-110">
+          <AnimatePresence mode="popLayout">
+            {MATRIX_TEXT.map((char) => {
+              if (!visibleIndices.has(char.id)) return null
 
-            return (
-              <motion.div
-                key={char.id}
-                layoutId={`char-${char.id}`}
-                initial={{ opacity: 1 }}
-                animate={{ opacity: 1 }}
-                exit={{ 
-                  opacity: 0, 
-                  y: char.id % 2 === 0 ? -30 : 30,
-                  filter: 'blur(20px)',
-                  transition: { duration: 0.4 }
-                }}
-                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="text-[16vw] sm:text-[14vw] font-bold leading-none select-none"
-              >
-                <ScrambleChar 
-                  target={char.target} 
-                  canScramble={char.canScramble}
-                  isScrambling={stage === 'scrambling' || stage === 'shrinking'}
-                  scrambleInterval={scrambleInterval}
-                  color={(visibleIndices.size === 3) ? char.finalColor : char.initialColor}
-                />
-              </motion.div>
-            )
-          })}
+              return (
+                <motion.div
+                  key={char.id}
+                  layoutId={`char-${char.id}`}
+                  initial={{ opacity: 1 }}
+                  animate={{ opacity: 1 }}
+                  exit={{
+                    opacity: 0,
+                    y: char.id % 2 === 0 ? -30 : 30,
+                    filter: 'blur(20px)',
+                    transition: { duration: 0.4 }
+                  }}
+                  transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                  className="text-[16vw] sm:text-[14vw] font-bold leading-none select-none"
+                >
+                  <ScrambleChar
+                    target={char.target}
+                    canScramble={char.canScramble}
+                    isScrambling={stage === 'scrambling' || stage === 'shrinking'}
+                    scrambleInterval={scrambleInterval}
+                    color={(visibleIndices.size === 3) ? char.finalColor : char.initialColor}
+                  />
+                </motion.div>
+              )
+            })}
+          </AnimatePresence>
+        </div>
+
+        <AnimatePresence>
+          {showTouch && (
+            <motion.div
+              key="tocami"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.45, ease: 'easeOut' }}
+              className="text-[10px] sm:text-[12px] tracking-[1.5em] text-white/50 uppercase font-sans pointer-events-none select-none"
+            >
+              TOCCAMI
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
-
-      {stage === 'final' && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 0.4, 0] }}
-          transition={{ repeat: Infinity, duration: 2.5 }}
-          className="absolute bottom-[25%] text-[10px] sm:text-[12px] tracking-[1.5em] text-white/50 uppercase font-sans pointer-events-none select-none"
-        >
-          TOCCAMI
-        </motion.div>
-      )}
     </div>
   )
 }

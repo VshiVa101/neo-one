@@ -5,133 +5,92 @@
 **Date:** April 15, 2026
 **GitHub Repo:** https://github.com/VshiVa101/neo-one.git
 
-# 🚀 Neo-One Vercel Deployment Checklist
-
-**Status:** Ready for deployment
-**Date:** April 15, 2026
-**GitHub Repo:** https://github.com/VshiVa101/neo-one.git
-
 ---
 
 ## ✅ Pre-Deployment (COMPLETATO)
 
-- [x] Codice pushato su GitHub (1242+ commits, 84+ MB)
+- [x] Codice pushato su GitHub
 - [x] Database Neon online e configurato
 - [x] Cloudinary storage pronto
-- [x] Account Neo creato nel database (neo@neo-one.art / NeoPink2026!Key#)
+- [x] Account Neo creato nel database
 - [x] MASTER_SPEC.md aggiornato
-- [x] Script create-neo-user.ts committato
-- [x] Footer Global creato e Types rigenerati
-- [x] Vercel Build Error RISOLTO (TypeScript Footer missing export)
+- [x] Footer/Header Globals creati e Types rigenerati
 
 ---
 
-## 🎯 Deployment Steps (PER TE)
+## 🎯 Deployment Steps
 
 ### Step 1: Vercel Import
 1. Vai a https://vercel.com/dashboard
 2. Clicca **"Add New"** → **"Project"**
 3. Seleziona **"Import Git Repository"**
-4. Paste URL: `https://github.com/VshiVa101/neo-one.git`
+4. Importa il repo dal tuo account GitHub
 5. Clicca **"Import"**
 
 ### Step 2: Configure Build
-**Vercel auto-rileva Next.js. LASCIA TUTTO DI DEFAULT:**
+Vercel auto-rileva Next.js. Lascia i default:
 - Framework: `Next.js` ✅
 - Root Directory: `./` ✅
 - Build Command: `pnpm build` ✅
-- Output Directory: `.next` ✅
 
 ### Step 3: Environment Variables
-Aggiungi queste variabili PRIMA di cliccare Deploy:
+Aggiungi le variabili dal tuo file `.env` locale **PRIMA** di cliccare Deploy.
 
-```
-DATABASE_URI = postgresql://neondb_owner:npg_0ZmC8YkDdnai@ep-lingering-wildflower-agitcscp.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require
+Variabili necessarie:
+- `DATABASE_URI`
+- `PAYLOAD_SECRET`
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+- `NEXT_PUBLIC_SERVER_URL`
+- `CRON_SECRET`
+- `PREVIEW_SECRET`
 
-PAYLOAD_SECRET = ca797a62e1dc6a42b10825a4
-
-CLOUDINARY_CLOUD_NAME = dhk3bdk5q
-
-CLOUDINARY_API_KEY = 721252821681267
-
-CLOUDINARY_API_SECRET = Do3VWp-biCfAH1xTbV-KOq67HIM
-
-NEXT_PUBLIC_SERVER_URL = https://neo-one.vercel.app
-
-CRON_SECRET = your-cron-secret
-
-PREVIEW_SECRET = your-preview-secret
-```
+> ⚠️ NON committare mai valori di env vars nel repository. Usa sempre la dashboard di Vercel.
 
 ### Step 4: Deploy
-1. Clicca **"Deploy"** in basso
+1. Clicca **"Deploy"**
 2. Aspetta 3-5 minuti
 3. Quando vedi ✅ **"Deployment successful"** → FATTO
 
 ### Step 5: Verifica
-- Apri l'URL che Vercel ti dà (tipo: https://neo-one.vercel.app)
+- Apri l'URL che Vercel ti dà
 - Verifica che il sito carichi
 - Prova ad andare a `/admin`
-- Login con: `neo@neo-one.art` / `NeoPink2026!Key#`
+- Login con le credenziali create via `scripts/create-neo-user.ts`
 
 ---
 
-## 📧 Credenziali Neo (Da condividere)
+## 🔐 Creare un Account Admin
 
-```
-🌐 URL Admin:  https://neo-one.vercel.app/admin
-📧 Email:      neo@neo-one.art
-🔐 Password:   NeoPink2026!Key#
+```bash
+# Passa email e password come variabili d'ambiente
+$env:NEO_EMAIL="user@example.com"
+$env:NEO_PASSWORD="SecurePassword123!"
+pnpm exec tsx scripts/create-neo-user.ts
 ```
 
 ---
 
 ## 🔄 Post-Deployment
 
-Dopo il deploy:
-
-### Post-release checklist (azione raccomandata)
-
-- Eseguire `pnpm run generate:types` e poi `pnpm exec tsc --noEmit` in locale per ripristinare la validazione TypeScript.
-- Rimuovere la regola temporanea `typescript.ignoreBuildErrors` in `next.config.ts` e pushare le correzioni.
-- Verificare che tutte le immagini principali siano nella cartella `public/media` e che i file WebP siano correttamente serviti.
-
-1. **Continua con Step 13.5** (Responsive mobile)
-   - Lavora in locale con `pnpm dev`
-   - Ogni commit in main auto-triggera redeploy su Vercel
-   - Neo vedrà i cambiamenti live in ~2-3 minuti
-
-2. **Step 14 Planning** (Calendar page)
-   - Route: `/calendar`
-   - Fetch signals ordinati per sortOrder
-   - UI: lista/griglia con miniature
+1. Ogni commit in `main` auto-triggera redeploy su Vercel
+2. Neo vedrà i cambiamenti live in ~2-3 minuti
+3. Il dominio custom si collega dopo (Settings → Domains)
 
 ---
 
 ## 🛠️ Troubleshooting
 
-**Se il build fallisce su Vercel:**
+**Build fallisce su Vercel:**
 1. Controlla che tutte le env vars siano settate
-2. Verifica che `pnpm install` funzioni in locale
+2. Verifica che `pnpm build` funzioni in locale
 3. Controlla il log del build su Vercel dashboard
-4. Se persiste, contattami con lo screenshot dell'errore
 
-**Se Neo non riesce a loggarsi:**
-1. Verifica che DATABASE_URI sia corretto
-2. Prova a creare un nuovo utente in locale con lo script
-3. Controlla la console browser per errori
+**Neo non riesce a loggarsi:**
+1. Verifica che `DATABASE_URI` sia corretto in Vercel
+2. Ricrea l'utente con lo script `create-neo-user.ts`
 
 ---
 
-## 📝 Notes
-
-- Vercel auto-redeploya ogni volta che pushiamo su main
-- Il dominio custom si collega DOPO (quando Neo lo avrà deciso)
-- I build sono free fino a 100/mese
-- Database Neon rimane online indipendentemente da Vercel
-
----
-
-**Quando il deploy è pronto, aggiorna questo file mettendo la data e l'URL finale.**
-
-Ultimo aggiornamento: 15 Aprile 2026 - Pre-deployment checklist completo
+Ultimo aggiornamento: 17 Aprile 2026

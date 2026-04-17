@@ -227,7 +227,7 @@
   }
 
   /* Exception for Hero / Technical elements - FORCED ACID GREEN & UPPERCASE */
-  [data-neo-skip] text, 
+  [data-neo-skip] text,
   [data-neo-skip] span,
   .neo-skip-branding text,
   .neo-skip-branding span {
@@ -236,25 +236,25 @@
     fill: #809829 !important;
   }
 
-  .neo-O { 
-    color: #F45390 !important; 
+  .neo-O {
+    color: #F45390 !important;
     text-transform: uppercase !important;
     font-weight: bold;
     display: inline-block;
   }
-  .neo-N { 
-    color: #809829 !important; 
+  .neo-N {
+    color: #809829 !important;
     text-transform: uppercase !important;
     font-weight: bold;
     display: inline-block;
   }
-  .neo-E { 
-    color: #FF82B2 !important; 
+  .neo-E {
+    color: #FF82B2 !important;
     text-transform: uppercase !important;
     font-weight: bold;
     display: inline-block;
   }
-  
+
   a, button, [role="button"], input, textarea, select {
     cursor: none !important;
   }
@@ -267,4 +267,63 @@ html {
 html[data-theme='dark'],
 html[data-theme='light'] {
   opacity: initial;
+}
+
+/* CRT transition effect (lightweight CSS-only fallback) */
+@keyframes crt-off {
+  0% {
+    transform: scaleY(1) translateZ(0);
+    opacity: 1;
+    filter: none;
+  }
+  40% {
+    transform: scaleY(0.08) translateZ(0);
+    opacity: 1;
+    filter: blur(0.6px) contrast(1.15);
+  }
+  70% {
+    transform: scaleY(0.12) translateZ(0);
+    opacity: 0.9;
+    filter: blur(1.2px) contrast(1.05) saturate(1.02);
+  }
+  100% {
+    transform: scaleY(0) translateZ(0);
+    opacity: 0;
+    filter: blur(1.6px) contrast(0.7) brightness(0.7);
+  }
+}
+
+@keyframes crt-noise {
+  0% { opacity: 0.06; transform: translateY(0); }
+  50% { opacity: 0.12; transform: translateY(-1px); }
+  100% { opacity: 0.06; transform: translateY(0); }
+}
+
+.crt-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: center;
+  background: black;
+  overflow: hidden;
+  animation: crt-off 1.2s ease-in-out both;
+}
+
+.crt-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, rgba(0,0,0,0.02) 1px, rgba(0,0,0,0.02) 2px);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.crt-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.45) 70%);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  animation: crt-noise 0.18s steps(2) infinite;
 }

@@ -2,7 +2,6 @@ import { config as dotenvConfig } from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { getPayload } from 'payload'
-import payloadConfig from '@payload-config'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -12,36 +11,69 @@ dotenvConfig({
   path: path.resolve(dirname, '../.env'),
 })
 
-// Ensure PAYLOAD_SECRET is set
-if (!process.env.PAYLOAD_SECRET) {
-  process.env.PAYLOAD_SECRET = 'ca797a62e1dc6a42b10825a4'
+// ── Validate required env vars ──────────────────────────────────
+const requiredEnv = ['DATABASE_URI', 'PAYLOAD_SECRET'] as const
+for (const key of requiredEnv) {
+  if (!process.env[key]) {
+    console.error(`❌ Missing required env variable: ${key}`)
+    console.error('   Make sure your .env file is present and contains all required values.')
+    process.exit(1)
+  }
 }
 
 async function createNeoUser() {
+  const email = process.env.NEO_EMAIL
+  const password = process.env.NEO_PASSWORD
+  const name = process.env.NEO_NAME || 'Neo'
+
+  if (!email || !password) {
+    console.error('❌ Usage: provide NEO_EMAIL and NEO_PASSWORD as env variables.')
+    console.error('')
+    console.error('   Example:')
+    console.error('   $env:NEO_EMAIL="neo@example.com"; $env:NEO_PASSWORD="SecurePass!"; pnpm exec tsx scripts/create-neo-user.ts')
+    process.exit(1)
+  }
+
+  const payloadConfig = (await import('@payload-config')).default
   const payload = await getPayload({ config: payloadConfig })
 
   try {
-    // Crea l'utente Neo
-    const user = await payload.create({
+    // Check if user already exists
+    const existing = await payload.find({
       collection: 'users',
-      data: {
-        email: 'neo@neo-one.art',
-        password: 'NeoPink2026!Key#',
-        name: 'Neo',
-      },
+      where: { email: { equals: email } },
+      depth: 0,
+      limit: 1,
     })
 
-    console.log('✅ Account creato per Neo:')
+    let user
+    if (existing.totalDocs && existing.totalDocs > 0) {
+      user = existing.docs[0]
+      await payload.update({
+        collection: 'users',
+        id: user.id,
+        data: { password, name },
+        depth: 0,
+      })
+      console.log('🔁 Existing user updated (password reset)')
+    } else {
+      user = await payload.create({
+        collection: 'users',
+        data: { email, password, name },
+      })
+      console.log('✅ New user created')
+    }
+
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log(`Email: neo@neo-one.art`)
-    console.log(`Password: NeoPink2026!Key#`)
-    console.log(`URL Login: https://neo-one.vercel.app/admin`)
+    console.log(`   Email:    ${email}`)
+    console.log(`   Name:     ${name}`)
+    console.log(`   User ID:  ${user.id}`)
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log(`ID utente: ${user.id}`)
 
     process.exit(0)
   } catch (error) {
-    console.error('❌ Errore nella creazione utente:', error)
+    console.error('❌ Failed to create/update user:')
+    console.error(error)
     process.exit(1)
   }
 }

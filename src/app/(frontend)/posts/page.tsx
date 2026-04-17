@@ -13,31 +13,18 @@ export const revalidate = 600
 
 export default async function Page() {
   const payload = await getPayload({ config: configPromise })
-  let posts
-
-  try {
-    posts = await payload.find({
-      collection: 'posts',
-      depth: 1,
-      limit: 12,
-      overrideAccess: false,
-      select: {
-        title: true,
-        slug: true,
-        categories: true,
-        meta: true,
-      },
-    })
-  } catch (err) {
-    // If 'posts' collection does not exist, show empty results.
-    posts = {
-      docs: [],
-      totalDocs: 0,
-      totalPages: 0,
-      page: 1,
-      limit: 12,
-    }
-  }
+  const posts = await payload.find({
+    collection: 'posts',
+    depth: 1,
+    limit: 12,
+    overrideAccess: false,
+    select: {
+      title: true,
+      slug: true,
+      categories: true,
+      meta: true,
+    },
+  })
 
   return (
     <div className="pt-24 pb-24">

@@ -15,6 +15,7 @@ export default function HeroClient() {
   const [isEyeReady, setIsEyeReady] = useState(false)
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [isFading, setIsFading] = useState(false)
+  const [isTouchDevice, setIsTouchDevice] = useState(false)
 
   const handleUnlock = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -40,6 +41,15 @@ export default function HeroClient() {
     setShouldRender(true)
   }, [])
 
+  useEffect(() => {
+    try {
+      const touch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0 || window.matchMedia('(pointer:coarse)').matches)
+      setIsTouchDevice(Boolean(touch))
+    } catch (e) {
+      setIsTouchDevice(false)
+    }
+  }, [])
+
   // Se siamo già in /home o altre rotte, non renderizzare l'overlay Hero
   // Se però stiamo transizionando, rimaniamo montati per completare il fade-out
   if (!shouldRender || (pathname !== '/' && !isTransitioning)) {
@@ -54,7 +64,7 @@ export default function HeroClient() {
         )}
       </AnimatePresence>
 
-      <motion.main 
+      <motion.main
         initial={{ opacity: 1 }}
         animate={{ opacity: isTransitioning ? 0 : 1 }}
         transition={{ duration: 1.5, ease: "easeInOut" }}
@@ -74,14 +84,16 @@ export default function HeroClient() {
           />
         )}
       </AnimatePresence>
-      
+
       {/* The 3D Scene - con interattività abilitata e segnalazione Ready */}
       <div className={`fixed inset-0 z-10 w-full h-screen pointer-events-auto transition-opacity duration-1000 ${isEyeReady ? 'opacity-100' : 'opacity-0'}`}>
-        <EyeScene 
-          targetRoute="/home" 
-          showCircularText={isEyeReady} 
+        <EyeScene
+          targetRoute="/home"
+          showCircularText={isEyeReady}
           onReady={() => setIsEyeReady(true)}
           isUnlocked={isUnlocked}
+          globalTracking={!isTouchDevice}
+          scaleMultiplier={isTouchDevice ? 1.6 : 1}
         />
       </div>
 

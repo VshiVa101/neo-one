@@ -39,7 +39,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   // Cerchiamo Neon e Bianconero negli indici per evitare i cluster di test
   const initialLeft = clusters.findIndex(c => c.slug?.toLowerCase().includes('neon') || c.title?.toLowerCase().includes('neon'))
   const initialRight = clusters.findIndex(c => c.slug?.toLowerCase().includes('bn') || c.slug?.toLowerCase().includes('bianco') || c.title?.toLowerCase().includes('mix'))
-  
+
   // Se non troviamo i preferiti, ripieghiamo sui primi due dell'array ordinato
   const startLeft = initialLeft !== -1 ? initialLeft : 0
   const startRight = initialRight !== -1 ? initialRight : (clusters.length > 1 ? 1 : 0)
@@ -54,7 +54,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
   const [cartHovered, setCartHovered] = useState(false)
   const [isHoveringFooter, setIsHoveringFooter] = useState(false)
-  
+
   // Stato del Mock Cluster espanso (null = chiuso, 'id_del_cluster' = aperto)
   const [expandedClusterId, setExpandedClusterId] = useState<number | string | null>(null)
 
@@ -80,7 +80,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   // Observer per fetching on-demand
   useEffect(() => {
     if (!expandedClusterId) return
-    
+
     // Cache hit: dati già presenti
     const cached = cachedSubclusters[expandedClusterId]
     if (cached) {
@@ -98,7 +98,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       if (isMounted) {
         setCachedSubclusters(prev => ({ ...prev, [expandedClusterId]: data }))
         setIsLoadingExpanded(false)
-        
+
         // AUTO-EXPAND: se c'è solo un mazzo, vai diretto alla griglia
         if (data.length === 1) {
           setExpandedDeckIndex(0)
@@ -115,7 +115,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   }, [expandedClusterId, cachedSubclusters])
 
   const currentSubclusters = expandedClusterId ? (cachedSubclusters[expandedClusterId] || []) : []
-  
+
   // Ref per il trascinamento del footer
   const footerRef = React.useRef<HTMLDivElement>(null)
 
@@ -123,7 +123,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   const replaceCluster = (newIdx: number, forcedSide?: 'left' | 'right') => {
     setNavState(prev => {
       const side = forcedSide || prev.next
-      
+
       if (side === 'left') {
         if (newIdx === prev.right) return prev
         return { ...prev, left: newIdx, next: 'right' }
@@ -140,7 +140,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
     const handleWheel = (e: WheelEvent) => {
       // Se il mouse sta sul footer o il cluster è espanso, non attivare il cambio cluster principale
       if (isHoveringFooter || expandedClusterId) return
-      
+
       e.preventDefault()
       if (isScrolling) return
       isScrolling = true
@@ -199,12 +199,12 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         )}
         {/* Intercettatore click sull'Occhio per resettare tutto lo stato */}
         {(expandedClusterId || expandedDeckIndex !== null) && (
-          <div 
-            className="absolute inset-0 z-[501] cursor-pointer" 
+          <div
+            className="absolute inset-0 z-[501] cursor-pointer"
             onClick={() => {
               setExpandedDeckIndex(null)
               setExpandedClusterId(null)
-            }} 
+            }}
           />
         )}
       </div>
@@ -308,13 +308,13 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       </div>
 
       {/* ── FOOTER: fila di thumbnail scorrevole (Drag orizzontale) ──────────────────── */}
-      <div 
+      <div
         ref={footerRef}
         className="absolute bottom-[10vh] left-0 w-full h-[18vh] z-20 overflow-hidden select-none"
         onMouseEnter={() => setIsHoveringFooter(true)}
         onMouseLeave={() => setIsHoveringFooter(false)}
       >
-        <motion.div 
+        <motion.div
           drag="x"
           dragConstraints={footerRef}
           initial={{ x: -80 }}
@@ -351,9 +351,9 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
           onMouseEnter={() => setCartHovered(true)}
           onMouseLeave={() => setCartHovered(false)}
           className="w-[35px] h-[35px] md:w-[50px] md:h-[50px] cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
-          style={{ 
+          style={{
             backgroundColor: cartHovered ? '#F45390' : '#B3828B',
-            boxShadow: cartHovered ? '0 0 20px rgba(244, 83, 144, 0.5)' : '0 0 10px rgba(0,0,0,0.3)' 
+            boxShadow: cartHovered ? '0 0 20px rgba(244, 83, 144, 0.5)' : '0 0 10px rgba(0,0,0,0.3)'
           }}
           title="Vai alla Cassa"
         >
@@ -405,7 +405,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                     <img src="/images/ui/direction-arrow-green.webp" className="absolute w-[50%] h-[50%] object-contain rotate-180 drop-shadow-md z-20 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </motion.button>
                 </div>
-                
+
                 <div className="absolute top-1/2 right-8 -translate-y-1/2 z-[110] hidden lg:block">
                   <motion.button
                     whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
@@ -419,21 +419,21 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                 </div>
 
                 {/* Striscia Orizzontale dei Mazzi di Subcluster in Stile Coverflow */}
-                <div 
+                <div
                    className="relative w-full h-[70vh] flex items-center justify-center"
                 >
                    {currentSubclusters.length === 0 ? (
                      <div className="text-white font-neo tracking-widest opacity-50 uppercase">Nessuna Opera Trovata</div>
                    ) : currentSubclusters.map((sub, idx) => {
                      const offset = idx - activeDeckIndex;
-                     
+
                      // Calcola rotazione, opacità e scaling in base alla distanza dal centro
                      const absOffset = Math.abs(offset);
                      const isActive = offset === 0;
-                     
+
                      // Seleziona la traslazione orizzontale in VW
                      const xTranslation = offset * 20; // Ogni mazzo è scostato di 20vw
-                     
+
                      // Effetto prospettico
                      const scale = isActive ? 1 : Math.max(0.7, 1 - absOffset * 0.15);
                      const opacity = isActive ? 1 : Math.max(0, 1 - absOffset * 0.4);
@@ -443,8 +443,8 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                      const zIndex = 60 - absOffset * 10;
 
                      return (
-                        <motion.div 
-                          key={'deck-wrapper-' + idx} 
+                        <motion.div
+                          key={'deck-wrapper-' + idx}
                           animate={{
                              x: `${xTranslation}vw`,
                              scale: scale,
@@ -457,7 +457,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                           className={`absolute ${isActive ? 'pointer-events-auto' : 'pointer-events-none'}`}
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <ClusterDeck 
+                          <ClusterDeck
                               subclusterTitle={sub.title}
                               artworks={sub.artworks}
                               onExpand={() => setExpandedDeckIndex(idx)}
@@ -473,7 +473,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       </AnimatePresence>
 
       {/* ── EXPANDED GALLERY GRID OVERLAY ──────────────────── */}
-      <ExpandedGalleryOverlay 
+      <ExpandedGalleryOverlay
         isOpen={expandedDeckIndex !== null}
         onClose={() => {
           setExpandedDeckIndex(null)

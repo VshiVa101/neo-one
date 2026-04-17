@@ -8,7 +8,7 @@ Questo documento è la guida "a prova d'errore" per Neo: accesso admin, flusso o
 
 - URL Admin: https://neo-one.vercel.app/admin
 - Email: neo@neo-one.art
-- Password: (inviata separatamente, cambiare al primo accesso)
+- Password: (da impostare al primo accesso o chiedi l'invio separatamente)
 
 Passaggi obbligatori dopo il primo login:
 
