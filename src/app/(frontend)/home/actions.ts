@@ -3,6 +3,7 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { SubclusterData } from '@/components/home/ClusterLayout'
+import { unstable_noStore as noStore } from 'next/cache'
 
 // Helper per risolvere in un bel path diretto l'immagine di cloudinary
 const getImageUrl = (media: any, defaultUrl: string) => {
@@ -27,6 +28,7 @@ const getImageUrl = (media: any, defaultUrl: string) => {
 }
 
 export async function fetchClusterSubclusters(clusterId: string): Promise<SubclusterData[]> {
+  noStore()
   const payload = await getPayload({ config: configPromise })
 
   // Recupero solo le categorie (sottocluster) che appartengono a questo cluster!
@@ -44,12 +46,13 @@ export async function fetchClusterSubclusters(clusterId: string): Promise<Subclu
     return []
   }
 
-  // Chiediamo SOLO le Artworks appartenenti a QUESTE categorie (Max 200)
+  // Chiediamo SOLO le Artworks appartenenti a QUESTE categorie (Max 1000)
   const { docs: artworks } = await payload.find({
     collection: 'artworks',
     where: { subcluster: { in: categoryIds } },
     depth: 1, // per recuperare i media URL
-    limit: 200,
+    limit: 1000,
+    sort: 'sortOrder',
   })
 
   // Formatizziamo la risposta al client Component
@@ -78,6 +81,7 @@ export async function fetchClusterSubclusters(clusterId: string): Promise<Subclu
   return subclusters
 }
 export async function fetchArtworkByNid(nid: string) {
+  noStore()
   const payload = await getPayload({ config: configPromise })
 
   const { docs } = await payload.find({

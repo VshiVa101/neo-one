@@ -61,12 +61,12 @@ export const ExpandedGalleryOverlay = ({
                     className="w-full h-full object-cover grayscale brightness-110 contrast-125 group-hover:grayscale-0 group-hover:brightness-100 group-hover:contrast-100 transition-all duration-700"
                   />
                   
-                  {/* Overlay Testo */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
-                    <p className="font-neo text-white text-lg tracking-widest uppercase mb-1 drop-shadow-md">
+                  {/* Overlay Testo Sempre Visibile In Basso */}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent flex flex-col justify-end p-4 lg:p-6 transition-all duration-300">
+                    <p className="font-neo text-white text-base lg:text-lg tracking-widest uppercase mb-1 drop-shadow-md">
                       {artwork.title}
                     </p>
-                    <div className="h-0.5 w-12 bg-[#768b1a] shadow-[0_0_10px_#768b1a]" />
+                    <div className="h-0.5 w-8 lg:w-12 bg-[#768b1a] shadow-[0_0_10px_#768b1a] group-hover:w-full transition-all duration-500" />
                   </div>
                   
                   {/* Numero opera (stile Acid - Sempre Green Acid) */}
