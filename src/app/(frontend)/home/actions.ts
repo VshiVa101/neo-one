@@ -65,9 +65,9 @@ export async function fetchClusterSubclusters(clusterId: string): Promise<Subclu
       return artSubclusterId === cat.id
     })
 
-    const mappedArtworks = catArtworks.map(art => ({
+    const mappedArtworks = catArtworks.map((art, index) => ({
       id: art.nid || art.id.toString(),
-      title: art.title || 'Senza Titolo',
+      title: art.title || String(index + 1),
       image: getImageUrl(art.mainImage, '/images/drops/placeholder.png')
     }))
 
@@ -98,7 +98,7 @@ export async function fetchArtworkByNid(nid: string) {
   return {
     id: art.id.toString(),
     nid: art.nid,
-    title: art.title || `OPERA ${art.nid}`,
+    title: art.title || '',
     image: getImageUrl(art.mainImage, '/images/drops/placeholder.png'),
     method: art.executionMethod || 'TECNICA MISTA NEO-ONE',
     support: art.support || 'SUPPORTO ORIGINALE',
@@ -115,8 +115,8 @@ export async function fetchArtworkByNid(nid: string) {
   }
 }
 
-export async function fetchAdjacentArtworks(currentNid: string, subclusterId: string | null): Promise<{ prevNid: string | null; nextNid: string | null }> {
-  if (!subclusterId) return { prevNid: null, nextNid: null }
+export async function fetchAdjacentArtworks(currentNid: string, subclusterId: string | null): Promise<{ prevNid: string | null; nextNid: string | null; currentIndex: number | null }> {
+  if (!subclusterId) return { prevNid: null, nextNid: null, currentIndex: null }
 
   const payload = await getPayload({ config: configPromise })
 
@@ -129,10 +129,11 @@ export async function fetchAdjacentArtworks(currentNid: string, subclusterId: st
   })
 
   const index = docs.findIndex(a => String(a.nid) === String(currentNid))
-  if (index === -1) return { prevNid: null, nextNid: null }
+  if (index === -1) return { prevNid: null, nextNid: null, currentIndex: null }
 
   return {
     prevNid: index > 0 ? String(docs[index - 1].nid) : null,
     nextNid: index < docs.length - 1 ? String(docs[index + 1].nid) : null,
+    currentIndex: index,
   }
 }

@@ -1139,3 +1139,7 @@ For deeper exploration of specific topics, refer to the context files located in
 - GitHub: https://github.com/payloadcms/payload
 - Examples: https://github.com/payloadcms/payload/tree/main/examples
 - Templates: https://github.com/payloadcms/payload/tree/main/templates
+
+## Regole di Versionamento
+1. **Versionamento main**: Quando l'utente chiede il versionamento main, esegui il commit su main e assicurati di eseguire il push su origin (Vercel) in modo che le modifiche siano visibili in produzione.
+2. **Versionamento semplice**: Esegui un commit locale senza pushare su main. Trattalo come un fork locale in attesa di autorizzazione per il push.

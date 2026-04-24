@@ -13,10 +13,10 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
 
   if (!artwork) return notFound()
 
-  const { prevNid, nextNid } = await fetchAdjacentArtworks(params.nid, artwork.subclusterId ?? null)
+  const { prevNid, nextNid, currentIndex } = await fetchAdjacentArtworks(params.nid, artwork.subclusterId ?? null)
 
-  const numericNidMatch = artwork.nid.match(/\d+/)
-  const numericNid = numericNidMatch ? parseInt(numericNidMatch[0], 10) : artwork.nid
+  const progressiveNumber = currentIndex !== null ? String(currentIndex + 1) : ''
+  const displayTitle = artwork.title ? artwork.title : progressiveNumber
 
   return (
     <main className="relative w-full h-screen overflow-hidden flex flex-col justify-between pt-[1vh] bg-[#151515]">
@@ -35,7 +35,7 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
         <span
           className="font-neo text-2xl lg:text-3xl tracking-widest font-bold leading-none text-[#768b1a] drop-shadow-[0_0_10px_rgba(118,139,26,0.6)]"
         >
-          {numericNid}
+          {displayTitle}
         </span>
       </div>
 
@@ -43,7 +43,7 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
       <div className="flex-1 w-full flex items-center justify-center p-1 lg:p-4 min-h-0 z-10">
         <ArtworkDetailClient
           nid={String(artwork.nid)}
-          title={artwork.title}
+          title={displayTitle}
           image={artwork.image}
           method={artwork.method}
           support={artwork.support}
