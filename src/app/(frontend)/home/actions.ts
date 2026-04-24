@@ -52,7 +52,7 @@ export async function fetchClusterSubclusters(clusterId: string): Promise<Subclu
     where: { subcluster: { in: categoryIds } },
     depth: 1, // per recuperare i media URL
     limit: 1000,
-    sort: 'sortOrder',
+    sort: 'nid',
   })
 
   // Formatizziamo la risposta al client Component

@@ -195,7 +195,17 @@ function CircularText({ isMobile }: { isMobile: boolean }) {
     const outerRef = useRef<HTMLDivElement | null>(null)
     const [content, setContent] = useState('')
     const [startOffsetPx, setStartOffsetPx] = useState<number>(0)
-    const chunks = ['nessuna paura...', 'nessuna censura...']
+    
+    const words = [
+        "nessuna paura...", 
+        "nessuna censura...", 
+        "toccami...", 
+        "no", 
+        "occhio...", 
+        "paura?", 
+        "sicuro?", 
+        "tua mamma non vuole..."
+    ];
 
     useLayoutEffect(() => {
         const el = outerRef.current
@@ -207,22 +217,59 @@ function CircularText({ isMobile }: { isMobile: boolean }) {
         const pathLengthPx = circumference * (svgWidth / 200)
         const fontSize = isMobile ? 10 : 9
 
-        // Misuriamo approssimativamente la larghezza del chunk usando canvas
+        // Misuriamo la larghezza dei chunk usando canvas
         const canvas = document.createElement('canvas')
         const ctx = canvas.getContext('2d')
         const computedFont = getComputedStyle(document.documentElement).getPropertyValue('--font-neo') || 'sans-serif'
         if (ctx) ctx.font = `${fontSize}px ${computedFont}`
-        const chunkText = `${chunks[0]} ${chunks[1]}`
-        const chunkWidth = Math.max(1, ctx ? ctx.measureText(chunkText).width : chunkText.length * fontSize * 0.5)
+        
+        const measure = (text: string) => {
+            return Math.max(1, ctx ? ctx.measureText(text).width : text.length * fontSize * 0.5)
+        }
 
-        const repeats = Math.max(2, Math.ceil(pathLengthPx / chunkWidth) + 1)
-        const repeated = new Array(repeats).fill(chunkText + '\u00A0\u00A0').join(' ')
-        setContent(repeated)
+        let currentText = ""
+        let currentWidth = 0
 
-        const totalTextWidth = chunkWidth * repeats
-        const leftover = Math.max(0, totalTextWidth - pathLengthPx)
-        const offsetPx = Math.round(leftover / 2)
-        setStartOffsetPx(offsetPx)
+        // Riempie il tracciato
+        while (currentWidth < pathLengthPx) {
+            // Sceglie una parola a caso
+            const randomWord = words[Math.floor(Math.random() * words.length)] + " "
+            const wordWidth = measure(randomWord)
+
+            if (currentWidth + wordWidth <= pathLengthPx) {
+                currentText += randomWord
+                currentWidth += wordWidth
+            } else {
+                // Cerca una parola più piccola che entri
+                let fitFound = false
+                const sortedWords = [...words].sort((a, b) => measure(a) - measure(b))
+                for (const word of sortedWords) {
+                    const wWidth = measure(word + " ")
+                    if (currentWidth + wWidth <= pathLengthPx) {
+                        currentText += word + " "
+                        currentWidth += wWidth
+                        fitFound = true
+                        break
+                    }
+                }
+                
+                // Se neanche la più piccola entra ("no"), usa i puntini
+                if (!fitFound) {
+                    const dotWidth = measure(".")
+                    while (currentWidth + dotWidth <= pathLengthPx) {
+                        currentText += "."
+                        currentWidth += dotWidth
+                    }
+                    break; // Spazio esaurito
+                }
+            }
+        }
+
+        setContent(currentText)
+
+        // Centra l'avanzo microscopico (se c'è)
+        const leftover = Math.max(0, pathLengthPx - currentWidth)
+        setStartOffsetPx(Math.round(leftover / 2))
     }, [isMobile])
 
     return (
@@ -231,7 +278,7 @@ function CircularText({ isMobile }: { isMobile: boolean }) {
                 <path id={isMobile ? 'mobileCurve' : 'desktopCurve'} d="M 100, 100 m -94, 0 a 94,94 0 1,1 188,0 a 94,94 0 1,1 -188,0" fill="transparent" />
                 <text className="font-neo text-[#809829] fill-current uppercase" style={{ fontSize: isMobile ? '10px' : '9px' }}>
                     <textPath href={`#${isMobile ? 'mobileCurve' : 'desktopCurve'}`} startOffset={`${startOffsetPx}px`}>
-                        {content || `${chunks[0]} ${chunks[1]} ${chunks[0]}`}
+                        {content}
                     </textPath>
                 </text>
             </svg>

@@ -363,14 +363,13 @@ export interface Category {
 export interface Artwork {
   id: number;
   /**
-   * Codice numerico unico dell'opera.
+   * Identificativo unico dell'opera. Usato anche come URL.
    */
   nid: string;
   /**
    * Neo spesso usa solo il N.ID.
    */
   title?: string | null;
-  slug?: string | null;
   mainImage: number | Media;
   /**
    * Scatti extra, close-up, dettagli.
@@ -394,7 +393,6 @@ export interface Artwork {
    */
   priceInfo?: string | null;
   subcluster: number | Category;
-  sortOrder?: number | null;
   /**
    * URL a un file audio breve (es. MP3 su Dropbox/Drive). Perfetto per il cluster Rumore.
    */
@@ -1349,7 +1347,6 @@ export interface CategoriesSelect<T extends boolean = true> {
 export interface ArtworksSelect<T extends boolean = true> {
   nid?: T;
   title?: T;
-  slug?: T;
   mainImage?: T;
   detailGallery?:
     | T
@@ -1364,7 +1361,6 @@ export interface ArtworksSelect<T extends boolean = true> {
   availability?: T;
   priceInfo?: T;
   subcluster?: T;
-  sortOrder?: T;
   audioSnippetUrl?: T;
   fullAudioUrl?: T;
   updatedAt?: T;

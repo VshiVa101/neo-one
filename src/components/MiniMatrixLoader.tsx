@@ -69,7 +69,7 @@ export function MiniMatrixLoader() {
   }, [])
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center pointer-events-none z-[120] pb-[10vh]">
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-black pointer-events-none z-[120] pb-[10vh]">
         <div className="flex gap-[0.05em] scale-[0.3] md:scale-[0.5]">
           <AnimatePresence>
             {MATRIX_TEXT.map((char) => (

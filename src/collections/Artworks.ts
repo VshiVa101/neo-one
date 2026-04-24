@@ -22,7 +22,7 @@ export const Artworks: CollectionConfig = {
       required: true,
       unique: true,
       admin: {
-        description: 'Codice numerico unico dell\'opera.',
+        description: 'Identificativo unico dell\'opera. Usato anche come URL.',
       },
     },
     {
@@ -33,14 +33,7 @@ export const Artworks: CollectionConfig = {
         description: 'Neo spesso usa solo il N.ID.',
       },
     },
-    {
-      name: 'slug',
-      label: 'Slug',
-      type: 'text',
-      unique: true,
-      index: true,
-      admin: { position: 'sidebar' },
-    },
+
     {
       name: 'mainImage',
       label: 'Immagine Principale',
@@ -119,13 +112,7 @@ export const Artworks: CollectionConfig = {
       relationTo: 'categories',
       required: true,
     },
-    {
-      name: 'sortOrder',
-      label: 'Ordine nel Mazzo',
-      type: 'number',
-      defaultValue: 0,
-      admin: { position: 'sidebar' },
-    },
+
     {
       name: 'audioSnippetUrl',
       label: 'URL Sample Audio',
