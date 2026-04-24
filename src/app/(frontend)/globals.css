@@ -211,7 +211,6 @@
   }
   body {
     @apply bg-background text-foreground min-h-[100vh] flex flex-col uppercase;
-    cursor: none !important;
   }
 
   /* Default Typography Sizes (Readable & Impactful) */
@@ -256,7 +255,7 @@
   }
 
   a, button, [role="button"], input, textarea, select {
-    cursor: none !important;
+    /* cursor rules removed */
   }
 }
 

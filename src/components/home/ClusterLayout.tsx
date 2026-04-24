@@ -63,6 +63,11 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   const [cachedSubclusters, setCachedSubclusters] = useState<Record<string, SubclusterData[]>>({})
   const [isLoadingExpanded, setIsLoadingExpanded] = useState(false)
 
+  // Gestione tasto indietro RIMOSSA per prevenire crash del router
+  useEffect(() => {
+    // La logica popstate/pushState è stata disabilitata perché interferiva con il router di Next.js
+  }, [expandedClusterId])
+
   // Indice del mazzo (Subcluster) attivo visibile in primo piano
   const [activeDeckIndex, setActiveDeckIndex] = useState(0)
 
@@ -119,6 +124,8 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
   // Ref per il trascinamento del footer
   const footerRef = React.useRef<HTMLDivElement>(null)
+  const touchStartX = React.useRef<number | null>(null)
+  const lastDeckSwitchTime = React.useRef<number>(0)
 
   // Funzione helper per rimpiazzare un lato (usando functional update per evitare closure stale)
   const replaceCluster = (newIdx: number, forcedSide?: 'left' | 'right') => {
@@ -210,8 +217,8 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         )}
       </div>
 
-      {/* ── MAIN STAGE: 2 cluster grandi + descrizioni (posizionato più in alto per dare respiro) ── */}
-      <div className="absolute top-[24vh] lg:top-[28vh] left-0 w-full h-[55vh] lg:h-[40vh] flex flex-col lg:flex-row items-center lg:items-start justify-start lg:justify-center gap-6 lg:gap-[3vw] px-4 lg:px-[5vw]">
+      {/* ── MAIN STAGE: 2 cluster grandi + descrizioni ── */}
+      <div className="absolute top-[22vh] md:top-[28vh] left-0 w-full min-h-[55vh] md:h-[40vh] flex flex-col md:flex-row items-center md:items-start justify-center gap-8 md:gap-[4vw] px-6 md:px-[5vw] overflow-y-auto md:overflow-hidden custom-scrollbar">
 
         {/* ── CLUSTER SINISTRO + descrizione ──── */}
         <div className="flex flex-row items-center lg:items-start gap-4 lg:gap-[2vw]">
@@ -224,7 +231,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               whileHover={{ scale: 1.05, rotate: -1, y: -5 }}
               transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
               onClick={() => setExpandedClusterId(leftCluster.id)}
-              className="w-[35vw] h-[35vw] lg:w-[20vw] lg:h-[20vw] max-w-[200px] max-h-[200px] lg:max-w-none lg:max-h-none flex-shrink-0 overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.7)] cursor-pointer"
+              className="w-[45vw] h-[45vw] md:w-[18vw] md:h-[18vw] max-w-[220px] max-h-[220px] md:max-w-none md:max-h-none flex-shrink-0 overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.7)] cursor-pointer"
             >
               <img
                 src={leftCluster.image}
@@ -251,7 +258,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                 {leftCluster.title}
               </h2>
               <p
-                className="mt-1 lg:mt-2 font-neo text-[10px] md:text-sm lg:text-[0.8vw] uppercase leading-relaxed tracking-wide truncate md:whitespace-normal"
+                className="mt-1 md:mt-2 font-neo text-[11px] md:text-sm lg:text-[0.9vw] uppercase leading-relaxed tracking-wide whitespace-normal break-words"
                 style={{ color: leftCluster.descColor }}
               >
                 {leftCluster.desc}
@@ -271,7 +278,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               whileHover={{ scale: 1.05, rotate: 1, y: -5 }}
               transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
               onClick={() => setExpandedClusterId(rightCluster.id)}
-              className="w-[35vw] h-[35vw] lg:w-[20vw] lg:h-[20vw] max-w-[200px] max-h-[200px] lg:max-w-none lg:max-h-none flex-shrink-0 overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.7)] cursor-pointer"
+              className="w-[45vw] h-[45vw] md:w-[18vw] md:h-[18vw] max-w-[220px] max-h-[220px] md:max-w-none md:max-h-none flex-shrink-0 overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.7)] cursor-pointer"
             >
               <img
                 src={rightCluster.image}
@@ -298,7 +305,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                 {rightCluster.title}
               </h2>
               <p
-                className="mt-1 lg:mt-2 font-neo text-[10px] md:text-sm lg:text-[0.8vw] uppercase leading-relaxed tracking-wide truncate md:whitespace-normal"
+                className="mt-1 md:mt-2 font-neo text-[11px] md:text-sm lg:text-[0.9vw] uppercase leading-relaxed tracking-wide whitespace-normal break-words"
                 style={{ color: rightCluster.descColor }}
               >
                 {rightCluster.desc}
@@ -314,6 +321,26 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         className="absolute bottom-[10vh] left-0 w-full h-[18vh] z-20 overflow-hidden select-none"
         onMouseEnter={() => setIsHoveringFooter(true)}
         onMouseLeave={() => setIsHoveringFooter(false)}
+        onWheel={(e) => {
+          if (footerRef.current) {
+            footerRef.current.scrollLeft += e.deltaY * 0.8
+          }
+        }}
+        onMouseDown={(e) => {
+          const ele = footerRef.current
+          if (!ele) return
+          let startPos = { left: ele.scrollLeft, x: e.clientX }
+          const handleMouseMove = (eMove: MouseEvent) => {
+            const dx = eMove.clientX - startPos.x
+            ele.scrollLeft = startPos.left - dx
+          }
+          const handleMouseUp = () => {
+            document.removeEventListener('mousemove', handleMouseMove)
+            document.removeEventListener('mouseup', handleMouseUp)
+          }
+          document.addEventListener('mousemove', handleMouseMove)
+          document.addEventListener('mouseup', handleMouseUp)
+        }}
       >
         <motion.div
           drag="x"
@@ -376,7 +403,43 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
             className="fixed inset-0 z-25 bg-black/80 backdrop-blur-md flex flex-col pt-[26vh] overflow-hidden"
-            onClick={() => setExpandedClusterId(null)} // Click outside closes overlay
+            onClick={() => setExpandedClusterId(null)}
+            onTouchStart={(e) => {
+              touchStartX.current = e.touches[0].clientX
+            }}
+            onTouchEnd={(e) => {
+              if (touchStartX.current === null) return
+              const touchEndX = e.changedTouches[0].clientX
+              const deltaX = touchStartX.current - touchEndX
+              if (Math.abs(deltaX) > 50) {
+                if (deltaX > 0) setActiveDeckIndex(prev => Math.min(currentSubclusters.length - 1, prev + 1))
+                else setActiveDeckIndex(prev => Math.max(0, prev - 1))
+              }
+              touchStartX.current = null
+            }}
+            onMouseMove={(e) => {
+              const now = Date.now()
+              if (now - lastDeckSwitchTime.current < 600) return // Cooldown di 600ms per evitare switch troppo rapidi
+
+              const { clientX } = e
+              const width = window.innerWidth
+              
+              if (clientX > width * 0.75) {
+                // Mouse nel 25% di destra
+                setActiveDeckIndex(prev => {
+                  const next = Math.min(currentSubclusters.length - 1, prev + 1)
+                  if (next !== prev) lastDeckSwitchTime.current = now
+                  return next
+                })
+              } else if (clientX < width * 0.25) {
+                // Mouse nel 25% di sinistra
+                setActiveDeckIndex(prev => {
+                  const next = Math.max(0, prev - 1)
+                  if (next !== prev) lastDeckSwitchTime.current = now
+                  return next
+                })
+              }
+            }}
           >
              {/* Il tasto Chiudi (X) è rimosso. Si chiude tramite la gesture sull'Occhio centrale */}
 
@@ -385,35 +448,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                <MiniMatrixLoader />
             ) : (
               <>
-                <div className="absolute top-1/2 left-8 -translate-y-1/2 z-[110] hidden lg:block">
-                  <motion.button
-                    whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={(e) => { e.stopPropagation(); setActiveDeckIndex(prev => Math.max(0, prev - 1)) }}
-                    className={`relative w-[6vw] h-[6vw] min-w-[60px] min-h-[60px] max-w-[80px] max-h-[80px] bg-[#d99f9f] rounded-full flex items-center justify-center transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.5)] ${activeDeckIndex > 0 ? 'cursor-pointer hover:shadow-[0_0_20px_rgba(118,139,26,0.8)] opacity-100' : 'opacity-30 pointer-events-none'}`}
-                  >
-                    <div className="group w-full h-full rounded-full absolute inset-0 peer" />
-                    <img src="/images/ui/direction-arrow-pink.webp" className="w-[50%] h-[50%] object-contain rotate-180 drop-shadow-md z-10 transition-colors pointer-events-none [.group:hover_~_&]:content-['/images/ui/direction-arrow-green.webp']" style={{ content: 'var(--tw-content)' }} />
-                    <style>{`
-                      .peer:hover + img { content: url('/images/ui/direction-arrow-green.webp') !important; }
-                    `}</style>
-                    <img src="/images/ui/direction-arrow-pink.webp" className="absolute w-[50%] h-[50%] object-contain rotate-180 drop-shadow-md z-10 group-hover:opacity-0 transition-opacity" />
-                    <img src="/images/ui/direction-arrow-green.webp" className="absolute w-[50%] h-[50%] object-contain rotate-180 drop-shadow-md z-20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </motion.button>
-                </div>
-
-                <div className="absolute top-1/2 right-8 -translate-y-1/2 z-[110] hidden lg:block">
-                  <motion.button
-                    whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={(e) => { e.stopPropagation(); setActiveDeckIndex(prev => Math.min(currentSubclusters.length - 1, prev + 1)) }}
-                    className={`relative w-[6vw] h-[6vw] min-w-[60px] min-h-[60px] max-w-[80px] max-h-[80px] bg-[#d99f9f] rounded-full flex items-center justify-center transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.5)] ${activeDeckIndex < currentSubclusters.length - 1 ? 'cursor-pointer hover:shadow-[0_0_20px_rgba(118,139,26,0.8)] opacity-100 group' : 'opacity-30 pointer-events-none'}`}
-                  >
-                    <img src="/images/ui/direction-arrow-pink.webp" className="w-[50%] h-[50%] object-contain drop-shadow-md z-10 group-hover:hidden" />
-                    <img src="/images/ui/direction-arrow-green.webp" className="w-[50%] h-[50%] object-contain drop-shadow-md z-20 hidden group-hover:block" />
-                  </motion.button>
-                </div>
-
+                {/* I tasti freccia < > sono stati rimossi. Usa il mouse ai lati per scorrere o lo swipe touch. */}
                 {/* Striscia Orizzontale dei Mazzi di Subcluster in Stile Coverflow */}
                 <div
                    className="relative w-full h-[70vh] flex items-center justify-center"

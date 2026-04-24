@@ -20,6 +20,10 @@ export const ExpandedGalleryOverlay = ({
 }: ExpandedGalleryOverlayProps) => {
   const router = useRouter()
 
+  React.useEffect(() => {
+    // La logica pushState è stata rimossa per evitare conflitti con il router di Next.js
+  }, [isOpen, onClose])
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -40,8 +44,8 @@ export const ExpandedGalleryOverlay = ({
           </div>
 
           {/* Griglia Opere */}
-          <div className="max-w-7xl mx-auto px-8 pb-24 mt-[30vh]">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 pb-24 mt-[35vh] md:mt-[30vh]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
               {artworks.map((artwork, i) => (
                 <motion.div
                   key={artwork.id + '-expanded-' + i}
@@ -52,13 +56,13 @@ export const ExpandedGalleryOverlay = ({
                     scale: 1.03, 
                     boxShadow: '0 0 30px rgba(118, 139, 26, 0.4)'
                   }}
-                  className="group relative h-[400px] border border-white/10 overflow-hidden cursor-pointer bg-black"
+                  className="group relative aspect-square sm:aspect-auto sm:h-[400px] border border-white/10 overflow-hidden cursor-pointer bg-black"
                   onClick={() => router.push(`/artwork/${artwork.id}`)}
                 >
                   <img 
                     src={artwork.image} 
                     alt={artwork.title}
-                    className="w-full h-full object-cover grayscale brightness-110 contrast-125 group-hover:grayscale-0 group-hover:brightness-100 group-hover:contrast-100 transition-all duration-700"
+                    className="w-full h-full object-cover grayscale brightness-110 contrast-125 sm:grayscale sm:brightness-110 sm:contrast-125 group-hover:grayscale-0 group-hover:brightness-100 group-hover:contrast-100 transition-all duration-700 max-sm:grayscale-0 max-sm:brightness-100 max-sm:contrast-100"
                   />
                   
                   {/* Overlay Testo Sempre Visibile In Basso */}

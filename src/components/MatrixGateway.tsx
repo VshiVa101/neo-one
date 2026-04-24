@@ -78,7 +78,7 @@ export function MatrixGateway({ onClick, isFading }: MatrixGatewayProps) {
     // 1. Inizio statico (neo-one)
     const startTimer = setTimeout(() => {
       setStage('scrambling')
-    }, 1500)
+    }, 200)
 
     // 2. Dopo lo svarione, inizia a rimuovere caratteri e rallentare
     const shrinkTimer = setTimeout(() => {
@@ -126,10 +126,10 @@ export function MatrixGateway({ onClick, isFading }: MatrixGatewayProps) {
 
   return (
     <div
-      className={`fixed inset-0 z-[1000] bg-black flex items-start justify-center pt-[20vh] cursor-pointer pointer-events-auto transition-opacity duration-1000 ${isFading ? 'opacity-0' : 'opacity-100'}`}
+      className={`fixed inset-0 z-[1000] bg-black flex items-start justify-center pt-[10vh] cursor-pointer pointer-events-auto transition-opacity duration-1000 ${isFading ? 'opacity-0' : 'opacity-100'}`}
       onClick={onClick}
     >
-      <div ref={lettersRef} className="flex flex-col items-center gap-6">
+      <div ref={lettersRef} className="flex flex-col items-center gap-2">
         <div className="flex gap-[0.05em] scale-100 md:scale-110">
           <AnimatePresence mode="popLayout">
             {MATRIX_TEXT.map((char) => {
@@ -171,7 +171,7 @@ export function MatrixGateway({ onClick, isFading }: MatrixGatewayProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
               transition={{ duration: 0.45, ease: 'easeOut' }}
-              className="text-[10px] sm:text-[12px] tracking-[1.5em] text-white/50 uppercase font-sans pointer-events-none select-none"
+              className="text-[10px] sm:text-[12px] tracking-[1.5em] ml-[1.5em] text-white/50 uppercase font-sans pointer-events-none select-none"
             >
               TOCCAMI
             </motion.div>

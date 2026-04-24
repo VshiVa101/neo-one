@@ -43,6 +43,7 @@ export const ArtworkDetailClient = ({
   const [purchaseHovered, setPurchaseHovered] = useState(false)
   const [cartHovered, setCartHovered] = useState(false)
   const [addedToCart, setAddedToCart] = useState(false)
+  const touchStartX = React.useRef<number | null>(null)
 
   const handlePurchase = () => {
     addToCart({ nid, title, image })
@@ -140,11 +141,28 @@ export const ArtworkDetailClient = ({
           <div 
             className="relative flex-1 bg-black rounded-lg p-1 lg:p-3 flex items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-white/5 overflow-hidden group cursor-zoom-in"
             onClick={() => setIsZoomOpen(true)}
+            onTouchStart={(e) => {
+              touchStartX.current = e.touches[0].clientX
+            }}
+            onTouchEnd={(e) => {
+              if (touchStartX.current === null) return
+              const touchEndX = e.changedTouches[0].clientX
+              const deltaX = touchEndX - touchStartX.current
+              if (deltaX > 50 && prevNid) {
+                // Swipe Right -> Prev
+                router.replace(`/artwork/${prevNid}`)
+              } else if (deltaX < -50 && nextNid) {
+                // Swipe Left -> Next
+                router.replace(`/artwork/${nextNid}`)
+              }
+              touchStartX.current = null
+            }}
           >
             <img 
                src={image} 
                alt={`Opera ${nid}`} 
                className="absolute inset-0 w-full h-full object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-transform duration-700 lg:group-hover:scale-[1.02]" 
+               draggable={false}
             />
           </div>
 

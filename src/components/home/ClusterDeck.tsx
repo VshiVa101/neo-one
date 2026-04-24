@@ -39,6 +39,8 @@ export const ClusterDeck = ({ subclusterTitle, artworks, onExpand }: ClusterDeck
     }
   }
 
+  const touchStartY = React.useRef<number | null>(null)
+
   // Calcola gli stili base a seconda della distanza dall'active index, ORA CIRCOLARE
   const getCardStyle = (index: number) => {
     let offset = (index - activeIndex) % artworks.length
@@ -107,18 +109,31 @@ export const ClusterDeck = ({ subclusterTitle, artworks, onExpand }: ClusterDeck
 
   return (
     <div 
-      className="flex flex-col items-center justify-start w-[25vw] h-full pt-[5vh] relative cursor-ns-resize"
+      className="flex flex-col items-center justify-start w-[80vw] lg:w-[25vw] xl:w-[20vw] h-full pt-[10vh] lg:pt-[5vh] relative cursor-ns-resize"
       onWheel={handleWheel}
+      onTouchStart={(e) => {
+        touchStartY.current = e.touches[0].clientY
+      }}
+      onTouchEnd={(e) => {
+        if (touchStartY.current === null) return
+        const touchEndY = e.changedTouches[0].clientY
+        const deltaY = touchStartY.current - touchEndY
+        if (Math.abs(deltaY) > 30) {
+          if (deltaY > 0) setActiveIndex(prev => (prev + 1) % artworks.length)
+          else setActiveIndex(prev => (prev - 1 + artworks.length) % artworks.length)
+        }
+        touchStartY.current = null
+      }}
     >
       {/* Intestazione del Subcluster / Deck */}
-      <div className="text-center z-50 mb-[10vh] shrink-0 pointer-events-none">
-        <h3 className="font-neo text-white text-[1.8vw] tracking-widest uppercase drop-shadow-md leading-none">
+      <div className="text-center z-50 mb-[5vh] lg:mb-[8vh] shrink-0 pointer-events-none">
+        <h3 className="font-neo text-white text-[6vw] lg:text-[1.8vw] xl:text-[1.5vw] tracking-widest uppercase drop-shadow-md leading-none">
           {subclusterTitle}
         </h3>
       </div>
 
       {/* Area del Mazzo */}
-      <div className="relative w-[20vw] h-[25vw] flex items-center justify-center pointer-events-none">
+      <div className="relative w-[55vw] h-[70vw] md:w-[40vw] md:h-[50vw] lg:w-[20vw] lg:h-[25vw] flex items-center justify-center pointer-events-none">
         <AnimatePresence>
           {artworks.map((artwork, i) => {
             const style = getCardStyle(i)

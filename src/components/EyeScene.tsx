@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useState, useEffect, Suspense, useLayoutEffect } from 'react'
+import React, { useRef, useState, useEffect, Suspense } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Html, useTexture, Decal, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
@@ -37,6 +37,7 @@ const EyeModel = ({
     const [hovered, setHovered] = useState(false)
     const { triggerTransition } = useTransition()
     const router = useRouter()
+    const [isIgnoringPointer, setIsIgnoringPointer] = useState(false)
 
     const { scene } = useGLTF(GLB_URL, DRACO_URL)
     const { viewport } = useThree()
@@ -97,15 +98,14 @@ const EyeModel = ({
 
         // Se non abbiamo un puntatore (es. su mobile/touch) usiamo movimenti autonomi (idle)
         const pointerMagnitude = Math.hypot(pointerX, pointerY)
-        const usingPointer = pointerMagnitude > 0.001
+        const usingPointer = (globalTracking || !isIgnoringPointer) && pointerMagnitude > 0.001
+        const timeMultiplier = globalTracking ? 1 : 2 // Faster float on mobile
 
-        const idleX = Math.sin(time * 0.35) * 0.6
-        const idleY = Math.sin(time * 0.45) * 0.25
+        const idleX = Math.sin(time * 0.35 * timeMultiplier) * (globalTracking ? 0.6 : 1.2)
+        const idleY = Math.sin(time * 0.45 * timeMultiplier) * (globalTracking ? 0.25 : 0.5)
 
         const targetX = usingPointer ? (pointerX * Math.PI) / 4 + rotationOffset : rotationOffset + idleX
         const targetY = usingPointer ? (pointerY * Math.PI) / 4 : idleY
-
-        // --- 3. CALCOLO MOVIMENTI SPECIALI ---
         let flipX = 0
         if (isFlipping) {
             const progress = flipTime / flipDuration
@@ -116,7 +116,7 @@ const EyeModel = ({
             // per evitare che il lerp cerchi di "tornare indietro" da 360 gradi a 0.
             // Lo facciamo solo nel primo frame dopo la fine del flipping.
             if (eyeRef.current.rotation.x < -Math.PI) {
-                 eyeRef.current.rotation.x += Math.PI * 2
+                eyeRef.current.rotation.x += Math.PI * 2
             }
         }
 
@@ -140,6 +140,10 @@ const EyeModel = ({
     const handleClick = () => {
         if (!isUnlocked) return // Impedisce l'attivazione se il lock è attivo
         if (hovered) setHovered(false)
+        
+        // Disable tracking immediately so it resets to center during/after flip
+        setIsIgnoringPointer(true)
+        
         triggerTransition()
         // Ritardiamo la navigazione reale per permettere la transizione fluida di 1.5s
         setTimeout(() => {
@@ -158,7 +162,7 @@ const EyeModel = ({
                     if (dashAudio.current) {
                         returnAudio.current?.pause()
                         dashAudio.current.currentTime = 0
-                        dashAudio.current.play().catch(() => {})
+                        dashAudio.current.play().catch(() => { })
                     }
                 }}
                 onPointerOut={() => {
@@ -167,7 +171,7 @@ const EyeModel = ({
                     if (returnAudio.current) {
                         dashAudio.current?.pause()
                         returnAudio.current.currentTime = 0
-                        returnAudio.current.play().catch(() => {})
+                        returnAudio.current.play().catch(() => { })
                     }
                 }}
                 onClick={handleClick}
@@ -190,94 +194,79 @@ const EyeModel = ({
     )
 }
 
-// Component per il testo circolare dinamico: mantiene le singole chunk e ripete la coppia
+// Component per il testo circolare dinamico.
+// Strategia: budget fisso di caratteri + SVG textLength per adattamento perfetto.
+// Zero misurazione canvas = zero bug di overflow su qualsiasi viewport.
 function CircularText({ isMobile }: { isMobile: boolean }) {
-    const outerRef = useRef<HTMLDivElement | null>(null)
     const [content, setContent] = useState('')
-    const [startOffsetPx, setStartOffsetPx] = useState<number>(0)
-    
+
     const words = [
-        "nessuna paura...", 
-        "nessuna censura...", 
-        "toccami...", 
-        "no", 
-        "occhio...", 
-        "paura?", 
-        "sicuro?", 
-        "tua mamma non vuole..."
+        "nessuna paura!...",
+        "nessuna censura!...",
+        "toccami!...",
+        "no!...",
+        "occhio?...",
+        "paura?...",
+        "sicuro?...",
+        "tua mamma non vuole!..."
     ];
 
-    useLayoutEffect(() => {
-        const el = outerRef.current
-        if (!el) return
+    // Circonferenza SVG fissa: 2 * PI * 94 ≈ 590.6 unità SVG
+    // Questa è una costante geometrica, indipendente dal viewport.
+    const pathLength = 2 * Math.PI * 94
 
-        const svgWidth = el.clientWidth || el.getBoundingClientRect().width || 200
-        const radius = 94
-        const circumference = 2 * Math.PI * radius
-        const pathLengthPx = circumference * (svgWidth / 200)
-        const fontSize = isMobile ? 10 : 9
+    useEffect(() => {
+        // Budget di caratteri conservativo.
+        // Il font uppercase Neo a 9px ha ~5.5-7 unità SVG per carattere.
+        // Usando ~6.5 come media: 590/6.5 ≈ 90 chars.
+        // textLength SVG compenserà qualsiasi micro-differenza regolando la spaziatura.
+        const charBudget = isMobile ? 80 : 90
 
-        // Misuriamo la larghezza dei chunk usando canvas
-        const canvas = document.createElement('canvas')
-        const ctx = canvas.getContext('2d')
-        const computedFont = getComputedStyle(document.documentElement).getPropertyValue('--font-neo') || 'sans-serif'
-        if (ctx) ctx.font = `${fontSize}px ${computedFont}`
-        
-        const measure = (text: string) => {
-            return Math.max(1, ctx ? ctx.measureText(text).width : text.length * fontSize * 0.5)
-        }
+        let text = ""
+        let lastWord = ""
 
-        let currentText = ""
-        let currentWidth = 0
+        // Riempi con token casuali senza ripetizioni immediate
+        while (true) {
+            const availableWords = words.filter(w => w !== lastWord)
+            const candidate = availableWords[Math.floor(Math.random() * availableWords.length)]
+            const spaced = candidate + " "
 
-        // Riempie il tracciato
-        while (currentWidth < pathLengthPx) {
-            // Sceglie una parola a caso
-            const randomWord = words[Math.floor(Math.random() * words.length)] + " "
-            const wordWidth = measure(randomWord)
-
-            if (currentWidth + wordWidth <= pathLengthPx) {
-                currentText += randomWord
-                currentWidth += wordWidth
-            } else {
-                // Cerca una parola più piccola che entri
-                let fitFound = false
-                const sortedWords = [...words].sort((a, b) => measure(a) - measure(b))
-                for (const word of sortedWords) {
-                    const wWidth = measure(word + " ")
-                    if (currentWidth + wWidth <= pathLengthPx) {
-                        currentText += word + " "
-                        currentWidth += wWidth
-                        fitFound = true
+            // Se il prossimo token supererebbe il budget, prova con uno più corto
+            if (text.length + spaced.length > charBudget) {
+                const sorted = [...availableWords].sort((a, b) => a.length - b.length)
+                let fitted = false
+                for (const word of sorted) {
+                    // +1 per lo spazio, deve restare entro il budget
+                    if (text.length + word.length + 1 <= charBudget) {
+                        text += word + " "
+                        lastWord = word
+                        fitted = true
                         break
                     }
                 }
-                
-                // Se neanche la più piccola entra ("no"), usa i puntini
-                if (!fitFound) {
-                    const dotWidth = measure(".")
-                    while (currentWidth + dotWidth <= pathLengthPx) {
-                        currentText += "."
-                        currentWidth += dotWidth
-                    }
-                    break; // Spazio esaurito
-                }
+                if (!fitted) break
+            } else {
+                text += spaced
+                lastWord = candidate
             }
         }
 
-        setContent(currentText)
+        // Riempi il budget rimanente con singoli punti "."
+        while (text.length < charBudget) {
+            text += "."
+        }
 
-        // Centra l'avanzo microscopico (se c'è)
-        const leftover = Math.max(0, pathLengthPx - currentWidth)
-        setStartOffsetPx(Math.round(leftover / 2))
+        setContent(text)
     }, [isMobile])
 
+    const curveId = isMobile ? 'mobileCurve' : 'desktopCurve'
+
     return (
-        <div ref={outerRef} className={`w-full h-full ${isMobile ? 'block md:hidden' : 'hidden md:block'}`}>
+        <div className={`w-full h-full ${isMobile ? 'block md:hidden' : 'hidden md:block'}`}>
             <svg viewBox="0 0 200 200" className="w-full h-full">
-                <path id={isMobile ? 'mobileCurve' : 'desktopCurve'} d="M 100, 100 m -94, 0 a 94,94 0 1,1 188,0 a 94,94 0 1,1 -188,0" fill="transparent" />
+                <path id={curveId} d="M 100, 100 m -94, 0 a 94,94 0 1,1 188,0 a 94,94 0 1,1 -188,0" fill="transparent" />
                 <text className="font-neo text-[#809829] fill-current uppercase" style={{ fontSize: isMobile ? '10px' : '9px' }}>
-                    <textPath href={`#${isMobile ? 'mobileCurve' : 'desktopCurve'}`} startOffset={`${startOffsetPx}px`}>
+                    <textPath href={`#${curveId}`} textLength={pathLength * 0.97} lengthAdjust="spacing">
                         {content}
                     </textPath>
                 </text>
