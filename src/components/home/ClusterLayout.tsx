@@ -6,6 +6,7 @@ import { EyeScene } from '@/components/EyeScene'
 import { ClusterDeck, MockArtwork } from '@/components/home/ClusterDeck'
 import { fetchClusterSubclusters } from '@/app/(frontend)/home/actions'
 import { ExpandedGalleryOverlay } from '@/components/home/ExpandedGalleryOverlay'
+import { MiniMatrixLoader } from '@/components/MiniMatrixLoader'
 import { usePathname } from 'next/navigation'
 import { useTransition } from '@/context/TransitionContext'
 
@@ -381,12 +382,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
             {isLoadingExpanded ? (
                // SPINNER NEO-1 - Forzato al centro assoluto dello schermo
-               <div className="fixed inset-0 flex flex-col items-center justify-center pointer-events-none z-[120] pb-[10vh]">
-                  <h2 className="font-neo text-[#F45390] text-3xl md:text-4xl tracking-[0.3em] uppercase opacity-90 animate-pulse text-center px-4">
-                     Sincronizzazione Archivi...
-                  </h2>
-                  <div className="w-[40vw] max-w-[400px] h-[1px] mt-6 bg-gradient-to-r from-transparent via-[#768b1a] to-transparent animate-pulse" />
-               </div>
+               <MiniMatrixLoader />
             ) : (
               <>
                 <div className="absolute top-1/2 left-8 -translate-y-1/2 z-[110] hidden lg:block">
