@@ -39,10 +39,16 @@ const EyeModel = ({
     const router = useRouter()
     const [isIgnoringPointer, setIsIgnoringPointer] = useState(false)
 
+    // Touch logic state per MOBILE
+    const longPressActive = useRef(false)
+    const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const activeTouchPoint = useRef<{x: number, y: number} | null>(null)
+    const lastTouchClickTime = useRef<number>(-999)
+
     const { scene } = useGLTF(GLB_URL, DRACO_URL)
     const { viewport } = useThree()
 
-    // Audio Refs per la gestione dei suoni
+    // Audio Refs
     const dashAudio = useRef<HTMLAudioElement | null>(null)
     const returnAudio = useRef<HTMLAudioElement | null>(null)
 
@@ -54,21 +60,37 @@ const EyeModel = ({
             audio.load()
             return audio
         }
-
         dashAudio.current = loadAudio('/media/return.mp3', 0.8)
         returnAudio.current = loadAudio('/media/return.mp3', 0.5)
     }, [])
 
-    // Calcoliamo una scala base basata sull'area minima visibile (vmin)
-    // Usiamo 0.10 come base e un moltiplicatore opzionale per mobile/hero.
+    // Event listener globale per intercettare i tap ovunque sullo schermo in modalità MOBILE
+    useEffect(() => {
+        if (globalTracking) return
+        const handleTouch = (e: TouchEvent) => {
+            const touch = e.touches[0]
+            if (touch) {
+                const nx = (touch.clientX / window.innerWidth) * 2 - 1
+                const ny = -(touch.clientY / window.innerHeight) * 2 + 1
+                activeTouchPoint.current = { x: nx, y: ny }
+                // Registra il tocco solo se non stiamo già facendo un long-press fisso sull'occhio
+                if (!longPressActive.current) {
+                    lastTouchClickTime.current = performance.now() / 1000
+                }
+            }
+        }
+        window.addEventListener('touchstart', handleTouch)
+        window.addEventListener('touchmove', handleTouch)
+        return () => {
+            window.removeEventListener('touchstart', handleTouch)
+            window.removeEventListener('touchmove', handleTouch)
+        }
+    }, [globalTracking])
+
     const baseScale = Math.min(viewport.width, viewport.height) * 0.10 * (scaleMultiplier || 1)
-    const currentTarget = hovered ? baseScale * 3.8 : baseScale
 
-
-    // Segnaliamo che l'occhio è pronto appena il componente viene montato con la scena
     useEffect(() => {
         if (scene && onReady) {
-            // Piccolo timeout per assicurarci che il renderer abbia allocato il contesto
             const timer = setTimeout(onReady, 100)
             return () => clearTimeout(timer)
         }
@@ -78,77 +100,142 @@ const EyeModel = ({
         if (!eyeRef.current) return
 
         const time = state.clock.getElapsedTime()
+        const isDesktop = globalTracking
 
-        // --- 1. DEFINIZIONE TIMING ---
-        const flipInterval = 13
+        // --- 1. TIMING E ANIMAZIONI PERIODICHE (SIA MOBILE CHE DESKTOP) ---
+        // Twitch orizzontale ogni 5 secondi
+        const jumpInterval = 5
+        const jumpDuration = 0.15
+        const isVibrating = (time % jumpInterval) < jumpDuration
+        let vibrationX = 0
+        if (isVibrating) {
+            const frequency = 100
+            const amplitude = 0.15
+            vibrationX = Math.sin(time * frequency) * amplitude
+        }
+
+        // Rivoluzione completa (ribaltamento asse verticale/X) ogni 9 secondi
+        const flipInterval = 9
         const flipDuration = 1.2
         const flipTime = time % flipInterval
         const isFlipping = flipTime < flipDuration
-
-        const jumpInterval = 4
-        const jumpDuration = 0.15
-        const isVibrating = !isFlipping && (time % jumpInterval) < jumpDuration
-
-        // --- 2. GESTIONE LOOK-AT (MOUSE) ---
-        const pointerX = (globalTracking && externalMouse?.current) ? externalMouse.current.x : state.pointer.x
-        const pointerY = (globalTracking && externalMouse?.current) ? externalMouse.current.y : state.pointer.y
-
-        // LOGICA ORIGINALE DI PUNTAMENTO (PI/4 e lerp 0.1)
-        const rotationOffset = -Math.PI / 2
-
-        // Se non abbiamo un puntatore (es. su mobile/touch) usiamo movimenti autonomi (idle)
-        const pointerMagnitude = Math.hypot(pointerX, pointerY)
-        const usingPointer = (globalTracking || !isIgnoringPointer) && pointerMagnitude > 0.001
-        const timeMultiplier = globalTracking ? 1 : 2 // Faster float on mobile
-
-        const idleX = Math.sin(time * 0.35 * timeMultiplier) * (globalTracking ? 0.6 : 1.2)
-        const idleY = Math.sin(time * 0.45 * timeMultiplier) * (globalTracking ? 0.25 : 0.5)
-
-        const targetX = usingPointer ? (pointerX * Math.PI) / 4 + rotationOffset : rotationOffset + idleX
-        const targetY = usingPointer ? (pointerY * Math.PI) / 4 : idleY
         let flipX = 0
         if (isFlipping) {
             const progress = flipTime / flipDuration
             const smoothProgress = (1 - Math.cos(progress * Math.PI)) / 2
             flipX = smoothProgress * Math.PI * 2
+        }
+
+        // Vortice (roll/rotazione su asse Z pupilla) ogni 13 secondi
+        const vortexInterval = 13
+        const vortexDuration = 1.5
+        const vortexTime = time % vortexInterval
+        const isVortexing = vortexTime < vortexDuration
+        let vortexZ = 0
+        if (isVortexing) {
+            const progress = vortexTime / vortexDuration
+            const smoothProgress = (1 - Math.cos(progress * Math.PI)) / 2
+            vortexZ = smoothProgress * Math.PI * 2
+        }
+
+        // --- 2. GESTIONE LOOK-AT ---
+        const rotationOffset = -Math.PI / 2
+        let targetX = rotationOffset
+        let targetY = 0
+
+        if (isDesktop) {
+            // DESKTOP: Puntatore sempre preciso, zero float
+            const pointerX = externalMouse?.current ? externalMouse.current.x : state.pointer.x
+            const pointerY = externalMouse?.current ? externalMouse.current.y : state.pointer.y
+            targetX = (pointerX * Math.PI / 4) + rotationOffset
+            targetY = (pointerY * Math.PI / 4)
         } else {
-            // FIX DEFINITIVO: Resettiamo la rotazione interna di Three.js
-            // per evitare che il lerp cerchi di "tornare indietro" da 360 gradi a 0.
-            // Lo facciamo solo nel primo frame dopo la fine del flipping.
-            if (eyeRef.current.rotation.x < -Math.PI) {
-                eyeRef.current.rotation.x += Math.PI * 2
+            // MOBILE: Float di base, punta al touch immediatamente per 1.5s o se tenuto premuto
+            const idleX = Math.sin(time * 0.35 * 2) * 1.2
+            const idleY = Math.sin(time * 0.45 * 2) * 0.5
+            
+            const currPerfTime = performance.now() / 1000
+            const timeSinceTouch = currPerfTime - lastTouchClickTime.current
+
+            if (longPressActive.current && activeTouchPoint.current) {
+                // Fissa il punto finchè premuto
+                targetX = (activeTouchPoint.current.x * Math.PI / 2) + rotationOffset
+                targetY = (activeTouchPoint.current.y * Math.PI / 2)
+            } else if (timeSinceTouch < 1.5 && activeTouchPoint.current) {
+                // Punta immediatamente il tocco per 1.5s
+                targetX = (activeTouchPoint.current.x * Math.PI / 2) + rotationOffset
+                targetY = (activeTouchPoint.current.y * Math.PI / 2)
+            } else {
+                // Float leggero e casuale
+                targetX = rotationOffset + idleX
+                targetY = idleY
             }
         }
 
-        let vibrationX = 0
-        let vibrationY = 0
-        if (isVibrating) {
-            const frequency = 100
-            const amplitude = 0.15
-            vibrationX = Math.sin(time * frequency) * amplitude
-            vibrationY = Math.cos(time * frequency) * amplitude
+        if (isIgnoringPointer) {
+            targetX = rotationOffset
+            targetY = 0
         }
 
-        // --- 4. APPLICAZIONE ROTAZIONE UNIFICATA ---
-        eyeRef.current.rotation.y = THREE.MathUtils.lerp(eyeRef.current.rotation.y, targetX + vibrationX, 0.1)
-        eyeRef.current.rotation.x = THREE.MathUtils.lerp(eyeRef.current.rotation.x, -targetY + vibrationY - flipX, 0.1)
+        // --- 3. APPLICAZIONE ROTAZIONE UNIFICATA ---
+        // Usiamo YXZ per permettere il corretto roll (Vortex) sull'asse della pupilla
+        eyeRef.current.rotation.order = 'YXZ'
 
-        const currentTargetLocal = hovered ? baseScale * 4.2 : baseScale
+        // Calcoliamo la rotazione base (look-at + vibration) mantenendola fluida con il lerp
+        if (eyeRef.current.userData.baseRotY === undefined) eyeRef.current.userData.baseRotY = eyeRef.current.rotation.y
+        if (eyeRef.current.userData.baseRotX === undefined) eyeRef.current.userData.baseRotX = eyeRef.current.rotation.x
+
+        eyeRef.current.userData.baseRotY = THREE.MathUtils.lerp(eyeRef.current.userData.baseRotY, targetX + vibrationX, 0.1)
+        eyeRef.current.userData.baseRotX = THREE.MathUtils.lerp(eyeRef.current.userData.baseRotX, -targetY, 0.1)
+
+        // Applichiamo le rotazioni animative (flipX e vortexZ) DIRETTAMENTE alla rotazione base
+        // Non usiamo il lerp per queste perché smoothProgress è già un'animazione fluida 0 -> 2PI.
+        eyeRef.current.rotation.y = eyeRef.current.userData.baseRotY
+        eyeRef.current.rotation.x = eyeRef.current.userData.baseRotX - flipX
+        eyeRef.current.rotation.z = vortexZ
+
+        const isComingForward = hovered || longPressActive.current
+        const currentTargetLocal = isComingForward ? baseScale * 4.2 : baseScale
         eyeRef.current.scale.setScalar(THREE.MathUtils.lerp(eyeRef.current.scale.x, currentTargetLocal, 0.15))
     })
 
     const handleClick = () => {
-        if (!isUnlocked) return // Impedisce l'attivazione se il lock è attivo
+        if (!isUnlocked) return
         if (hovered) setHovered(false)
-        
-        // Disable tracking immediately so it resets to center during/after flip
         setIsIgnoringPointer(true)
-        
         triggerTransition()
-        // Ritardiamo la navigazione reale per permettere la transizione fluida di 1.5s
         setTimeout(() => {
             router.push(targetRoute)
         }, 1500)
+    }
+
+    const handlePointerDown = (e: any) => {
+        if (globalTracking) return // Su desktop usa l'hover normale
+        try { e?.stopPropagation?.() } catch {}
+        try { e?.target?.setPointerCapture?.(e.pointerId) } catch {}
+        
+        if (longPressTimer.current) clearTimeout(longPressTimer.current)
+        longPressTimer.current = setTimeout(() => {
+            longPressActive.current = true
+            if (dashAudio.current) {
+                dashAudio.current.currentTime = 0
+                dashAudio.current.play().catch(() => {})
+            }
+        }, 300) // Dopo 300ms considera long-press
+    }
+
+    const handlePointerUp = (e: any) => {
+        if (globalTracking) return
+        try { e?.target?.releasePointerCapture?.(e.pointerId) } catch {}
+        if (longPressTimer.current) clearTimeout(longPressTimer.current)
+        
+        if (longPressActive.current) {
+            longPressActive.current = false
+            if (returnAudio.current) {
+                returnAudio.current.currentTime = 0
+                returnAudio.current.play().catch(() => {})
+            }
+        }
     }
 
     return (
@@ -174,6 +261,9 @@ const EyeModel = ({
                         returnAudio.current.play().catch(() => { })
                     }
                 }}
+                onPointerDown={handlePointerDown}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerUp}
                 onClick={handleClick}
                 scale={baseScale}
                 position={[0, 0, 0]}

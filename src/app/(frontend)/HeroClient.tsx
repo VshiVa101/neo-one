@@ -92,7 +92,7 @@ export default function HeroClient() {
           showCircularText={isEyeReady}
           onReady={() => setIsEyeReady(true)}
           isUnlocked={isUnlocked}
-          globalTracking={!isTouchDevice}
+          globalTracking={true}
           scaleMultiplier={isTouchDevice ? 1.6 : 1}
         />
       </div>

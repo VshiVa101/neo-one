@@ -43,6 +43,8 @@ export const ArtworkDetailClient = ({
   const [purchaseHovered, setPurchaseHovered] = useState(false)
   const [cartHovered, setCartHovered] = useState(false)
   const [addedToCart, setAddedToCart] = useState(false)
+  const [isFlipped, setIsFlipped] = useState(false)
+  const [infoHovered, setInfoHovered] = useState(false)
   const touchStartX = React.useRef<number | null>(null)
 
   const handlePurchase = () => {
@@ -115,14 +117,14 @@ export const ArtworkDetailClient = ({
             <div className="relative z-10 w-[90%] aspect-[3/1] mb-12 flex items-center justify-center">
               <div 
                 className="w-full h-full bg-[#768b1a] drop-shadow-[0_0_20px_rgba(118,139,26,0.8)]" 
-                style={{ WebkitMaskImage: 'url(/images/ui/logo-neo-bianco.webp)', WebkitMaskSize: '100% 100%', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} 
+                style={{ WebkitMaskImage: 'url(/images/ui/logo-neoone-blackmetal-bianco.png)', WebkitMaskSize: '100% 100%', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} 
               />
             </div>
             {/* Btn Prev */}
             <div className="relative z-10 w-full flex justify-center mt-8">
               {prevNid ? (
                 <motion.button
-                  className="pointer-events-auto cursor-pointer focus:outline-none w-[7vw] h-[7vw] min-w-[70px] min-h-[70px] bg-[#d99f9f] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-colors"
+                  className="pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#d99f9f] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-colors"
                   onClick={() => router.replace(`/artwork/${prevNid}`)}
                   onMouseEnter={() => setPrevHovered(true)}
                   onMouseLeave={() => setPrevHovered(false)}
@@ -132,38 +134,62 @@ export const ArtworkDetailClient = ({
                   <img src={prevHovered ? '/images/ui/direction-arrow-green.webp' : '/images/ui/direction-arrow-pink.webp'} className="w-[50%] object-contain rotate-180" draggable={false} />
                 </motion.button>
               ) : (
-                 <div className="w-[7vw] h-[7vw] min-w-[70px] min-h-[70px] opacity-0" />
+                 <div className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] opacity-0" />
               )}
             </div>
           </div>
 
           {/* 2. CENTER ARTWORK (A tutto schermo senza crop) */}
-          <div 
-            className="relative flex-1 bg-black rounded-lg p-1 lg:p-3 flex items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-white/5 overflow-hidden group cursor-zoom-in"
-            onClick={() => setIsZoomOpen(true)}
-            onTouchStart={(e) => {
-              touchStartX.current = e.touches[0].clientX
-            }}
-            onTouchEnd={(e) => {
-              if (touchStartX.current === null) return
-              const touchEndX = e.changedTouches[0].clientX
-              const deltaX = touchEndX - touchStartX.current
-              if (deltaX > 50 && prevNid) {
-                // Swipe Right -> Prev
-                router.replace(`/artwork/${prevNid}`)
-              } else if (deltaX < -50 && nextNid) {
-                // Swipe Left -> Next
-                router.replace(`/artwork/${nextNid}`)
-              }
-              touchStartX.current = null
-            }}
-          >
-            <img 
-               src={image} 
-               alt={`Opera ${nid}`} 
-               className="absolute inset-0 w-full h-full object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-transform duration-700 lg:group-hover:scale-[1.02]" 
-               draggable={false}
-            />
+          <div className="relative flex-1 bg-black rounded-lg p-1 lg:p-3 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-white/5 overflow-hidden group perspective-[1000px]">
+            <motion.div 
+              className="w-full h-full relative"
+              animate={{ rotateY: isFlipped ? 180 : 0 }}
+              transition={{ duration: 0.8, type: 'spring', bounce: 0.2 }}
+              style={{ transformStyle: 'preserve-3d' }}
+            >
+              {/* Front: Image */}
+              <div 
+                className="absolute inset-0 flex items-center justify-center cursor-zoom-in backface-hidden"
+                style={{ backfaceVisibility: 'hidden' }}
+                onClick={() => setIsZoomOpen(true)}
+                onTouchStart={(e) => {
+                  touchStartX.current = e.touches[0].clientX
+                }}
+                onTouchEnd={(e) => {
+                  if (touchStartX.current === null) return
+                  const touchEndX = e.changedTouches[0].clientX
+                  const deltaX = touchEndX - touchStartX.current
+                  if (deltaX > 50 && prevNid) {
+                    router.replace(`/artwork/${prevNid}`)
+                  } else if (deltaX < -50 && nextNid) {
+                    router.replace(`/artwork/${nextNid}`)
+                  }
+                  touchStartX.current = null
+                }}
+              >
+                <img 
+                   src={image} 
+                   alt={`Opera ${nid}`} 
+                   className="absolute inset-0 w-full h-full object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-transform duration-700 lg:group-hover:scale-[1.02]" 
+                   draggable={false}
+                />
+              </div>
+
+              {/* Back: Text Data */}
+              <div 
+                className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-[#111] rounded-lg border border-white/10"
+                style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+              >
+                <h2 className="font-neo text-[#F45390] text-3xl lg:text-5xl tracking-[0.2em] mb-4 uppercase">Dettagli</h2>
+                <p className="font-neo text-[#768b1a] text-xl lg:text-2xl tracking-widest uppercase mb-2">{title}</p>
+                <p className="font-neo text-white text-base lg:text-xl tracking-widest uppercase mb-1">{method} / {support}</p>
+                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest uppercase mb-6">{dimensions} — {year}</p>
+                
+                <h3 className="font-neo text-[#F45390] text-2xl lg:text-3xl tracking-[0.2em] mb-2 uppercase">Disponibilità</h3>
+                <p className="font-neo text-white text-base lg:text-xl tracking-widest uppercase mb-1">{isAvailable ? 'ACQUISTABILE' : 'ARCHIVIO'}</p>
+                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest uppercase">{priceInfo}</p>
+              </div>
+            </motion.div>
           </div>
 
           {/* 3. RIGHT PANEL (Nascosta su Mobile) */}
@@ -177,14 +203,14 @@ export const ArtworkDetailClient = ({
             <div className="relative z-10 w-[90%] aspect-[3/1] mb-12 flex items-center justify-center">
               <div 
                 className="w-full h-full bg-[#768b1a] drop-shadow-[0_0_20px_rgba(118,139,26,0.8)]" 
-                style={{ WebkitMaskImage: 'url(/images/ui/logo-neo-bianco-2.webp)', WebkitMaskSize: '100% 100%', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} 
+                style={{ WebkitMaskImage: 'url(/images/ui/logo-neoone-blackmetal-bianco.png)', WebkitMaskSize: '100% 100%', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} 
               />
             </div>
             {/* Btn Next */}
             <div className="relative z-10 w-full flex justify-center mt-8">
               {nextNid ? (
                 <motion.button
-                  className="pointer-events-auto cursor-pointer focus:outline-none w-[7vw] h-[7vw] min-w-[70px] min-h-[70px] bg-[#d99f9f] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-colors"
+                  className="pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#d99f9f] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-colors"
                   onClick={() => router.replace(`/artwork/${nextNid}`)}
                   onMouseEnter={() => setNextHovered(true)}
                   onMouseLeave={() => setNextHovered(false)}
@@ -194,46 +220,41 @@ export const ArtworkDetailClient = ({
                   <img src={nextHovered ? '/images/ui/direction-arrow-green.webp' : '/images/ui/direction-arrow-pink.webp'} className="w-[50%] object-contain" draggable={false} />
                 </motion.button>
               ) : (
-                 <div className="w-[7vw] h-[7vw] min-w-[70px] min-h-[70px] opacity-0" />
+                 <div className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] opacity-0" />
               )}
             </div>
           </div>
         </div>
-        {/* ── BOTTOM BAR STRUTTURALE (Responsive) ── */}
-        <div className="w-full lg:w-[90vw] mt-2 lg:mt-6 pb-4 lg:pb-0 z-30 bg-transparent lg:bg-black/80 rounded-lg lg:border border-transparent lg:border-white/5 lg:py-3 lg:px-6 flex flex-col lg:flex-row items-center justify-between lg:shadow-[0_0_20px_rgba(0,0,0,0.8)] gap-2 lg:gap-0">
+        {/* ── BOTTOM BAR STRUTTURALE (SOLO BOTTONI, Responsive) ── */}
+        <div className="w-full lg:w-[90vw] mt-2 lg:mt-6 pb-4 lg:pb-0 z-30 bg-transparent lg:bg-black/80 rounded-lg lg:border border-transparent lg:border-white/5 lg:py-3 lg:px-6 flex flex-row items-center justify-center lg:shadow-[0_0_20px_rgba(0,0,0,0.8)]">
           
-          {/* Riga Testuale Mobile (Nascosta in Desktop) */}
-          <div className="w-full flex lg:hidden justify-between px-2">
-            <div className="flex flex-col text-left">
-              <h2 className="font-neo text-[#F45390] text-xl tracking-[0.2em] mb-1">art details</h2>
-              <p className="font-neo text-white text-[9px] tracking-widest uppercase truncate max-w-[45vw]">{method} / {support}</p>
-              <p className="font-neo text-white/50 text-[8px] tracking-widest uppercase truncate max-w-[45vw]">{dimensions} — {year}</p>
-            </div>
-            <div className="flex flex-col text-right">
-              <h2 className="font-neo text-[#F45390] text-xl tracking-[0.2em] mb-1">status</h2>
-              <p className="font-neo text-white text-[9px] tracking-widest uppercase">{isAvailable ? 'ACQUISTABILE' : 'ARCHIVIO'}</p>
-              <p className="font-neo text-white/50 text-[8px] tracking-widest uppercase">{priceInfo}</p>
-            </div>
-          </div>
-
-          {/* Colonna Sinistra / Metadati (Solo Desktop) */}
-          <div className="hidden lg:flex flex-col flex-1 pl-4">
-            <h2 className="font-neo text-[#F45390] text-3xl lg:text-4xl tracking-[0.2em] mb-2 uppercase">art details</h2>
-            <p className="font-neo text-white text-base tracking-widest uppercase">{method} / {support}</p>
-            <p className="font-neo text-white/50 text-sm tracking-widest uppercase">{dimensions} — {year}</p>
-          </div>
-
-          {/* ── SEZIONE TASTI CENTRALE / MOBILE-ROW ── */}
-          <div className="w-full lg:w-auto flex flex-row items-center justify-between lg:justify-center px-4 lg:px-0 gap-6">
+          <div className="w-full flex flex-row items-center justify-between lg:justify-center px-4 lg:px-0 gap-4 lg:gap-8">
             {/* Tasto Back - Esc */}
             <motion.button
               whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
               whileTap={{ scale: 0.9 }}
               onClick={() => router.back()}
-              className="w-[45px] h-[45px] lg:w-[60px] lg:h-[60px] flex-shrink-0 bg-[#d99f9f] rounded-full flex items-center justify-center outline-none border border-[#d99f9f] shadow-[0_0_10px_rgba(0,0,0,1)] z-20"
+              className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#d99f9f] rounded-full flex items-center justify-center outline-none border border-[#d99f9f] shadow-[0_0_10px_rgba(0,0,0,1)] z-20"
               title="Torna alla Gallery"
             >
                <img src="/images/ui/esccc.webp" className="w-[55%] h-[55%] object-contain opacity-80" />
+            </motion.button>
+
+            {/* Info Flip Button */}
+            <motion.button 
+              className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-transparent rounded-full flex items-center justify-center focus:outline-none"
+              onClick={(e) => { e.stopPropagation(); setIsFlipped(!isFlipped); }}
+              onMouseEnter={() => setInfoHovered(true)}
+              onMouseLeave={() => setInfoHovered(false)}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              title="Dettagli Opera"
+            >
+              <img 
+                src={infoHovered ? '/images/ui/inforverde.webp' : '/images/ui/inforosa.webp'} 
+                alt="Info" 
+                className="w-[90%] h-[90%] object-contain drop-shadow-[0_0_10px_rgba(0,0,0,1)]" 
+              />
             </motion.button>
 
             {/* Pulsante PRE-ORDER LOGO */}
@@ -248,7 +269,7 @@ export const ArtworkDetailClient = ({
                <img 
                  src={purchaseHovered || addedToCart ? '/images/ui/pre-orderverde.webp' : '/images/ui/pre-orderrosa.webp'}
                  alt="Purchase"
-                 className="h-[45px] lg:h-[120px] w-auto max-w-full object-contain drop-shadow-[0_0_15px_rgba(244,83,144,0.4)] transition-all duration-300" 
+                 className="h-[50px] lg:h-[70px] w-auto max-w-full object-contain drop-shadow-[0_0_15px_rgba(244,83,144,0.4)] transition-all duration-300" 
                />
             </motion.button>
 
@@ -259,7 +280,7 @@ export const ArtworkDetailClient = ({
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={handlePurchase} 
-              className="relative w-[45px] h-[45px] lg:w-[60px] lg:h-[60px] flex-shrink-0 bg-[#d99f9f] rounded-full flex outline-none border border-[#d99f9f] hover:border-[#768b1a] justify-center items-center cursor-pointer shadow-[0_0_10px_rgba(0,0,0,1)]"
+              className="relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#d99f9f] rounded-full flex outline-none border border-[#d99f9f] hover:border-[#768b1a] justify-center items-center cursor-pointer shadow-[0_0_10px_rgba(0,0,0,1)]"
             >
               <img src="/images/ui/carrello.webp" className="w-[50%] h-[50%] object-contain relative z-10" />
               {/* Contatore ESTERNO */}
@@ -269,13 +290,6 @@ export const ArtworkDetailClient = ({
                 </span>
               )}
             </motion.button>
-          </div>
-
-          {/* Colonna Destra / Actions (Solo Desktop) */}
-          <div className="hidden lg:flex flex-col flex-1 text-right pr-4">
-             <h2 className="font-neo text-[#F45390] text-3xl lg:text-4xl tracking-[0.2em] mb-2 uppercase">status</h2>
-             <p className="font-neo text-white text-base tracking-widest uppercase">{isAvailable ? 'ACQUISTABILE' : 'ARCHIVIO'}</p>
-             <p className="font-neo text-white/50 text-sm tracking-widest uppercase">{priceInfo}</p>
           </div>
         </div>
       </div>

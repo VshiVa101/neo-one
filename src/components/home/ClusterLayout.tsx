@@ -9,6 +9,7 @@ import { ExpandedGalleryOverlay } from '@/components/home/ExpandedGalleryOverlay
 import { MiniMatrixLoader } from '@/components/MiniMatrixLoader'
 import { usePathname } from 'next/navigation'
 import { useTransition } from '@/context/TransitionContext'
+import { BrandedTitle } from '@/components/BrandedTitle'
 
 export interface SubclusterData {
   id: number | string
@@ -252,10 +253,9 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               className="pt-2 lg:pt-[1vw] max-w-[50vw] lg:max-w-[14vw]"
             >
               <h2
-                className="text-xl md:text-3xl lg:text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none"
-                style={{ color: leftCluster.titleColor }}
+                className="text-xl md:text-3xl lg:text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none branded-title"
               >
-                {leftCluster.title}
+                <BrandedTitle text={leftCluster.title} />
               </h2>
               <p
                 className="mt-1 md:mt-2 font-neo text-[11px] md:text-sm lg:text-[0.9vw] uppercase leading-relaxed tracking-wide whitespace-normal break-words"
@@ -299,10 +299,9 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               className="pt-2 lg:pt-[1vw] max-w-[50vw] lg:max-w-[14vw]"
             >
               <h2
-                className="text-xl md:text-3xl lg:text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none"
-                style={{ color: rightCluster.titleColor }}
+                className="text-xl md:text-3xl lg:text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none branded-title"
               >
-                {rightCluster.title}
+                <BrandedTitle text={rightCluster.title} />
               </h2>
               <p
                 className="mt-1 md:mt-2 font-neo text-[11px] md:text-sm lg:text-[0.9vw] uppercase leading-relaxed tracking-wide whitespace-normal break-words"
@@ -417,29 +416,6 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               }
               touchStartX.current = null
             }}
-            onMouseMove={(e) => {
-              const now = Date.now()
-              if (now - lastDeckSwitchTime.current < 600) return // Cooldown di 600ms per evitare switch troppo rapidi
-
-              const { clientX } = e
-              const width = window.innerWidth
-              
-              if (clientX > width * 0.75) {
-                // Mouse nel 25% di destra
-                setActiveDeckIndex(prev => {
-                  const next = Math.min(currentSubclusters.length - 1, prev + 1)
-                  if (next !== prev) lastDeckSwitchTime.current = now
-                  return next
-                })
-              } else if (clientX < width * 0.25) {
-                // Mouse nel 25% di sinistra
-                setActiveDeckIndex(prev => {
-                  const next = Math.max(0, prev - 1)
-                  if (next !== prev) lastDeckSwitchTime.current = now
-                  return next
-                })
-              }
-            }}
           >
              {/* Il tasto Chiudi (X) è rimosso. Si chiude tramite la gesture sull'Occhio centrale */}
 
@@ -485,8 +461,9 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                           }}
                           transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
                           style={{ perspective: 1000 }}
-                          className={`absolute ${isActive ? 'pointer-events-auto' : 'pointer-events-none'}`}
+                          className="absolute pointer-events-auto"
                           onClick={(e) => e.stopPropagation()}
+                          onMouseEnter={() => setActiveDeckIndex(idx)}
                         >
                           <ClusterDeck
                               subclusterTitle={sub.title}
