@@ -23,10 +23,10 @@ export const ClusterDeck = ({ subclusterTitle, artworks, onExpand }: ClusterDeck
 
   // Ritardo sfoglio debounce
   const scrollTimeout = React.useRef<NodeJS.Timeout | null>(null)
-  
+
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     if (scrollTimeout.current) return
-    
+
     // Settiamo un mini-blocco per evitare scorrimenti doppi
     scrollTimeout.current = setTimeout(() => {
       scrollTimeout.current = null
@@ -44,10 +44,10 @@ export const ClusterDeck = ({ subclusterTitle, artworks, onExpand }: ClusterDeck
   // Calcola gli stili base a seconda della distanza dall'active index, ORA CIRCOLARE
   const getCardStyle = (index: number) => {
     let offset = (index - activeIndex) % artworks.length
-    if (offset < 0) offset += artworks.length;
+    if (offset < 0) offset += artworks.length
 
     if (offset > Math.floor(artworks.length / 2)) {
-       offset -= artworks.length;
+      offset -= artworks.length
     }
 
     if (offset === 0) {
@@ -108,7 +108,7 @@ export const ClusterDeck = ({ subclusterTitle, artworks, onExpand }: ClusterDeck
   }
 
   return (
-    <div 
+    <div
       className="flex flex-col items-center justify-start w-[80vw] lg:w-[25vw] xl:w-[20vw] h-full pt-[10vh] lg:pt-[5vh] relative cursor-ns-resize"
       onWheel={handleWheel}
       onTouchStart={(e) => {
@@ -119,8 +119,8 @@ export const ClusterDeck = ({ subclusterTitle, artworks, onExpand }: ClusterDeck
         const touchEndY = e.changedTouches[0].clientY
         const deltaY = touchStartY.current - touchEndY
         if (Math.abs(deltaY) > 30) {
-          if (deltaY > 0) setActiveIndex(prev => (prev + 1) % artworks.length)
-          else setActiveIndex(prev => (prev - 1 + artworks.length) % artworks.length)
+          if (deltaY > 0) setActiveIndex((prev) => (prev + 1) % artworks.length)
+          else setActiveIndex((prev) => (prev - 1 + artworks.length) % artworks.length)
         }
         touchStartY.current = null
       }}
@@ -148,11 +148,11 @@ export const ClusterDeck = ({ subclusterTitle, artworks, onExpand }: ClusterDeck
                   scale: style.scale,
                   zIndex: style.zIndex,
                   opacity: style.opacity,
-                  filter: `brightness(${style.brightness})`
+                  filter: `brightness(${style.brightness})`,
                 }}
                 transition={{
                   duration: 0.5,
-                  ease: [0.32, 0.72, 0, 1] // Curva aggressiva che si assesta morbida
+                  ease: [0.32, 0.72, 0, 1], // Curva aggressiva che si assesta morbida
                 }}
                 className={`absolute w-full h-full border-2 border-[#1A1A1A] shadow-[0_15px_30px_rgba(0,0,0,0.8)] overflow-hidden bg-[#111] pointer-events-auto ${isActive ? 'cursor-pointer hover:border-[#F45390]' : ''}`}
                 onClick={() => {

@@ -71,7 +71,9 @@ export const ArtworkDetailClient = ({
       document.body.style.overflow = 'unset'
       setZoomScale(1) // Reset zoom on close
     }
-    return () => { document.body.style.overflow = 'unset' }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
   }, [isZoomOpen])
 
   return (
@@ -79,7 +81,7 @@ export const ArtworkDetailClient = ({
       {/* ── MODALE OVERLAY ZOOM A SCHERMO INTERO ── */}
       <AnimatePresence>
         {isZoomOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -87,37 +89,44 @@ export const ArtworkDetailClient = ({
             onClick={() => setIsZoomOpen(false)}
             onWheel={handleWheel}
           >
-             <motion.img 
-                src={image} 
-                alt={`Zoom Opera ${nid}`} 
-                drag
-                dragConstraints={{ left: -1000, right: 1000, top: -1000, bottom: 1000 }}
-                dragElastic={0.1}
-                dragMomentum={false}
-                style={{ scale: zoomScale }}
-                className="max-w-[95vw] max-h-[95vh] object-contain transition-transform duration-75 ease-linear pointer-events-auto"
-                onClick={(e) => e.stopPropagation()} 
-             />
+            <motion.img
+              src={image}
+              alt={`Zoom Opera ${nid}`}
+              drag
+              dragConstraints={{ left: -1000, right: 1000, top: -1000, bottom: 1000 }}
+              dragElastic={0.1}
+              dragMomentum={false}
+              style={{ scale: zoomScale }}
+              className="max-w-[95vw] max-h-[95vh] object-contain transition-transform duration-75 ease-linear pointer-events-auto"
+              onClick={(e) => e.stopPropagation()}
+            />
           </motion.div>
         )}
       </AnimatePresence>
 
       <div className="flex flex-col w-full h-full max-w-[100vw] lg:max-w-[95vw] mx-auto justify-center items-center pb-2 relative z-20 px-2 lg:px-0">
-        
         {/* ── MIDDLE ROW (Le 3 colonne su Desktop, Solo Centro su Mobile) ── */}
         <div className="flex flex-row items-stretch justify-center w-full h-[55vh] md:h-[60vh] lg:h-[65vh] gap-[2vw]">
-          
           {/* 1. LEFT PANEL (Nascosta su Mobile) */}
           <div className="relative hidden lg:flex w-[22vw] bg-black rounded-lg overflow-hidden flex-col items-center justify-center pointer-events-none">
             {/* Zebra BG */}
             <div className="absolute inset-0">
-               <img src="/images/ui/pink-zebra-bg.webp" alt="bg" className="w-[120%] h-full object-cover -translate-x-[10%]" />
+              <img
+                src="/images/ui/pink-zebra-bg.webp"
+                alt="bg"
+                className="w-[120%] h-full object-cover -translate-x-[10%]"
+              />
             </div>
             {/* Logo Neo-One */}
             <div className="relative z-10 w-[90%] aspect-[3/1] mb-12 flex items-center justify-center">
-              <div 
-                className="w-full h-full bg-[#768b1a] drop-shadow-[0_0_20px_rgba(118,139,26,0.8)]" 
-                style={{ WebkitMaskImage: 'url(/images/ui/logo-neoone-blackmetal-bianco.png)', WebkitMaskSize: '100% 100%', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} 
+              <div
+                className="w-full h-full bg-[#768b1a] drop-shadow-[0_0_20px_rgba(118,139,26,0.8)]"
+                style={{
+                  WebkitMaskImage: 'url(/images/ui/logo-neoone-blackmetal-bianco.png)',
+                  WebkitMaskSize: '100% 100%',
+                  WebkitMaskRepeat: 'no-repeat',
+                  WebkitMaskPosition: 'center',
+                }}
               />
             </div>
             {/* Btn Prev */}
@@ -131,24 +140,32 @@ export const ArtworkDetailClient = ({
                   whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <img src={prevHovered ? '/images/ui/direction-arrow-green.webp' : '/images/ui/direction-arrow-pink.webp'} className="w-[50%] object-contain rotate-180" draggable={false} />
+                  <img
+                    src={
+                      prevHovered
+                        ? '/images/ui/direction-arrow-green.webp'
+                        : '/images/ui/direction-arrow-pink.webp'
+                    }
+                    className="w-[50%] object-contain rotate-180"
+                    draggable={false}
+                  />
                 </motion.button>
               ) : (
-                 <div className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] opacity-0" />
+                <div className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] opacity-0" />
               )}
             </div>
           </div>
 
           {/* 2. CENTER ARTWORK (A tutto schermo senza crop) */}
           <div className="relative flex-1 bg-black rounded-lg p-1 lg:p-3 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-white/5 overflow-hidden group perspective-[1000px]">
-            <motion.div 
+            <motion.div
               className="w-full h-full relative"
               animate={{ rotateY: isFlipped ? 180 : 0 }}
               transition={{ duration: 0.8, type: 'spring', bounce: 0.2 }}
               style={{ transformStyle: 'preserve-3d' }}
             >
               {/* Front: Image */}
-              <div 
+              <div
                 className="absolute inset-0 flex items-center justify-center cursor-zoom-in backface-hidden"
                 style={{ backfaceVisibility: 'hidden' }}
                 onClick={() => setIsZoomOpen(true)}
@@ -167,16 +184,16 @@ export const ArtworkDetailClient = ({
                   touchStartX.current = null
                 }}
               >
-                <img 
-                   src={image} 
-                   alt={`Opera ${nid}`} 
-                   className="absolute inset-0 w-full h-full object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-transform duration-700 lg:group-hover:scale-[1.02]" 
-                   draggable={false}
+                <img
+                  src={image}
+                  alt={`Opera ${nid}`}
+                  className="absolute inset-0 w-full h-full object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-transform duration-700 lg:group-hover:scale-[1.02]"
+                  draggable={false}
                 />
               </div>
 
               {/* Back: Text Data */}
-              <div 
+              <div
                 className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-[#111] rounded-lg border border-white/10"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
@@ -184,7 +201,7 @@ export const ArtworkDetailClient = ({
                 <p className="font-neo text-[#768b1a] text-xl lg:text-2xl tracking-widest uppercase mb-2">{title}</p>
                 <p className="font-neo text-white text-base lg:text-xl tracking-widest uppercase mb-1">{method} / {support}</p>
                 <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest uppercase mb-6">{dimensions} — {year}</p>
-                
+
                 <h3 className="font-neo text-[#F45390] text-2xl lg:text-3xl tracking-[0.2em] mb-2 uppercase">Disponibilità</h3>
                 <p className="font-neo text-white text-base lg:text-xl tracking-widest uppercase mb-1">{isAvailable ? 'ACQUISTABILE' : 'ARCHIVIO'}</p>
                 <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest uppercase">{priceInfo}</p>
@@ -196,14 +213,23 @@ export const ArtworkDetailClient = ({
           <div className="relative hidden lg:flex w-[22vw] bg-black rounded-lg overflow-hidden flex-col items-center justify-center pointer-events-none">
             {/* Zebra BG */}
             <div className="absolute inset-0">
-               <img src="/images/ui/pink-zebra-bg.webp" alt="bg" className="w-[120%] h-full object-cover translate-x-[10%]" />
-               <div className="absolute inset-0 bg-black/10" />
+              <img
+                src="/images/ui/pink-zebra-bg.webp"
+                alt="bg"
+                className="w-[120%] h-full object-cover translate-x-[10%]"
+              />
+              <div className="absolute inset-0 bg-black/10" />
             </div>
             {/* Logo Neo-One */}
             <div className="relative z-10 w-[90%] aspect-[3/1] mb-12 flex items-center justify-center">
-              <div 
-                className="w-full h-full bg-[#768b1a] drop-shadow-[0_0_20px_rgba(118,139,26,0.8)]" 
-                style={{ WebkitMaskImage: 'url(/images/ui/logo-neoone-blackmetal-bianco.png)', WebkitMaskSize: '100% 100%', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} 
+              <div
+                className="w-full h-full bg-[#768b1a] drop-shadow-[0_0_20px_rgba(118,139,26,0.8)]"
+                style={{
+                  WebkitMaskImage: 'url(/images/ui/logo-neoone-blackmetal-bianco.png)',
+                  WebkitMaskSize: '100% 100%',
+                  WebkitMaskRepeat: 'no-repeat',
+                  WebkitMaskPosition: 'center',
+                }}
               />
             </div>
             {/* Btn Next */}
@@ -217,17 +243,24 @@ export const ArtworkDetailClient = ({
                   whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <img src={nextHovered ? '/images/ui/direction-arrow-green.webp' : '/images/ui/direction-arrow-pink.webp'} className="w-[50%] object-contain" draggable={false} />
+                  <img
+                    src={
+                      nextHovered
+                        ? '/images/ui/direction-arrow-green.webp'
+                        : '/images/ui/direction-arrow-pink.webp'
+                    }
+                    className="w-[50%] object-contain"
+                    draggable={false}
+                  />
                 </motion.button>
               ) : (
-                 <div className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] opacity-0" />
+                <div className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] opacity-0" />
               )}
             </div>
           </div>
         </div>
         {/* ── BOTTOM BAR STRUTTURALE (SOLO BOTTONI, Responsive) ── */}
         <div className="w-full lg:w-[90vw] mt-2 lg:mt-6 pb-4 lg:pb-0 z-30 bg-transparent lg:bg-black/80 rounded-lg lg:border border-transparent lg:border-white/5 lg:py-3 lg:px-6 flex flex-row items-center justify-center lg:shadow-[0_0_20px_rgba(0,0,0,0.8)]">
-          
           <div className="w-full flex flex-row items-center justify-between lg:justify-center px-4 lg:px-0 gap-4 lg:gap-8">
             {/* Tasto Back - Esc */}
             <motion.button

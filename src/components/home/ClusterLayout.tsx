@@ -36,22 +36,29 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   const shouldRenderBackgroundEye = pathname !== '/' || isTransitioning
 
   // Se non ci sono cluster o ce n'è solo 1, evitiamo errori nella destrutturazione in Home
-  if (!clusters || clusters.length < 2) return null;
+  if (!clusters || clusters.length < 2) return null
   // LOGICA DI PRIORITÀ FORZATA (Leo's View)
   // Cerchiamo Neon e Bianconero negli indici per evitare i cluster di test
-  const initialLeft = clusters.findIndex(c => c.slug?.toLowerCase().includes('neon') || c.title?.toLowerCase().includes('neon'))
-  const initialRight = clusters.findIndex(c => c.slug?.toLowerCase().includes('bn') || c.slug?.toLowerCase().includes('bianco') || c.title?.toLowerCase().includes('mix'))
+  const initialLeft = clusters.findIndex(
+    (c) => c.slug?.toLowerCase().includes('neon') || c.title?.toLowerCase().includes('neon'),
+  )
+  const initialRight = clusters.findIndex(
+    (c) =>
+      c.slug?.toLowerCase().includes('bn') ||
+      c.slug?.toLowerCase().includes('bianco') ||
+      c.title?.toLowerCase().includes('mix'),
+  )
 
   // Se non troviamo i preferiti, ripieghiamo sui primi due dell'array ordinato
   const startLeft = initialLeft !== -1 ? initialLeft : 0
-  const startRight = initialRight !== -1 ? initialRight : (clusters.length > 1 ? 1 : 0)
+  const startRight = initialRight !== -1 ? initialRight : clusters.length > 1 ? 1 : 0
 
   // Stato accorpato per la navigazione dei cluster
   const [navState, setNavState] = useState({
     left: startLeft,
     right: startRight,
     next: 'left' as 'left' | 'right',
-    pool: 2
+    pool: 2,
   })
 
   const [cartHovered, setCartHovered] = useState(false)
@@ -101,27 +108,31 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
     let isMounted = true
     setIsLoadingExpanded(true)
 
-    fetchClusterSubclusters(String(expandedClusterId)).then((data) => {
-      if (isMounted) {
-        setCachedSubclusters(prev => ({ ...prev, [expandedClusterId]: data }))
-        setIsLoadingExpanded(false)
+    fetchClusterSubclusters(String(expandedClusterId))
+      .then((data) => {
+        if (isMounted) {
+          setCachedSubclusters((prev) => ({ ...prev, [expandedClusterId]: data }))
+          setIsLoadingExpanded(false)
 
-        // AUTO-EXPAND: se c'è solo un mazzo, vai diretto alla griglia
-        if (data.length === 1) {
-          setExpandedDeckIndex(0)
-        } else {
-          setActiveDeckIndex(Math.floor(data.length / 2))
+          // AUTO-EXPAND: se c'è solo un mazzo, vai diretto alla griglia
+          if (data.length === 1) {
+            setExpandedDeckIndex(0)
+          } else {
+            setActiveDeckIndex(Math.floor(data.length / 2))
+          }
         }
-      }
-    }).catch(err => {
-      console.error(err)
-      if (isMounted) setIsLoadingExpanded(false)
-    })
+      })
+      .catch((err) => {
+        console.error(err)
+        if (isMounted) setIsLoadingExpanded(false)
+      })
 
-    return () => { isMounted = false }
+    return () => {
+      isMounted = false
+    }
   }, [expandedClusterId, cachedSubclusters])
 
-  const currentSubclusters = expandedClusterId ? (cachedSubclusters[expandedClusterId] || []) : []
+  const currentSubclusters = expandedClusterId ? cachedSubclusters[expandedClusterId] || [] : []
 
   // Ref per il trascinamento del footer
   const footerRef = React.useRef<HTMLDivElement>(null)
@@ -130,7 +141,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
   // Funzione helper per rimpiazzare un lato (usando functional update per evitare closure stale)
   const replaceCluster = (newIdx: number, forcedSide?: 'left' | 'right') => {
-    setNavState(prev => {
+    setNavState((prev) => {
       const side = forcedSide || prev.next
 
       if (side === 'left') {
@@ -155,7 +166,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       isScrolling = true
       setTimeout(() => (isScrolling = false), 900)
 
-      setNavState(prev => {
+      setNavState((prev) => {
         const nextIdx = prev.pool % clusters.length
         if (e.deltaY > 0) {
           // Scroll giù -> rimpiazza SINISTRA
@@ -171,7 +182,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
     }
 
     const handleKey = (e: KeyboardEvent) => {
-      setNavState(prev => {
+      setNavState((prev) => {
         const nextIdx = prev.pool % clusters.length
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
           if (nextIdx === prev.right) return prev
@@ -198,7 +209,6 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
   return (
     <div className="w-full h-screen relative z-10 overflow-hidden">
-
       {/* ── OCCHIO TOP CENTER (responsivo con vh) ── */}
       <div className="fixed top-[3vh] lg:top-[4vh] left-1/2 -translate-x-1/2 w-[14vh] h-[14vh] lg:w-[30vh] lg:h-[30vh] z-[500]">
         {shouldRenderBackgroundEye ? (
@@ -220,7 +230,6 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
       {/* ── MAIN STAGE: 2 cluster grandi + descrizioni ── */}
       <div className="absolute top-[22vh] md:top-[28vh] left-0 w-full min-h-[55vh] md:h-[40vh] flex flex-col md:flex-row items-center md:items-start justify-center gap-8 md:gap-[4vw] px-6 md:px-[5vw] overflow-y-auto md:overflow-hidden custom-scrollbar">
-
         {/* ── CLUSTER SINISTRO + descrizione ──── */}
         <div className="flex flex-row items-center lg:items-start gap-4 lg:gap-[2vw]">
           <AnimatePresence mode="wait">
@@ -252,9 +261,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               transition={{ duration: 0.4, delay: 0.3 }}
               className="pt-2 lg:pt-[1vw] max-w-[50vw] lg:max-w-[14vw]"
             >
-              <h2
-                className="text-xl md:text-3xl lg:text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none branded-title"
-              >
+              <h2 className="text-xl md:text-3xl lg:text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none branded-title">
                 <BrandedTitle text={leftCluster.title} />
               </h2>
               <p
@@ -298,9 +305,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               transition={{ duration: 0.4, delay: 0.3 }}
               className="pt-2 lg:pt-[1vw] max-w-[50vw] lg:max-w-[14vw]"
             >
-              <h2
-                className="text-xl md:text-3xl lg:text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none branded-title"
-              >
+              <h2 className="text-xl md:text-3xl lg:text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none branded-title">
                 <BrandedTitle text={rightCluster.title} />
               </h2>
               <p
@@ -348,24 +353,24 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
           className="absolute left-0 flex justify-start items-center gap-[2.5vw] h-full pl-0 pr-[150px] w-max cursor-grab active:cursor-grabbing"
         >
           {clusters.map((cluster, i) => (
-              <motion.div
-                key={cluster.id + '_footer_' + i}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{
-                  opacity: (i === navState.left || i === navState.right) ? 0.4 : 0.8,
-                  scale: (i === navState.left || i === navState.right) ? 0.9 : 1,
-                  y: 0
-                }}
-                whileHover={{ scale: 1.05, rotate: 2, y: -5 }}
-                transition={{ duration: 0.4 }}
-                onClick={() => replaceCluster(i)}
-                className="w-[14vw] h-[14vw] md:w-[12vw] md:h-[12vw] flex-shrink-0 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-[#111] cursor-pointer border border-gray-700/30"
-              >
-                <img
-                  src={cluster.image}
-                  alt={cluster.title}
-                  className="w-full h-full object-contain p-2 pointer-events-none"
-                />
+            <motion.div
+              key={cluster.id + '_footer_' + i}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{
+                opacity: i === navState.left || i === navState.right ? 0.4 : 0.8,
+                scale: i === navState.left || i === navState.right ? 0.9 : 1,
+                y: 0,
+              }}
+              whileHover={{ scale: 1.05, rotate: 2, y: -5 }}
+              transition={{ duration: 0.4 }}
+              onClick={() => replaceCluster(i)}
+              className="w-[14vw] h-[14vw] md:w-[12vw] md:h-[12vw] flex-shrink-0 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-[#111] cursor-pointer border border-gray-700/30"
+            >
+              <img
+                src={cluster.image}
+                alt={cluster.title}
+                className="w-full h-full object-contain p-2 pointer-events-none"
+              />
             </motion.div>
           ))}
         </motion.div>
@@ -380,12 +385,18 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
           className="w-[35px] h-[35px] md:w-[50px] md:h-[50px] cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
           style={{
             backgroundColor: cartHovered ? '#F45390' : '#B3828B',
-            boxShadow: cartHovered ? '0 0 20px rgba(244, 83, 144, 0.5)' : '0 0 10px rgba(0,0,0,0.3)'
+            boxShadow: cartHovered
+              ? '0 0 20px rgba(244, 83, 144, 0.5)'
+              : '0 0 10px rgba(0,0,0,0.3)',
           }}
           title="Vai alla Cassa"
         >
           <img
-            src={cartHovered ? '/images/drops/carrellorosa_optimized.webp' : '/images/drops/carrello_optimized.webp'}
+            src={
+              cartHovered
+                ? '/images/drops/carrellorosa_optimized.webp'
+                : '/images/drops/carrello_optimized.webp'
+            }
             alt="Carrello"
             className="w-full h-full object-contain"
           />
@@ -411,53 +422,55 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               const touchEndX = e.changedTouches[0].clientX
               const deltaX = touchStartX.current - touchEndX
               if (Math.abs(deltaX) > 50) {
-                if (deltaX > 0) setActiveDeckIndex(prev => Math.min(currentSubclusters.length - 1, prev + 1))
-                else setActiveDeckIndex(prev => Math.max(0, prev - 1))
+                if (deltaX > 0)
+                  setActiveDeckIndex((prev) => Math.min(currentSubclusters.length - 1, prev + 1))
+                else setActiveDeckIndex((prev) => Math.max(0, prev - 1))
               }
               touchStartX.current = null
             }}
           >
-             {/* Il tasto Chiudi (X) è rimosso. Si chiude tramite la gesture sull'Occhio centrale */}
+            {/* Il tasto Chiudi (X) è rimosso. Si chiude tramite la gesture sull'Occhio centrale */}
 
             {isLoadingExpanded ? (
-               // SPINNER NEO-1 - Forzato al centro assoluto dello schermo
-               <MiniMatrixLoader />
+              // SPINNER NEO-1 - Forzato al centro assoluto dello schermo
+              <MiniMatrixLoader />
             ) : (
               <>
                 {/* I tasti freccia < > sono stati rimossi. Usa il mouse ai lati per scorrere o lo swipe touch. */}
                 {/* Striscia Orizzontale dei Mazzi di Subcluster in Stile Coverflow */}
-                <div
-                   className="relative w-full h-[70vh] flex items-center justify-center"
-                >
-                   {currentSubclusters.length === 0 ? (
-                     <div className="text-white font-neo tracking-widest opacity-50 uppercase">Nessuna Opera Trovata</div>
-                   ) : currentSubclusters.map((sub, idx) => {
-                     const offset = idx - activeDeckIndex;
+                <div className="relative w-full h-[70vh] flex items-center justify-center">
+                  {currentSubclusters.length === 0 ? (
+                    <div className="text-white font-neo tracking-widest opacity-50 uppercase">
+                      Nessuna Opera Trovata
+                    </div>
+                  ) : (
+                    currentSubclusters.map((sub, idx) => {
+                      const offset = idx - activeDeckIndex
 
-                     // Calcola rotazione, opacità e scaling in base alla distanza dal centro
-                     const absOffset = Math.abs(offset);
-                     const isActive = offset === 0;
+                      // Calcola rotazione, opacità e scaling in base alla distanza dal centro
+                      const absOffset = Math.abs(offset)
+                      const isActive = offset === 0
 
-                     // Seleziona la traslazione orizzontale in VW
-                     const xTranslation = offset * 20; // Ogni mazzo è scostato di 20vw
+                      // Seleziona la traslazione orizzontale in VW
+                      const xTranslation = offset * 20 // Ogni mazzo è scostato di 20vw
 
-                     // Effetto prospettico
-                     const scale = isActive ? 1 : Math.max(0.7, 1 - absOffset * 0.15);
-                     const opacity = isActive ? 1 : Math.max(0, 1 - absOffset * 0.4);
-                     // Sfuma gradualmente le carte non centrali
-                     const rotateY = offset > 0 ? -15 : offset < 0 ? 15 : 0;
-                     // Mantiene i cloni laterali bassi e il clone centrale alto
-                     const zIndex = 60 - absOffset * 10;
+                      // Effetto prospettico
+                      const scale = isActive ? 1 : Math.max(0.7, 1 - absOffset * 0.15)
+                      const opacity = isActive ? 1 : Math.max(0, 1 - absOffset * 0.4)
+                      // Sfuma gradualmente le carte non centrali
+                      const rotateY = offset > 0 ? -15 : offset < 0 ? 15 : 0
+                      // Mantiene i cloni laterali bassi e il clone centrale alto
+                      const zIndex = 60 - absOffset * 10
 
-                     return (
+                      return (
                         <motion.div
                           key={'deck-wrapper-' + idx}
                           animate={{
-                             x: `${xTranslation}vw`,
-                             scale: scale,
-                             opacity: opacity,
-                             rotateY: rotateY,
-                             zIndex: zIndex
+                            x: `${xTranslation}vw`,
+                            scale: scale,
+                            opacity: opacity,
+                            rotateY: rotateY,
+                            zIndex: zIndex,
                           }}
                           transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
                           style={{ perspective: 1000 }}
@@ -466,13 +479,14 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                           onMouseEnter={() => setActiveDeckIndex(idx)}
                         >
                           <ClusterDeck
-                              subclusterTitle={sub.title}
-                              artworks={sub.artworks}
-                              onExpand={() => setExpandedDeckIndex(idx)}
+                            subclusterTitle={sub.title}
+                            artworks={sub.artworks}
+                            onExpand={() => setExpandedDeckIndex(idx)}
                           />
                         </motion.div>
-                     )
-                   })}
+                      )
+                    })
+                  )}
                 </div>
               </>
             )}
@@ -490,10 +504,11 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
             setExpandedClusterId(null)
           }
         }}
-        subclusterTitle={expandedDeckIndex !== null ? currentSubclusters[expandedDeckIndex].title : ''}
+        subclusterTitle={
+          expandedDeckIndex !== null ? currentSubclusters[expandedDeckIndex].title : ''
+        }
         artworks={expandedDeckIndex !== null ? currentSubclusters[expandedDeckIndex].artworks : []}
       />
-
     </div>
   )
 }

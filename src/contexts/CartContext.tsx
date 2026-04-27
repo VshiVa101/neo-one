@@ -40,14 +40,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   }, [items])
 
   const addToCart = (item: CartItem) => {
-    setItems(prev => {
-      if (prev.find(i => i.nid === item.nid)) return prev
+    setItems((prev) => {
+      if (prev.find((i) => i.nid === item.nid)) return prev
       return [...prev, item]
     })
   }
 
   const removeFromCart = (nid: string) => {
-    setItems(prev => prev.filter(i => i.nid !== nid))
+    setItems((prev) => prev.filter((i) => i.nid !== nid))
   }
 
   return (

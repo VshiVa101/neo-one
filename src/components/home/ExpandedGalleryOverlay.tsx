@@ -12,11 +12,11 @@ interface ExpandedGalleryOverlayProps {
   artworks: MockArtwork[]
 }
 
-export const ExpandedGalleryOverlay = ({ 
-  isOpen, 
-  onClose, 
-  subclusterTitle, 
-  artworks 
+export const ExpandedGalleryOverlay = ({
+  isOpen,
+  onClose,
+  subclusterTitle,
+  artworks,
 }: ExpandedGalleryOverlayProps) => {
   const router = useRouter()
 
@@ -52,19 +52,19 @@ export const ExpandedGalleryOverlay = ({
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  whileHover={{ 
-                    scale: 1.03, 
-                    boxShadow: '0 0 30px rgba(118, 139, 26, 0.4)'
+                  whileHover={{
+                    scale: 1.03,
+                    boxShadow: '0 0 30px rgba(118, 139, 26, 0.4)',
                   }}
                   className="group relative aspect-square sm:aspect-auto sm:h-[400px] border border-white/10 overflow-hidden cursor-pointer bg-black"
                   onClick={() => router.push(`/artwork/${artwork.id}`)}
                 >
-                  <img 
-                    src={artwork.image} 
+                  <img
+                    src={artwork.image}
                     alt={artwork.title}
                     className="w-full h-full object-cover grayscale brightness-110 contrast-125 sm:grayscale sm:brightness-110 sm:contrast-125 group-hover:grayscale-0 group-hover:brightness-100 group-hover:contrast-100 transition-all duration-700 max-sm:grayscale-0 max-sm:brightness-100 max-sm:contrast-100"
                   />
-                  
+
                   {/* Overlay Testo Sempre Visibile In Basso */}
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent flex flex-col justify-end p-4 lg:p-6 transition-all duration-300">
                     <p className="font-neo text-white text-base lg:text-lg tracking-widest uppercase mb-1 drop-shadow-md">
@@ -72,19 +72,21 @@ export const ExpandedGalleryOverlay = ({
                     </p>
                     <div className="h-0.5 w-8 lg:w-12 bg-[#768b1a] shadow-[0_0_10px_#768b1a] group-hover:w-full transition-all duration-500" />
                   </div>
-                  
+
                   {/* Numero opera (stile Acid - Sempre Green Acid) */}
                   <div className="absolute top-4 right-4 font-neo text-[#768b1a] text-xs italic drop-shadow-[0_0_5px_rgba(118,139,26,0.5)]">
-                    [{String(i+1).padStart(3, '0')}]
+                    [{String(i + 1).padStart(3, '0')}]
                   </div>
                 </motion.div>
               ))}
             </div>
           </div>
-          
+
           {/* Footer Gallery */}
           <div className="w-full py-12 flex flex-col items-center">
-             <p className="font-neo text-gray-600 text-[10px] tracking-[0.5em] uppercase">Fine Sottocluster</p>
+            <p className="font-neo text-gray-600 text-[10px] tracking-[0.5em] uppercase">
+              Fine Sottocluster
+            </p>
           </div>
         </motion.div>
       )}
