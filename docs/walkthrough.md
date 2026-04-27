@@ -4,8 +4,15 @@ This walkthrough summarizes the latest improvements made to the Neo-One Art Hub,
 
 ## 3D Eye Improvements
 
-- **Mobile Pointing Precision**: Increased the rotation magnitude on mobile touch events (`Math.PI / 2` instead of `Math.PI / 4`) to ensure the pupil accurately points to the edges of the screen upon interaction.
-- **Vortex & Flip Synchronization**: Fixed the rotation order to `YXZ` to enable a clean Z-axis roll (vortex) regardless of the eye's target orientation.
+- **Tracking Architecture Fix**: The 3D eye now uses a two-layer transform model:
+  - outer group = look/tracking toward cursor or touch target;
+  - inner group = living animations (flip, roll/vortex, vibration).
+  This prevents periodic animations from stealing or locking the look-at axes.
+- **Desktop Cursor Tracking**: Desktop input updates from global mouse movement and mouse down events, so the eye continuously follows the cursor and also responds immediately to clicks.
+- **Mobile Touch Tracking**: Mobile input updates from `touchstart`, `touchmove`, `touchend`, and `touchcancel`. The eye points to the user touch while the finger is active, remains fixed for ~1 second after release, then returns to idle floating.
+- **Synthetic Mouse Guard**: Mobile browsers can emit fake mouse events after touch. These are ignored briefly after touch so the eye does not get stuck in desktop/mouse mode.
+- **GLB Instance Safety**: The GLB scene is cloned per `EyeScene` instance. This avoids shared `Object3D` conflicts when multiple eyes exist during route transitions or layered layouts.
+- **Living Animations Preserved**: The slow flip, fast pupil-axis roll/vortex, and periodic vibration remain active, but they run only on the inner animation group so the eye stays alive without breaking tracking.
 
 ## Artwork Detail Interface
 
@@ -20,5 +27,6 @@ This walkthrough summarizes the latest improvements made to the Neo-One Art Hub,
 
 ## Documentation Versioning
 
-- Added this walkthrough to track implementation details.
-- Pushed all changes to `main`.
+- Keep this walkthrough aligned with interaction-level implementation details that future models must preserve.
+- For the 3D eye, never remove the living animations unless explicitly requested. If tracking breaks, prefer separating transform layers instead of deleting motion.
+- Before pushing to `main`, verify `pnpm tsc --noEmit`, update internal docs, and confirm only intentional files are staged.

@@ -1,11 +1,12 @@
-# Payload Website Template
+# Neo-One Art Hub
 
-## Release v1.1.0 (2026-04-15)
+## Release v1.1.2 (2026-04-27)
 
-- Updated documentation and onboarding for Neo. See `CHANGELOG.md` and `docs/NEO_ONBOARDING.md` for details.
+- Fixed the 3D Eye interaction system: desktop cursor tracking, mobile touch targeting, model cloning per instance, and separated living animations from look-at tracking.
+- Updated internal alignment documentation for model handoff, versioning continuity, and project safety rules. See `CHANGELOG.md`, `MASTER_SPEC.md`, and `docs/NEO_ALIGNMENT.md` for details.
 
 
-This is the official [Payload Website Template](https://github.com/payloadcms/payload/blob/main/templates/website). Use it to power websites, blogs, or portfolios from small to enterprise. This repo includes a fully-working backend, enterprise-grade admin panel, and a beautifully designed, production-ready website.
+Neo-One Art Hub is a custom interactive art hub built on top of the official [Payload Website Template](https://github.com/payloadcms/payload/blob/main/templates/website). The project preserves the Payload/Next.js foundation while evolving it into a bespoke cinematic frontend, Payload CMS backend, and production-ready artist showcase.
 
 This template is right for you if you are working on:
 

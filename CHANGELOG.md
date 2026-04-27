@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.2] - 2026-04-27
+
+- **Bugfix / Core UX**: Reworked `EyeScene` 3D eye tracking so desktop follows the cursor continuously and mobile points to user touches, holds the target briefly, then returns to idle floating.
+- **3D Architecture**: Separated eye tracking from “living” animations by using an outer tracking group and an inner animation group, preserving capovolgimento lento, fast roll/vortex, and periodic vibration without letting them block pointer response.
+- **Reliability**: Cloned the cached GLB scene per `EyeScene` instance to avoid Object3D contention when multiple eyes/canvases are mounted during transitions or across routes.
+- **Navigation Fix**: Restored default click navigation for non-landing eye instances while keeping the landing Hero explicitly locked behind the Matrix gateway.
+- **Documentation**: Added/updated internal alignment notes for future model handoffs, versioning continuity, 3D-eye implementation constraints, and safe release practice.
+- **Deployment**: Versioned on `main` and pushed to `origin/main` so Vercel can trigger a production build.
+
 ## [1.1.1] - 2026-04-23
 
 - **Bugfix**: Fixed caching issues causing stale cluster rendering by implementing `noStore()` in `actions.ts`.
