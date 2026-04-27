@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '@/contexts/CartContext'
+import { BrandedTitle } from '@/components/BrandedTitle'
 
 interface ArtworkDetailClientProps {
   nid: string
@@ -33,7 +34,7 @@ export const ArtworkDetailClient = ({
   nextNid,
 }: ArtworkDetailClientProps) => {
   const router = useRouter()
-  const { addToCart, count } = useCart()
+  const { addToCart, count, setIsCartOpen } = useCart()
 
   const [isZoomOpen, setIsZoomOpen] = useState(false)
   const [zoomScale, setZoomScale] = useState(1)
@@ -134,7 +135,7 @@ export const ArtworkDetailClient = ({
               {prevNid ? (
                 <motion.button
                   className="pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#d99f9f] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-colors"
-                  onClick={() => router.replace(`/artwork/${prevNid}`)}
+                  onClick={() => router.push(`/artwork/${prevNid}`)}
                   onMouseEnter={() => setPrevHovered(true)}
                   onMouseLeave={() => setPrevHovered(false)}
                   whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
@@ -177,9 +178,9 @@ export const ArtworkDetailClient = ({
                   const touchEndX = e.changedTouches[0].clientX
                   const deltaX = touchEndX - touchStartX.current
                   if (deltaX > 50 && prevNid) {
-                    router.replace(`/artwork/${prevNid}`)
+                    router.push(`/artwork/${prevNid}`)
                   } else if (deltaX < -50 && nextNid) {
-                    router.replace(`/artwork/${nextNid}`)
+                    router.push(`/artwork/${nextNid}`)
                   }
                   touchStartX.current = null
                 }}
@@ -197,14 +198,18 @@ export const ArtworkDetailClient = ({
                 className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-[#111] rounded-lg border border-white/10"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
-                <h2 className="font-neo text-[#F45390] text-3xl lg:text-5xl tracking-[0.2em] mb-4 uppercase">Dettagli</h2>
-                <p className="font-neo text-[#768b1a] text-xl lg:text-2xl tracking-widest uppercase mb-2">{title}</p>
-                <p className="font-neo text-white text-base lg:text-xl tracking-widest uppercase mb-1">{method} / {support}</p>
-                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest uppercase mb-6">{dimensions} — {year}</p>
+                <h2 className="font-neo text-[#F45390] text-3xl lg:text-5xl tracking-[0.2em] mb-4 uppercase branded-title">
+                  <BrandedTitle text="Dettagli" />
+                </h2>
+                <p className="font-neo text-white text-xl lg:text-2xl tracking-widest lowercase mb-2 neo-skip-branding">{title}</p>
+                <p className="font-neo text-white text-base lg:text-xl tracking-widest lowercase mb-1 neo-skip-branding">{method} / {support}</p>
+                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest lowercase mb-6 neo-skip-branding">{dimensions} — {year}</p>
 
-                <h3 className="font-neo text-[#F45390] text-2xl lg:text-3xl tracking-[0.2em] mb-2 uppercase">Disponibilità</h3>
-                <p className="font-neo text-white text-base lg:text-xl tracking-widest uppercase mb-1">{isAvailable ? 'ACQUISTABILE' : 'ARCHIVIO'}</p>
-                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest uppercase">{priceInfo}</p>
+                <h2 className="font-neo text-[#F45390] text-2xl lg:text-4xl tracking-[0.2em] mb-2 uppercase branded-title">
+                   <BrandedTitle text="Disponibilità" />
+                </h2>
+                <p className="font-neo text-white text-base lg:text-xl tracking-widest lowercase mb-1 neo-skip-branding">{isAvailable ? 'ACQUISTABILE' : 'ARCHIVIO'}</p>
+                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest lowercase neo-skip-branding">{priceInfo}</p>
               </div>
             </motion.div>
           </div>
@@ -237,7 +242,7 @@ export const ArtworkDetailClient = ({
               {nextNid ? (
                 <motion.button
                   className="pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#d99f9f] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-colors"
-                  onClick={() => router.replace(`/artwork/${nextNid}`)}
+                  onClick={() => router.push(`/artwork/${nextNid}`)}
                   onMouseEnter={() => setNextHovered(true)}
                   onMouseLeave={() => setNextHovered(false)}
                   whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
@@ -261,68 +266,75 @@ export const ArtworkDetailClient = ({
         </div>
         {/* ── BOTTOM BAR STRUTTURALE (SOLO BOTTONI, Responsive) ── */}
         <div className="w-full lg:w-[90vw] mt-2 lg:mt-6 pb-4 lg:pb-0 z-30 bg-transparent lg:bg-black/80 rounded-lg lg:border border-transparent lg:border-white/5 lg:py-3 lg:px-6 flex flex-row items-center justify-center lg:shadow-[0_0_20px_rgba(0,0,0,0.8)]">
-          <div className="w-full flex flex-row items-center justify-between lg:justify-center px-4 lg:px-0 gap-4 lg:gap-8">
-            {/* Tasto Back - Esc */}
-            <motion.button
-              whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => router.back()}
-              className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#d99f9f] rounded-full flex items-center justify-center outline-none border border-[#d99f9f] shadow-[0_0_10px_rgba(0,0,0,1)] z-20"
-              title="Torna alla Gallery"
-            >
-               <img src="/images/ui/esccc.webp" className="w-[55%] h-[55%] object-contain opacity-80" />
-            </motion.button>
+          <div className="w-full flex flex-row items-center justify-between lg:justify-center px-4 lg:px-0 gap-4 lg:gap-12">
+            
+            {/* GRUPPO: X + INFO */}
+            <div className="flex flex-row items-center gap-4 lg:gap-8">
+              {/* Tasto Back - Esc */}
+              <motion.button
+                whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => router.back()}
+                className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#d99f9f] rounded-full flex items-center justify-center outline-none border border-[#d99f9f] shadow-[0_0_10px_rgba(0,0,0,1)] z-20"
+                title="Torna alla Gallery"
+              >
+                 <img src="/images/ui/esccc.webp" className="w-[55%] h-[55%] object-contain opacity-80" />
+              </motion.button>
 
-            {/* Info Flip Button */}
-            <motion.button 
-              className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-transparent rounded-full flex items-center justify-center focus:outline-none"
-              onClick={(e) => { e.stopPropagation(); setIsFlipped(!isFlipped); }}
-              onMouseEnter={() => setInfoHovered(true)}
-              onMouseLeave={() => setInfoHovered(false)}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              title="Dettagli Opera"
-            >
-              <img 
-                src={infoHovered ? '/images/ui/inforverde.webp' : '/images/ui/inforosa.webp'} 
-                alt="Info" 
-                className="w-[90%] h-[90%] object-contain drop-shadow-[0_0_10px_rgba(0,0,0,1)]" 
-              />
-            </motion.button>
+              {/* Info Flip Button */}
+              <motion.button 
+                className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-transparent rounded-full flex items-center justify-center focus:outline-none"
+                onClick={(e) => { e.stopPropagation(); setIsFlipped(!isFlipped); }}
+                onMouseEnter={() => setInfoHovered(true)}
+                onMouseLeave={() => setInfoHovered(false)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                title="Dettagli Opera"
+              >
+                <img 
+                  src={infoHovered ? '/images/ui/inforverde.webp' : '/images/ui/inforosa.webp'} 
+                  alt="Info" 
+                  className="w-[90%] h-[90%] object-contain drop-shadow-[0_0_10px_rgba(0,0,0,1)]" 
+                />
+              </motion.button>
+            </div>
 
-            {/* Pulsante PRE-ORDER LOGO */}
-            <motion.button
-              onClick={handlePurchase}
-              onMouseEnter={() => setPurchaseHovered(true)}
-              onMouseLeave={() => setPurchaseHovered(false)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative outline-none flex justify-center py-1 lg:py-2 flex-[0_0_40%] lg:flex-[0_0_30vw]"
-            >
-               <img 
-                 src={purchaseHovered || addedToCart ? '/images/ui/pre-orderverde.webp' : '/images/ui/pre-orderrosa.webp'}
-                 alt="Purchase"
-                 className="h-[50px] lg:h-[70px] w-auto max-w-full object-contain drop-shadow-[0_0_15px_rgba(244,83,144,0.4)] transition-all duration-300" 
-               />
-            </motion.button>
+            {/* GRUPPO: PRE-ORDER + CARRELLO */}
+            <div className="flex flex-row items-center gap-2 lg:gap-6 flex-1 justify-end lg:justify-start">
+              {/* Pulsante PRE-ORDER LOGO */}
+              <motion.button
+                onClick={handlePurchase}
+                onMouseEnter={() => setPurchaseHovered(true)}
+                onMouseLeave={() => setPurchaseHovered(false)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative outline-none flex justify-center py-1 lg:py-2 flex-1 max-w-[40vw] lg:max-w-[25vw]"
+              >
+                 <img 
+                   src={purchaseHovered || addedToCart ? '/images/ui/pre-orderverde.webp' : '/images/ui/pre-orderrosa.webp'}
+                   alt="Purchase"
+                   className="h-[50px] lg:h-[70px] w-auto max-w-full object-contain drop-shadow-[0_0_15px_rgba(244,83,144,0.4)] transition-all duration-300" 
+                 />
+              </motion.button>
 
-            {/* Carrello */}
-            <motion.button
-              onMouseEnter={() => setCartHovered(true)}
-              onMouseLeave={() => setCartHovered(false)}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={handlePurchase} 
-              className="relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#d99f9f] rounded-full flex outline-none border border-[#d99f9f] hover:border-[#768b1a] justify-center items-center cursor-pointer shadow-[0_0_10px_rgba(0,0,0,1)]"
-            >
-              <img src="/images/ui/carrello.webp" className="w-[50%] h-[50%] object-contain relative z-10" />
-              {/* Contatore ESTERNO */}
-              {count > 0 && (
-                <span className="absolute -top-2 -right-2 w-[22px] h-[22px] lg:w-[24px] lg:h-[24px] flex items-center justify-center bg-[#768b1a] rounded-full font-neo text-[10px] lg:text-sm text-black font-bold border lg:border-2 border-black z-20 shadow-[0_0_5px_rgba(118,139,26,0.8)]">
-                  {count}
-                </span>
-              )}
-            </motion.button>
+              {/* Carrello */}
+              <motion.button
+                onMouseEnter={() => setCartHovered(true)}
+                onMouseLeave={() => setCartHovered(false)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setIsCartOpen(true)}
+                className="relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#d99f9f] rounded-full flex outline-none border border-[#d99f9f] hover:border-[#768b1a] justify-center items-center cursor-pointer shadow-[0_0_10px_rgba(0,0,0,1)]"
+              >
+                <img src="/images/ui/carrello.webp" className="w-[50%] h-[50%] object-contain relative z-10" />
+                {/* Contatore ESTERNO */}
+                {count > 0 && (
+                  <span className="absolute -top-2 -right-2 w-[22px] h-[22px] lg:w-[24px] lg:h-[24px] flex items-center justify-center bg-[#768b1a] rounded-full font-neo text-[10px] lg:text-sm text-black font-bold border lg:border-2 border-black z-20 shadow-[0_0_5px_rgba(118,139,26,0.8)]">
+                    {count}
+                  </span>
+                )}
+              </motion.button>
+            </div>
           </div>
         </div>
       </div>

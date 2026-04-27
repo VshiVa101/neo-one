@@ -10,6 +10,7 @@ import { MiniMatrixLoader } from '@/components/MiniMatrixLoader'
 import { usePathname } from 'next/navigation'
 import { useTransition } from '@/context/TransitionContext'
 import { BrandedTitle } from '@/components/BrandedTitle'
+import { useCart } from '@/contexts/CartContext'
 
 export interface SubclusterData {
   id: number | string
@@ -30,13 +31,12 @@ export interface ClusterData {
 export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   const pathname = usePathname()
   const { isTransitioning } = useTransition()
+  const { setIsCartOpen } = useCart()
 
   // Se siamo nella landing page (/), montiamo l'occhio dello sfondo SOLO quando inizia la transizione.
   // Questo evita di avere 2 Canvas WebGL contemporaneamente al caricamento iniziale.
   const shouldRenderBackgroundEye = pathname !== '/' || isTransitioning
 
-  // Se non ci sono cluster o ce n'è solo 1, evitiamo errori nella destrutturazione in Home
-  if (!clusters || clusters.length < 2) return null
   // LOGICA DI PRIORITÀ FORZATA (Leo's View)
   // Cerchiamo Neon e Bianconero negli indici per evitare i cluster di test
   const initialLeft = clusters.findIndex(
@@ -53,7 +53,6 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   const startLeft = initialLeft !== -1 ? initialLeft : 0
   const startRight = initialRight !== -1 ? initialRight : clusters.length > 1 ? 1 : 0
 
-  // Stato accorpato per la navigazione dei cluster
   const [navState, setNavState] = useState({
     left: startLeft,
     right: startRight,
@@ -131,6 +130,10 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       isMounted = false
     }
   }, [expandedClusterId, cachedSubclusters])
+
+  // Se non ci sono cluster o ce n'è solo 1, evitiamo errori nella destrutturazione in Home
+  if (!clusters || clusters.length < 2) return null
+
 
   const currentSubclusters = expandedClusterId ? cachedSubclusters[expandedClusterId] || [] : []
 
@@ -264,10 +267,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               <h2 className="text-xl md:text-3xl lg:text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none branded-title">
                 <BrandedTitle text={leftCluster.title} />
               </h2>
-              <p
-                className="mt-1 md:mt-2 font-neo text-[11px] md:text-sm lg:text-[0.9vw] uppercase leading-relaxed tracking-wide whitespace-normal break-words"
-                style={{ color: leftCluster.descColor }}
-              >
+              <p className="mt-1 md:mt-2 font-neo text-[11px] md:text-sm lg:text-[0.9vw] lowercase leading-relaxed tracking-wide whitespace-normal break-words text-white neo-skip-branding">
                 {leftCluster.desc}
               </p>
             </motion.div>
@@ -308,10 +308,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               <h2 className="text-xl md:text-3xl lg:text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none branded-title">
                 <BrandedTitle text={rightCluster.title} />
               </h2>
-              <p
-                className="mt-1 md:mt-2 font-neo text-[11px] md:text-sm lg:text-[0.9vw] uppercase leading-relaxed tracking-wide whitespace-normal break-words"
-                style={{ color: rightCluster.descColor }}
-              >
+              <p className="mt-1 md:mt-2 font-neo text-[11px] md:text-sm lg:text-[0.9vw] lowercase leading-relaxed tracking-wide whitespace-normal break-words text-white neo-skip-branding">
                 {rightCluster.desc}
               </p>
             </motion.div>
@@ -326,6 +323,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         onMouseEnter={() => setIsHoveringFooter(true)}
         onMouseLeave={() => setIsHoveringFooter(false)}
         onWheel={(e) => {
+          e.stopPropagation()
           if (footerRef.current) {
             footerRef.current.scrollLeft += e.deltaY * 0.8
           }
@@ -352,27 +350,32 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
           initial={{ x: -80 }}
           className="absolute left-0 flex justify-start items-center gap-[2.5vw] h-full pl-0 pr-[150px] w-max cursor-grab active:cursor-grabbing"
         >
-          {clusters.map((cluster, i) => (
-            <motion.div
-              key={cluster.id + '_footer_' + i}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{
-                opacity: i === navState.left || i === navState.right ? 0.4 : 0.8,
-                scale: i === navState.left || i === navState.right ? 0.9 : 1,
-                y: 0,
-              }}
-              whileHover={{ scale: 1.05, rotate: 2, y: -5 }}
-              transition={{ duration: 0.4 }}
-              onClick={() => replaceCluster(i)}
-              className="w-[14vw] h-[14vw] md:w-[12vw] md:h-[12vw] flex-shrink-0 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-[#111] cursor-pointer border border-gray-700/30"
-            >
-              <img
-                src={cluster.image}
-                alt={cluster.title}
-                className="w-full h-full object-contain p-2 pointer-events-none"
-              />
-            </motion.div>
-          ))}
+          {clusters.map((cluster, i) => {
+            const isSelected = i === navState.left || i === navState.right
+            if (isSelected) return null
+
+            return (
+              <motion.div
+                key={cluster.id + '_footer_' + i}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{
+                  opacity: 0.8,
+                  scale: 1,
+                  y: 0,
+                }}
+                whileHover={{ scale: 1.05, rotate: 2, y: -5 }}
+                transition={{ duration: 0.4 }}
+                onClick={() => replaceCluster(i)}
+                className="w-[14vw] h-[14vw] md:w-[12vw] md:h-[12vw] flex-shrink-0 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-[#111] cursor-pointer border border-gray-700/30"
+              >
+                <img
+                  src={cluster.image}
+                  alt={cluster.title}
+                  className="w-full h-full object-contain p-2 pointer-events-none"
+                />
+              </motion.div>
+            )
+          })}
         </motion.div>
       </div>
 
@@ -382,6 +385,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
           whileTap={{ scale: 0.9 }}
           onMouseEnter={() => setCartHovered(true)}
           onMouseLeave={() => setCartHovered(false)}
+          onClick={() => setIsCartOpen(true)}
           className="w-[35px] h-[35px] md:w-[50px] md:h-[50px] cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
           style={{
             backgroundColor: cartHovered ? '#F45390' : '#B3828B',

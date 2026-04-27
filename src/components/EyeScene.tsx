@@ -149,7 +149,11 @@ const EyeModel = ({
     setIsIgnoringPointer(true)
     triggerTransition()
     setTimeout(() => {
-      router.push(targetRoute)
+      if (targetRoute === '/home') {
+        router.replace(targetRoute)
+      } else {
+        router.push(targetRoute)
+      }
     }, 1500)
   }
 
@@ -216,7 +220,7 @@ function CircularText({ isMobile }: { isMobile: boolean }) {
     'nessuna censura!...',
     'toccami!...',
     'no!...',
-    'occhio?...',
+    'occhio!',
     'paura?...',
     'sicuro?...',
     'tua mamma non vuole!...',

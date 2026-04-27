@@ -34,7 +34,18 @@ export const ExpandedGalleryOverlay = ({
           className="fixed inset-0 z-[200] bg-black/90 overflow-y-auto overflow-x-hidden custom-scrollbar"
         >
           {/* Header Galleria */}
-          <div className="sticky top-0 left-0 w-full p-8 flex flex-col items-start z-[210] pt-[28vh] md:pt-8 bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none">
+          <div className="sticky top-0 left-0 w-full p-8 flex flex-col items-start z-[210] pt-[16vh] md:pt-8 bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none">
+            
+            {/* Close Button X */}
+            <motion.button
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={onClose}
+              className="absolute top-4 right-4 md:top-8 md:right-8 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-[#d99f9f] rounded-full pointer-events-auto shadow-[0_0_15px_rgba(0,0,0,0.5)] z-[220]"
+            >
+              <img src="/images/ui/esccc.webp" className="w-1/2 h-1/2 object-contain" />
+            </motion.button>
+
             <div className="flex flex-col w-full pb-8 pointer-events-auto">
               <h2 className="font-neo text-[#F45390] text-3xl md:text-5xl tracking-[0.2em] uppercase drop-shadow-[0_0_10px_rgba(244,83,144,0.5)]">
                 {subclusterTitle}
@@ -44,7 +55,7 @@ export const ExpandedGalleryOverlay = ({
           </div>
 
           {/* Griglia Opere */}
-          <div className="max-w-7xl mx-auto px-4 md:px-8 pb-24 mt-[35vh] md:mt-[30vh]">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 pb-24 mt-[5vh] md:mt-[30vh]">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
               {artworks.map((artwork, i) => (
                 <motion.div
@@ -56,7 +67,7 @@ export const ExpandedGalleryOverlay = ({
                     scale: 1.03,
                     boxShadow: '0 0 30px rgba(118, 139, 26, 0.4)',
                   }}
-                  className="group relative aspect-square sm:aspect-auto sm:h-[400px] border border-white/10 overflow-hidden cursor-pointer bg-black"
+                  className="group relative aspect-square sm:aspect-auto h-[450px] border border-white/10 overflow-hidden cursor-pointer bg-black"
                   onClick={() => router.push(`/artwork/${artwork.id}`)}
                 >
                   <img
