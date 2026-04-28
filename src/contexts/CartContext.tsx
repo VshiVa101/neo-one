@@ -8,12 +8,14 @@ interface CartItem {
   nid: string
   title: string
   image: string
+  quantity: number
 }
 
 interface CartContextType {
   items: CartItem[]
-  addToCart: (item: CartItem) => void
+  addToCart: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => void
   removeFromCart: (nid: string) => void
+  updateQuantity: (nid: string, delta: number) => void
   count: number
   isCartOpen: boolean
   setIsCartOpen: (open: boolean) => void
@@ -23,6 +25,7 @@ const CartContext = createContext<CartContextType>({
   items: [],
   addToCart: () => {},
   removeFromCart: () => {},
+  updateQuantity: () => {},
   count: 0,
   isCartOpen: false,
   setIsCartOpen: () => {},
@@ -53,10 +56,15 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem('neo-cart', JSON.stringify(items))
   }, [items])
 
-  const addToCart = (item: CartItem) => {
+  const addToCart = (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => {
     setItems((prev) => {
-      if (prev.find((i) => i.nid === item.nid)) return prev
-      return [...prev, item]
+      const existing = prev.find((i) => i.nid === item.nid)
+      if (existing) {
+        return prev.map((i) =>
+          i.nid === item.nid ? { ...i, quantity: i.quantity + (item.quantity || 1) } : i,
+        )
+      }
+      return [...prev, { ...item, quantity: item.quantity || 1 }]
     })
   }
 
@@ -64,8 +72,26 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setItems((prev) => prev.filter((i) => i.nid !== nid))
   }
 
+  const updateQuantity = (nid: string, delta: number) => {
+    setItems((prev) =>
+      prev
+        .map((item) => (item.nid === nid ? { ...item, quantity: item.quantity + delta } : item))
+        .filter((item) => item.quantity > 0),
+    )
+  }
+
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, count: items.length, isCartOpen, setIsCartOpen }}>
+    <CartContext.Provider
+      value={{
+        items,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        count: items.reduce((acc, item) => acc + item.quantity, 0),
+        isCartOpen,
+        setIsCartOpen,
+      }}
+    >
       {children}
       
       <AnimatePresence>
@@ -74,7 +100,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 lg:p-8 overflow-y-auto custom-scrollbar"
+            className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-xl flex items-start justify-center p-6 md:p-12 lg:p-20 overflow-y-auto custom-scrollbar"
           >
             {/* Close Button */}
             <motion.button
@@ -88,23 +114,71 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
             <div className="w-full max-w-4xl flex flex-col gap-8 lg:gap-12 py-12 neo-skip-branding" data-neo-skip="true">
               {/* Cart Items */}
-              <div className="flex flex-col gap-4">
-                <h2 className="font-neo text-[#F45390] text-3xl lg:text-5xl tracking-[0.2em] uppercase branded-title">
-                  <BrandedTitle text="Carrello" />
-                </h2>
-                <div className="flex flex-row flex-wrap gap-4 mt-4">
+              {/* Cart Items Area */}
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-neo text-[#F45390] text-3xl lg:text-5xl tracking-[0.2em] uppercase branded-title">
+                    <BrandedTitle text="Carrello" />
+                  </h2>
+                  {items.length > 0 && (
+                    <span className="font-neo text-white/50 text-[10px] uppercase tracking-widest">
+                      {items.reduce((acc, item) => acc + item.quantity, 0)} articoli selezionati
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-row flex-wrap gap-4 lg:gap-6 mt-4 min-h-[120px] lg:min-h-[160px] items-start">
                   {items.length === 0 ? (
-                    <p className="font-neo text-white/30 text-sm tracking-widest uppercase">Il tuo carrello è vuoto</p>
+                    <p className="font-neo text-white/30 text-sm tracking-widest uppercase">
+                      Il tuo carrello è vuoto
+                    </p>
                   ) : (
                     items.map((item) => (
-                      <div key={item.nid} className="relative group w-20 h-20 lg:w-32 lg:h-32 border border-white/10 overflow-hidden bg-[#111]">
-                        <img src={item.image} alt={item.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
-                        <button 
-                          onClick={() => removeFromCart(item.nid)}
-                          className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
-                        >
-                          <span className="font-neo text-white text-[10px] uppercase tracking-tighter">Rimuovi</span>
-                        </button>
+                      <div
+                        key={item.nid}
+                        className="relative group w-24 h-24 lg:w-40 lg:h-40 border border-white/10 overflow-hidden bg-[#111] transition-all duration-300 hover:border-[#F45390]/50"
+                      >
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                        />
+                        
+                        {/* Quantity Controls Overlay */}
+                        <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-3">
+                          <div className="flex items-center gap-4">
+                            <motion.button
+                              whileHover={{ scale: 1.2, color: '#F45390' }}
+                              whileTap={{ scale: 0.8 }}
+                              onClick={() => updateQuantity(item.nid, -1)}
+                              className="text-white text-xl font-neo p-2"
+                            >
+                              -
+                            </motion.button>
+                            <span className="font-neo text-white text-lg">{item.quantity}</span>
+                            <motion.button
+                              whileHover={{ scale: 1.2, color: '#768b1a' }}
+                              whileTap={{ scale: 0.8 }}
+                              onClick={() => updateQuantity(item.nid, 1)}
+                              className="text-white text-xl font-neo p-2"
+                            >
+                              +
+                            </motion.button>
+                          </div>
+                          <button
+                            onClick={() => removeFromCart(item.nid)}
+                            className="font-neo text-white/40 text-[9px] uppercase tracking-tighter hover:text-white transition-colors"
+                          >
+                            Rimuovi tutto
+                          </button>
+                        </div>
+
+                        {/* Badge per quantità visibile se > 1 e non hovered */}
+                        {item.quantity > 1 && (
+                          <div className="absolute top-1 right-1 bg-[#F45390] text-black font-neo text-[10px] w-5 h-5 flex items-center justify-center rounded-full group-hover:opacity-0 transition-opacity">
+                            {item.quantity}
+                          </div>
+                        )}
                       </div>
                     ))
                   )}

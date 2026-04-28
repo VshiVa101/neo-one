@@ -15,13 +15,16 @@ export function NeoBrandingObserver() {
   useEffect(() => {
     const processNode = (node: Node): boolean => {
       // Evita di processare nodi già marcati o elementi tecnici
-      const parentElement = node.nodeType === Node.ELEMENT_NODE ? (node as HTMLElement) : node.parentElement
-      
+      const parentElement =
+        node.nodeType === Node.ELEMENT_NODE ? (node as HTMLElement) : node.parentElement
+
       if (parentElement) {
         if (
-          parentElement.dataset.neoProcessed || 
-          parentElement.dataset.neoSkip || 
-          parentElement.closest('[data-neo-skip]') || // Controllo risalendo l'albero
+          parentElement.dataset.neoProcessed ||
+          parentElement.dataset.neoSkip ||
+          parentElement.closest('[data-neo-skip]') ||
+          parentElement.classList.contains('neo-skip-branding') ||
+          parentElement.closest('.neo-skip-branding') ||
           ['SCRIPT', 'STYLE', 'SVG', 'IMG', 'CANVAS', 'VIDEO'].includes(parentElement.tagName)
         ) {
           return false
@@ -31,18 +34,20 @@ export function NeoBrandingObserver() {
       if (node.nodeType === Node.TEXT_NODE && node.nodeValue?.trim()) {
         const text = node.nodeValue
         const regex = /([one])/gi
-        
+
         if (regex.test(text)) {
           const fragment = document.createDocumentFragment()
           let lastIndex = 0
           let match
 
           regex.lastIndex = 0
-          
+
           while ((match = regex.exec(text)) !== null) {
             // Testo prima del match (forzato in minuscolo)
             if (match.index > lastIndex) {
-              fragment.appendChild(document.createTextNode(text.substring(lastIndex, match.index).toLowerCase()))
+              fragment.appendChild(
+                document.createTextNode(text.substring(lastIndex, match.index).toLowerCase()),
+              )
             }
 
             const char = match[0].toUpperCase()
@@ -81,7 +86,7 @@ export function NeoBrandingObserver() {
           processNode(child)
         }
       }
-      
+
       return false
     }
 
@@ -98,7 +103,7 @@ export function NeoBrandingObserver() {
         } else if (mutation.type === 'characterData') {
           // Se cambia il testo di un nodo esistente, dobbiamo riprocessarlo
           // Ma attenzione: replaceChild triggera MutationObserver.
-          // In questo scenario specifico, il TEXT_NODE originale viene sostituito, 
+          // In questo scenario specifico, il TEXT_NODE originale viene sostituito,
           // quindi MutationObserver vedrà un'aggiunta di nodi (childList).
         }
       }
@@ -107,7 +112,7 @@ export function NeoBrandingObserver() {
     observer.observe(document.body, {
       childList: true,
       subtree: true,
-      characterData: true
+      characterData: true,
     })
 
     return () => observer.disconnect()

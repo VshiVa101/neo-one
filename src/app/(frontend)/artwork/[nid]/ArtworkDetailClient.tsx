@@ -278,9 +278,9 @@ export const ArtworkDetailClient = ({
         </div>
         {/* ── BOTTOM BAR STRUTTURALE (SOLO BOTTONI, Responsive) ── */}
         <div className="w-full lg:w-[90vw] mt-2 lg:mt-6 pb-4 lg:pb-0 z-30 bg-transparent lg:bg-black/80 rounded-lg lg:border border-transparent lg:border-white/5 lg:py-3 lg:px-6 flex flex-row items-center justify-center lg:shadow-[0_0_20px_rgba(0,0,0,0.8)]">
-          <div className="w-full flex flex-row items-center justify-between lg:justify-center px-4 lg:px-0 gap-4 lg:gap-12">
+          <div className="w-full flex flex-row items-center justify-evenly lg:justify-center px-4 lg:px-0 gap-2 lg:gap-12">
             {/* GRUPPO: X + INFO */}
-            <div className="flex flex-row items-center gap-4 lg:gap-8">
+            <div className="flex flex-row items-center gap-3 lg:gap-8">
               {/* Tasto Back - Esc */}
               <motion.button
                 whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
@@ -317,7 +317,7 @@ export const ArtworkDetailClient = ({
             </div>
 
             {/* GRUPPO: PRE-ORDER + CARRELLO */}
-            <div className="flex flex-row items-center gap-4 lg:gap-6 flex-1 justify-end lg:justify-start">
+            <div className="flex flex-row items-center gap-3 lg:gap-6">
               {/* Pulsante PRE-ORDER LOGO */}
               <motion.button
                 onClick={handlePurchase}
