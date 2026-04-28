@@ -109,7 +109,7 @@ export const ClusterDeck = ({ subclusterTitle, artworks, onExpand }: ClusterDeck
 
   return (
     <div
-      className="flex flex-col items-center justify-start w-[80vw] lg:w-[25vw] xl:w-[20vw] h-full pt-[4vh] lg:pt-[5vh] relative cursor-ns-resize"
+      className="flex flex-col items-center justify-start w-[80vw] lg:w-[25vw] xl:w-[20vw] h-full pt-[6vh] lg:pt-[5vh] relative cursor-ns-resize"
       onWheel={handleWheel}
       onTouchStart={(e) => {
         touchStartY.current = e.touches[0].clientY
@@ -126,7 +126,7 @@ export const ClusterDeck = ({ subclusterTitle, artworks, onExpand }: ClusterDeck
       }}
     >
       {/* Intestazione del Subcluster / Deck */}
-      <div className="text-center z-50 mb-[8vh] lg:mb-[8vh] shrink-0 pointer-events-none">
+      <div className="text-center z-50 mb-[12vh] lg:mb-[10vh] shrink-0 pointer-events-none">
         <h3 className="font-neo text-white text-[6vw] lg:text-[1.8vw] xl:text-[1.5vw] tracking-widest uppercase drop-shadow-md leading-none">
           {subclusterTitle}
         </h3>

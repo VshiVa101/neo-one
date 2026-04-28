@@ -34,8 +34,8 @@ export const ExpandedGalleryOverlay = ({
           className="fixed inset-0 z-[200] bg-black/90 overflow-y-auto overflow-x-hidden custom-scrollbar"
         >
           {/* Header Galleria */}
-          <div className="sticky top-0 left-0 w-full p-8 flex flex-col items-start z-[210] pt-[16vh] md:pt-8 bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none">
-            
+          {/* Header Galleria - Top position mobile vs desktop adjusted */}
+          <div className="sticky top-0 left-0 w-full p-8 flex flex-col items-start z-[210] pt-[12vh] md:pt-[15vh] bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none">
             {/* Close Button X */}
             <motion.button
               whileHover={{ scale: 1.1, rotate: 90 }}

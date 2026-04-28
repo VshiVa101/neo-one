@@ -134,7 +134,6 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   // Se non ci sono cluster o ce n'è solo 1, evitiamo errori nella destrutturazione in Home
   if (!clusters || clusters.length < 2) return null
 
-
   const currentSubclusters = expandedClusterId ? cachedSubclusters[expandedClusterId] || [] : []
 
   // Ref per il trascinamento del footer
@@ -324,6 +323,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         onMouseLeave={() => setIsHoveringFooter(false)}
         onWheel={(e) => {
           e.stopPropagation()
+          e.preventDefault()
           if (footerRef.current) {
             footerRef.current.scrollLeft += e.deltaY * 0.8
           }

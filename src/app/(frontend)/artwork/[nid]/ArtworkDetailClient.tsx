@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '@/contexts/CartContext'
 import { BrandedTitle } from '@/components/BrandedTitle'
+import { useNavigationHistory } from '@/hooks/useNavigationHistory'
 
 interface ArtworkDetailClientProps {
   nid: string
@@ -34,6 +35,7 @@ export const ArtworkDetailClient = ({
   nextNid,
 }: ArtworkDetailClientProps) => {
   const router = useRouter()
+  const { goBack } = useNavigationHistory()
   const { addToCart, count, setIsCartOpen } = useCart()
 
   const [isZoomOpen, setIsZoomOpen] = useState(false)
@@ -201,15 +203,25 @@ export const ArtworkDetailClient = ({
                 <h2 className="font-neo text-[#F45390] text-3xl lg:text-5xl tracking-[0.2em] mb-4 uppercase branded-title">
                   <BrandedTitle text="Dettagli" />
                 </h2>
-                <p className="font-neo text-white text-xl lg:text-2xl tracking-widest lowercase mb-2 neo-skip-branding">{title}</p>
-                <p className="font-neo text-white text-base lg:text-xl tracking-widest lowercase mb-1 neo-skip-branding">{method} / {support}</p>
-                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest lowercase mb-6 neo-skip-branding">{dimensions} — {year}</p>
+                <p className="font-neo text-white text-xl lg:text-2xl tracking-widest lowercase mb-2 neo-skip-branding">
+                  {title}
+                </p>
+                <p className="font-neo text-white text-base lg:text-xl tracking-widest lowercase mb-1 neo-skip-branding">
+                  {method} / {support}
+                </p>
+                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest lowercase mb-6 neo-skip-branding">
+                  {dimensions} — {year}
+                </p>
 
                 <h2 className="font-neo text-[#F45390] text-2xl lg:text-4xl tracking-[0.2em] mb-2 uppercase branded-title">
-                   <BrandedTitle text="Disponibilità" />
+                  <BrandedTitle text="Disponibilità" />
                 </h2>
-                <p className="font-neo text-white text-base lg:text-xl tracking-widest lowercase mb-1 neo-skip-branding">{isAvailable ? 'ACQUISTABILE' : 'ARCHIVIO'}</p>
-                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest lowercase neo-skip-branding">{priceInfo}</p>
+                <p className="font-neo text-white text-base lg:text-xl tracking-widest lowercase mb-1 neo-skip-branding">
+                  {isAvailable ? 'ACQUISTABILE' : 'ARCHIVIO'}
+                </p>
+                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest lowercase neo-skip-branding">
+                  {priceInfo}
+                </p>
               </div>
             </motion.div>
           </div>
@@ -267,40 +279,45 @@ export const ArtworkDetailClient = ({
         {/* ── BOTTOM BAR STRUTTURALE (SOLO BOTTONI, Responsive) ── */}
         <div className="w-full lg:w-[90vw] mt-2 lg:mt-6 pb-4 lg:pb-0 z-30 bg-transparent lg:bg-black/80 rounded-lg lg:border border-transparent lg:border-white/5 lg:py-3 lg:px-6 flex flex-row items-center justify-center lg:shadow-[0_0_20px_rgba(0,0,0,0.8)]">
           <div className="w-full flex flex-row items-center justify-between lg:justify-center px-4 lg:px-0 gap-4 lg:gap-12">
-            
             {/* GRUPPO: X + INFO */}
             <div className="flex flex-row items-center gap-4 lg:gap-8">
               {/* Tasto Back - Esc */}
               <motion.button
                 whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => router.back()}
+                onClick={() => goBack('/home')}
                 className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#d99f9f] rounded-full flex items-center justify-center outline-none border border-[#d99f9f] shadow-[0_0_10px_rgba(0,0,0,1)] z-20"
                 title="Torna alla Gallery"
               >
-                 <img src="/images/ui/esccc.webp" className="w-[55%] h-[55%] object-contain opacity-80" />
+                <img
+                  src="/images/ui/esccc.webp"
+                  className="w-[55%] h-[55%] object-contain opacity-80"
+                />
               </motion.button>
 
               {/* Info Flip Button */}
-              <motion.button 
+              <motion.button
                 className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-transparent rounded-full flex items-center justify-center focus:outline-none"
-                onClick={(e) => { e.stopPropagation(); setIsFlipped(!isFlipped); }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsFlipped(!isFlipped)
+                }}
                 onMouseEnter={() => setInfoHovered(true)}
                 onMouseLeave={() => setInfoHovered(false)}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 title="Dettagli Opera"
               >
-                <img 
-                  src={infoHovered ? '/images/ui/inforverde.webp' : '/images/ui/inforosa.webp'} 
-                  alt="Info" 
-                  className="w-[90%] h-[90%] object-contain drop-shadow-[0_0_10px_rgba(0,0,0,1)]" 
+                <img
+                  src={infoHovered ? '/images/ui/inforverde.webp' : '/images/ui/inforosa.webp'}
+                  alt="Info"
+                  className="w-[90%] h-[90%] object-contain drop-shadow-[0_0_10px_rgba(0,0,0,1)]"
                 />
               </motion.button>
             </div>
 
             {/* GRUPPO: PRE-ORDER + CARRELLO */}
-            <div className="flex flex-row items-center gap-2 lg:gap-6 flex-1 justify-end lg:justify-start">
+            <div className="flex flex-row items-center gap-4 lg:gap-6 flex-1 justify-end lg:justify-start">
               {/* Pulsante PRE-ORDER LOGO */}
               <motion.button
                 onClick={handlePurchase}
@@ -310,11 +327,15 @@ export const ArtworkDetailClient = ({
                 whileTap={{ scale: 0.95 }}
                 className="relative outline-none flex justify-center py-1 lg:py-2 flex-1 max-w-[40vw] lg:max-w-[25vw]"
               >
-                 <img 
-                   src={purchaseHovered || addedToCart ? '/images/ui/pre-orderverde.webp' : '/images/ui/pre-orderrosa.webp'}
-                   alt="Purchase"
-                   className="h-[50px] lg:h-[70px] w-auto max-w-full object-contain drop-shadow-[0_0_15px_rgba(244,83,144,0.4)] transition-all duration-300" 
-                 />
+                <img
+                  src={
+                    purchaseHovered || addedToCart
+                      ? '/images/ui/pre-orderverde.webp'
+                      : '/images/ui/pre-orderrosa.webp'
+                  }
+                  alt="Purchase"
+                  className="h-[50px] lg:h-[70px] w-auto max-w-full object-contain drop-shadow-[0_0_15px_rgba(244,83,144,0.4)] transition-all duration-300"
+                />
               </motion.button>
 
               {/* Carrello */}
@@ -326,7 +347,10 @@ export const ArtworkDetailClient = ({
                 onClick={() => setIsCartOpen(true)}
                 className="relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#d99f9f] rounded-full flex outline-none border border-[#d99f9f] hover:border-[#768b1a] justify-center items-center cursor-pointer shadow-[0_0_10px_rgba(0,0,0,1)]"
               >
-                <img src="/images/ui/carrello.webp" className="w-[50%] h-[50%] object-contain relative z-10" />
+                <img
+                  src="/images/ui/carrello.webp"
+                  className="w-[50%] h-[50%] object-contain relative z-10"
+                />
                 {/* Contatore ESTERNO */}
                 {count > 0 && (
                   <span className="absolute -top-2 -right-2 w-[22px] h-[22px] lg:w-[24px] lg:h-[24px] flex items-center justify-center bg-[#768b1a] rounded-full font-neo text-[10px] lg:text-sm text-black font-bold border lg:border-2 border-black z-20 shadow-[0_0_5px_rgba(118,139,26,0.8)]">
