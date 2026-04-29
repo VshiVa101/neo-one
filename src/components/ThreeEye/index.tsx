@@ -88,7 +88,7 @@ function EyeGlobe({ onClick, isHovered, mousePosition, jumpscare }: EyeGlobeProp
   )
 }
 
-function Scene({ onClick, isHovered, mousePosition }: EyeGlobeProps) {
+function Scene({ onClick, isHovered, mousePosition, jumpscare }: EyeGlobeProps) {
   const { camera } = useThree()
 
   useEffect(() => {

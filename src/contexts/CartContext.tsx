@@ -42,7 +42,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
-  const [shippingNotice, setShippingNotice] = useState('')
+  const [shippingNotice, setShippingNotice] = useState<any>('')
   const [emailTouched, setEmailTouched] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
