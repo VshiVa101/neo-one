@@ -75,6 +75,7 @@ export async function fetchArtworkByNid(nid: string) {
   if (!docs || docs.length === 0) return null
 
   const art = docs[0]
+  const subcluster = art.subcluster as any
 
   return {
     id: art.id.toString(),
@@ -89,9 +90,28 @@ export async function fetchArtworkByNid(nid: string) {
     priceInfo: art.priceInfo || 'DISPONIBILITÀ SU RICHIESTA',
     audioSnippetUrl: art.audioSnippetUrl || null,
     fullAudioUrl: art.fullAudioUrl || null,
-    subclusterId: typeof art.subcluster === 'object' && art.subcluster !== null
-      ? (art.subcluster as any).id?.toString()
-      : art.subcluster?.toString() || null,
+    subclusterId: typeof subcluster === 'object' && subcluster !== null
+      ? subcluster.id?.toString()
+      : subcluster?.toString() || null,
+    clusterId: typeof subcluster === 'object' && subcluster?.cluster
+      ? (typeof subcluster.cluster === 'object' ? subcluster.cluster.id : subcluster.cluster).toString()
+      : null,
+    deckIndex: await (async () => {
+      const cId = typeof subcluster === 'object' && subcluster?.cluster
+        ? (typeof subcluster.cluster === 'object' ? subcluster.cluster.id : subcluster.cluster)
+        : null;
+      if (!cId) return null;
+      const { docs: siblings } = await payload.find({
+        collection: 'categories',
+        where: { cluster: { equals: cId } },
+        sort: 'sortOrder',
+        depth: 0,
+        limit: 50,
+      });
+      const sId = typeof subcluster === 'object' && subcluster !== null ? subcluster.id : subcluster;
+      const idx = siblings.findIndex(s => String(s.id) === String(sId));
+      return idx !== -1 ? idx : null;
+    })(),
     gallery: (art.detailGallery || []).map((item: any) => getImageUrl(item.image, '/images/drops/placeholder.png'))
   }
 }

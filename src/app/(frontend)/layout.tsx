@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { cn } from '@/utilities/ui'
 import React from 'react'
 import localFont from 'next/font/local'
+import Script from 'next/script'
 
 import { AdminBar } from '@/components/AdminBar'
 import { Providers as AppProviders } from '@/providers'
@@ -31,7 +32,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html className={cn(mergedFontNeo.variable)} lang="en" suppressHydrationWarning>
       <head>
-        <script
+        <Script
+          id="theme-script"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
       (function () {
@@ -68,7 +71,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       })();
       `,
           }}
-          id="theme-script"
         />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />

@@ -158,11 +158,7 @@ const EyeModel = ({
     setIsIgnoringPointer(true)
     triggerTransition()
     setTimeout(() => {
-      if (targetRoute === '/home') {
-        router.replace(targetRoute)
-      } else {
-        router.push(targetRoute)
-      }
+      router.push(targetRoute)
     }, 1500)
   }
 

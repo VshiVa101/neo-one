@@ -546,9 +546,9 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
           }
         }}
         subclusterTitle={
-          expandedDeckIndex !== null ? currentSubclusters[expandedDeckIndex].title : ''
+          expandedDeckIndex !== null ? currentSubclusters[expandedDeckIndex]?.title || '' : ''
         }
-        artworks={expandedDeckIndex !== null ? currentSubclusters[expandedDeckIndex].artworks : []}
+        artworks={expandedDeckIndex !== null ? currentSubclusters[expandedDeckIndex]?.artworks || [] : []}
         clusterId={expandedClusterId}
         deckIndex={expandedDeckIndex}
       />

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useCallback } from 'react'
 
 interface NavigationHistory {
@@ -11,6 +11,7 @@ interface NavigationHistory {
 export const useNavigationHistory = () => {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const historyRef = useRef<NavigationHistory>({ stack: [], canGoBack: false })
 
   // Initialize history from sessionStorage on mount
@@ -29,12 +30,15 @@ export const useNavigationHistory = () => {
   useEffect(() => {
     if (!pathname) return
 
+    const queryString = searchParams.toString()
+    const fullPath = queryString ? `${pathname}?${queryString}` : pathname
+
     const currentStack = historyRef.current.stack
     const lastPath = currentStack[currentStack.length - 1]
 
     // Don't add duplicate consecutive entries
-    if (lastPath !== pathname) {
-      currentStack.push(pathname)
+    if (lastPath !== fullPath) {
+      currentStack.push(fullPath)
       // Keep only last 20 entries to avoid memory issues
       if (currentStack.length > 20) {
         currentStack.shift()
@@ -79,13 +83,39 @@ export const useNavigationHistory = () => {
     } catch {
       // Silent fail
     }
-  }, [router, pathname])
+  }, [router, pathname, searchParams])
+
+  // Navigate back to the last non-artwork page (The Gallery/Home)
+  const goBackToGallery = useCallback((fallbackPath: string = '/home') => {
+    const currentStack = [...historyRef.current.stack]
+    
+    // Find the latest path that is NOT an artwork detail page
+    let galleryPath = fallbackPath
+    for (let i = currentStack.length - 1; i >= 0; i--) {
+      const path = currentStack[i]
+      if (!path.startsWith('/artwork/')) {
+        galleryPath = path
+        // Trim the stack to this point
+        historyRef.current.stack = currentStack.slice(0, i + 1)
+        break
+      }
+    }
+
+    router.push(galleryPath)
+    
+    try {
+      sessionStorage.setItem('neo-nav-history', JSON.stringify(historyRef.current))
+    } catch {
+      // Silent fail
+    }
+  }, [router])
 
   // Check if we can go back
   const canGoBack = historyRef.current.canGoBack
 
   return {
     goBack,
+    goBackToGallery,
     canGoBack,
     history: historyRef.current.stack
   }

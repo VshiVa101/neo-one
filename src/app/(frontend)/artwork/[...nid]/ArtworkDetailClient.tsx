@@ -19,6 +19,8 @@ interface ArtworkDetailClientProps {
   priceInfo: string
   prevNid: string | null
   nextNid: string | null
+  clusterId?: string | null
+  deckIndex?: number | null
 }
 
 export const ArtworkDetailClient = ({
@@ -33,9 +35,11 @@ export const ArtworkDetailClient = ({
   priceInfo,
   prevNid,
   nextNid,
+  clusterId,
+  deckIndex,
 }: ArtworkDetailClientProps) => {
   const router = useRouter()
-  const { goBack } = useNavigationHistory()
+  const { goBackToGallery } = useNavigationHistory()
   const { addToCart, count, setIsCartOpen } = useCart()
 
   const [isZoomOpen, setIsZoomOpen] = useState(false)
@@ -57,6 +61,23 @@ export const ArtworkDetailClient = ({
   }
 
   const isAvailable = availability === 'comprabile'
+
+  // Utility per costruire URL con parametri di navigazione (per tornare alla gallery corretta)
+  const getNavUrl = (targetNid: string) => {
+    const params = new URLSearchParams()
+    if (clusterId) params.set('cluster', clusterId)
+    if (deckIndex !== null && deckIndex !== undefined) params.set('deck', deckIndex.toString())
+    const qs = params.toString()
+    return `/artwork/${encodeURIComponent(targetNid)}${qs ? '?' + qs : ''}`
+  }
+
+  const handleExitToGallery = () => {
+    if (clusterId && deckIndex !== null && deckIndex !== undefined) {
+      router.push(`/home?cluster=${clusterId}&deck=${deckIndex}`)
+    } else {
+      goBackToGallery('/home')
+    }
+  }
 
   // Wheel handler per Zoom In/Out
   const handleWheel = (e: React.WheelEvent) => {
@@ -86,13 +107,13 @@ export const ArtworkDetailClient = ({
         if (isZoomOpen) {
           setIsZoomOpen(false)
         } else {
-          goBack('/home')
+          handleExitToGallery()
         }
       }
     }
     window.addEventListener('keydown', handleEsc)
     return () => window.removeEventListener('keydown', handleEsc)
-  }, [isZoomOpen, goBack])
+  }, [isZoomOpen, goBackToGallery, clusterId, deckIndex])
 
   return (
     <>
@@ -152,7 +173,7 @@ export const ArtworkDetailClient = ({
               {prevNid ? (
                 <motion.button
                   className="pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#d99f9f] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-colors"
-                  onClick={() => router.push(`/artwork/${encodeURIComponent(prevNid)}`)}
+                  onClick={() => router.push(getNavUrl(prevNid))}
                   onMouseEnter={() => setPrevHovered(true)}
                   onMouseLeave={() => setPrevHovered(false)}
                   whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
@@ -195,9 +216,9 @@ export const ArtworkDetailClient = ({
                   const touchEndX = e.changedTouches[0].clientX
                   const deltaX = touchEndX - touchStartX.current
                   if (deltaX > 50 && prevNid) {
-                    router.push(`/artwork/${encodeURIComponent(prevNid)}`)
+                    router.push(getNavUrl(prevNid))
                   } else if (deltaX < -50 && nextNid) {
-                    router.push(`/artwork/${encodeURIComponent(nextNid)}`)
+                    router.push(getNavUrl(nextNid))
                   }
                   touchStartX.current = null
                 }}
@@ -269,7 +290,7 @@ export const ArtworkDetailClient = ({
               {nextNid ? (
                 <motion.button
                   className="pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#d99f9f] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-colors"
-                  onClick={() => router.push(`/artwork/${encodeURIComponent(nextNid)}`)}
+                  onClick={() => router.push(getNavUrl(nextNid))}
                   onMouseEnter={() => setNextHovered(true)}
                   onMouseLeave={() => setNextHovered(false)}
                   whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
@@ -300,7 +321,7 @@ export const ArtworkDetailClient = ({
               <motion.button
                 whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => goBack('/home')}
+                onClick={handleExitToGallery}
                 className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#d99f9f] rounded-full flex items-center justify-center outline-none border border-[#d99f9f] shadow-[0_0_10px_rgba(0,0,0,1)] z-20 transition-colors duration-300"
                 title="Torna alla Gallery"
               >

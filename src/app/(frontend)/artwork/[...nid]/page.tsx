@@ -35,7 +35,9 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
       <div className="flex flex-col items-center flex-shrink-0 z-[500] relative">
         <div className="relative w-[14vh] h-[14vh] lg:w-[18vh] lg:h-[18vh] mb-1 drop-shadow-[0_0_20px_rgba(118,139,26,0.3)]">
           <EyeScene
-            targetRoute="/home"
+            targetRoute={artwork.clusterId && artwork.deckIndex !== null 
+              ? `/home?cluster=${artwork.clusterId}&deck=${artwork.deckIndex}` 
+              : '/home'}
             showCircularText={false}
             globalTracking={true}
             scaleMultiplier={1.3}
@@ -60,6 +62,8 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
           priceInfo={artwork.priceInfo}
           prevNid={prevNid}
           nextNid={nextNid}
+          clusterId={artwork.clusterId}
+          deckIndex={artwork.deckIndex}
         />
       </div>
 
