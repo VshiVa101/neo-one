@@ -12,6 +12,7 @@ import { Clusters } from './collections/Clusters'
 import { Categories } from './collections/Categories'
 import { Artworks } from './collections/Artworks'
 import { Signals } from './collections/Signals'
+import { Submissions } from './collections/Submissions'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { plugins as projectPlugins } from './plugins'
@@ -45,6 +46,7 @@ export default buildConfig({
     Categories,
     Artworks,
     Signals,
+    Submissions,
     Pages,
     Posts,
   ],

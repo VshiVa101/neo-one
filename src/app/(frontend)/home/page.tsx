@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 import { ClusterLayout, ClusterData } from '@/components/home/ClusterLayout'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
+import { Suspense } from 'react'
 
 // Helper function per estrarre l'URL in modo sicuro (Cloudinary focus)
 const getImageUrl = (media: any, defaultUrl: string) => {
@@ -76,7 +77,9 @@ export default async function HomePage() {
         className="absolute inset-0 w-screen h-screen object-cover z-0 opacity-40 brightness-75 scale-100 md:scale-105"
       />
       {mappedClusters.length >= 2 ? (
-        <ClusterLayout key={Date.now()} clusters={mappedClusters} />
+        <Suspense fallback={<div className="z-10 text-[#768b1a] font-neo animate-pulse">CARICAMENTO CLUSTER...</div>}>
+          <ClusterLayout clusters={mappedClusters} />
+        </Suspense>
       ) : (
         <div className="z-10 text-white font-neo tracking-widest">CARICAMENTO CLUSTER IN CORSO...</div>
       )}

@@ -1,13 +1,13 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue } from 'framer-motion'
 import { EyeScene } from '@/components/EyeScene'
 import { ClusterDeck, MockArtwork } from '@/components/home/ClusterDeck'
 import { fetchClusterSubclusters } from '@/app/(frontend)/home/actions'
 import { ExpandedGalleryOverlay } from '@/components/home/ExpandedGalleryOverlay'
 import { MiniMatrixLoader } from '@/components/MiniMatrixLoader'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useTransition } from '@/context/TransitionContext'
 import { BrandedTitle } from '@/components/BrandedTitle'
 import { useCart } from '@/contexts/CartContext'
@@ -30,6 +30,7 @@ export interface ClusterData {
 
 export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const { isTransitioning } = useTransition()
   const { setIsCartOpen } = useCart()
 
@@ -70,6 +71,22 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   const [cachedSubclusters, setCachedSubclusters] = useState<Record<string, SubclusterData[]>>({})
   const [isLoadingExpanded, setIsLoadingExpanded] = useState(false)
 
+  // STATO PER LA GALLERIA ESPANSA
+  const [expandedDeckIndex, setExpandedDeckIndex] = useState<number | null>(null)
+
+  // Rileva stato della gallery dai parametri URL (per il tasto Back)
+  useEffect(() => {
+    const clusterParam = searchParams.get('cluster')
+    const deckParam = searchParams.get('deck')
+
+    if (clusterParam) {
+      setExpandedClusterId(clusterParam)
+    }
+    if (deckParam !== null && deckParam !== undefined) {
+      setExpandedDeckIndex(parseInt(deckParam, 10))
+    }
+  }, [searchParams])
+
   // Gestione tasto indietro RIMOSSA per prevenire crash del router
   useEffect(() => {
     // La logica popstate/pushState è stata disabilitata perché interferiva con il router di Next.js
@@ -77,9 +94,6 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
   // Indice del mazzo (Subcluster) attivo visibile in primo piano
   const [activeDeckIndex, setActiveDeckIndex] = useState(0)
-
-  // STATO PER LA GALLERIA ESPANSA
-  const [expandedDeckIndex, setExpandedDeckIndex] = useState<number | null>(null)
 
   // Disabilita lo scroll del body quando la galleria è aperta
   useEffect(() => {
@@ -138,6 +152,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
   // Ref per il trascinamento del footer
   const footerRef = React.useRef<HTMLDivElement>(null)
+  const footerX = useMotionValue(0)
   const touchStartX = React.useRef<number | null>(null)
   const lastDeckSwitchTime = React.useRef<number>(0)
 
@@ -161,7 +176,10 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
     const handleWheel = (e: WheelEvent) => {
       // Se il mouse sta sul footer o il cluster è espanso, non attivare il cambio cluster principale
-      if (isHoveringFooter || expandedClusterId) return
+      // Usiamo sia il check sul target che lo stato isHoveringFooter per massima sicurezza
+      const target = e.target as HTMLElement
+      const isOverFooter = target?.closest?.('.home-footer-container')
+      if (isOverFooter || isHoveringFooter || expandedClusterId) return
 
       e.preventDefault()
       if (isScrolling) return
@@ -199,11 +217,49 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
     window.addEventListener('wheel', handleWheel, { passive: false })
     window.addEventListener('keydown', handleKey)
+
+    // Listener nativo per il footer per gestire lo scroll orizzontale tramite motion value
+    const footer = footerRef.current
+    const handleFooterWheel = (e: WheelEvent) => {
+      const footer = footerRef.current
+      if (footer) {
+        // Impediamo lo scroll globale
+        e.preventDefault()
+        e.stopPropagation()
+        
+        // Cerchiamo l'elemento interno w-max per la larghezza reale
+        const content = footer.querySelector('.w-max') as HTMLElement
+        if (!content) return
+
+        const containerWidth = footer.clientWidth
+        const contentWidth = content.offsetWidth
+        
+        // Calcoliamo il limite massimo di scorrimento (negativo)
+        // Aggiungiamo un margine di 100px alla fine
+        const maxScroll = Math.min(0, containerWidth - contentWidth - 80)
+        
+        // Usiamo deltaY o deltaX (per mouse con scroll orizzontale)
+        const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
+        
+        const currentX = footerX.get()
+        const newX = Math.min(0, Math.max(maxScroll, currentX - delta))
+        
+        footerX.set(newX)
+      }
+    }
+
+    if (footer) {
+      footer.addEventListener('wheel', handleFooterWheel, { passive: false })
+    }
+
     return () => {
       window.removeEventListener('wheel', handleWheel)
       window.removeEventListener('keydown', handleKey)
+      if (footer) {
+        footer.removeEventListener('wheel', handleFooterWheel)
+      }
     }
-  }, [isHoveringFooter, expandedClusterId, clusters.length])
+  }, [expandedClusterId, clusters.length, footerX])
 
   // I due cluster in primo piano (estratti dai due indici indipendenti)
   const leftCluster = clusters[navState.left]
@@ -212,26 +268,25 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   return (
     <div className="w-full h-screen relative z-10 overflow-hidden">
       {/* ── OCCHIO TOP CENTER (responsivo con vh) ── */}
-      <div className="fixed top-[3vh] lg:top-[4vh] left-1/2 -translate-x-1/2 w-[14vh] h-[14vh] lg:w-[30vh] lg:h-[30vh] z-[500]">
+      <div className="fixed top-[2vh] md:top-[4vh] left-1/2 -translate-x-1/2 w-[12vh] h-[12vh] md:w-[28vh] md:h-[28vh] z-[500]">
         {shouldRenderBackgroundEye ? (
-          <EyeScene targetRoute="/home" showCircularText={false} globalTracking={true} />
-        ) : (
-          <div className="w-full h-full bg-transparent" />
-        )}
-        {/* Intercettatore click sull'Occhio per resettare tutto lo stato */}
-        {(expandedClusterId || expandedDeckIndex !== null) && (
-          <div
-            className="absolute inset-0 z-[501] cursor-pointer"
-            onClick={() => {
+          <EyeScene
+            targetRoute="/home"
+            showCircularText={false}
+            globalTracking={true}
+            scaleMultiplier={1.3}
+            onClick={(expandedClusterId || expandedDeckIndex !== null) ? () => {
               setExpandedDeckIndex(null)
               setExpandedClusterId(null)
-            }}
+            } : undefined}
           />
+        ) : (
+          <div className="w-full h-full bg-transparent" />
         )}
       </div>
 
       {/* ── MAIN STAGE: 2 cluster grandi + descrizioni ── */}
-      <div className="absolute top-[22vh] md:top-[28vh] left-0 w-full min-h-[55vh] md:h-[40vh] flex flex-col md:flex-row items-center md:items-start justify-center gap-8 md:gap-[4vw] px-6 md:px-[5vw] overflow-y-auto md:overflow-hidden custom-scrollbar">
+      <div className="absolute top-[16vh] md:top-[32vh] left-0 w-full h-auto md:h-[44vh] flex flex-col md:flex-row items-center md:items-start justify-center gap-6 md:gap-[4vw] px-6 md:px-[5vw] overflow-y-auto md:overflow-hidden custom-scrollbar z-10">
         {/* ── CLUSTER SINISTRO + descrizione ──── */}
         <div className="flex flex-row items-center lg:items-start gap-4 lg:gap-[2vw]">
           <AnimatePresence mode="wait">
@@ -315,96 +370,78 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         </div>
       </div>
 
-      {/* ── FOOTER: fila di thumbnail scorrevole (Drag orizzontale) ──────────────────── */}
-      <div
-        ref={footerRef}
-        className="absolute bottom-[10vh] left-0 w-full h-[18vh] z-20 overflow-hidden select-none"
-        onMouseEnter={() => setIsHoveringFooter(true)}
-        onMouseLeave={() => setIsHoveringFooter(false)}
-        onWheel={(e) => {
-          e.stopPropagation()
-          e.preventDefault()
-          if (footerRef.current) {
-            footerRef.current.scrollLeft += e.deltaY * 0.8
-          }
-        }}
-        onMouseDown={(e) => {
-          const ele = footerRef.current
-          if (!ele) return
-          let startPos = { left: ele.scrollLeft, x: e.clientX }
-          const handleMouseMove = (eMove: MouseEvent) => {
-            const dx = eMove.clientX - startPos.x
-            ele.scrollLeft = startPos.left - dx
-          }
-          const handleMouseUp = () => {
-            document.removeEventListener('mousemove', handleMouseMove)
-            document.removeEventListener('mouseup', handleMouseUp)
-          }
-          document.addEventListener('mousemove', handleMouseMove)
-          document.addEventListener('mouseup', handleMouseUp)
-        }}
-      >
-        <motion.div
-          drag="x"
-          dragConstraints={footerRef}
-          initial={{ x: -80 }}
-          className="absolute left-0 flex justify-start items-center gap-[2.5vw] h-full pl-0 pr-[150px] w-max cursor-grab active:cursor-grabbing"
+      {/* ── FOOTER & CART ROW ──────────────────── */}
+      <div className="absolute bottom-[1vh] md:bottom-[2vh] left-0 w-full flex items-center px-[5vw] gap-6 z-20 pointer-events-none">
+        {/* Footer: scrollable thumbnails */}
+        <div
+          ref={footerRef}
+          className="flex-1 h-[15vh] md:h-[20vh] pt-[1vh] md:pt-[2vh] overflow-hidden select-none home-footer-container pointer-events-auto"
+          onMouseEnter={() => setIsHoveringFooter(true)}
+          onMouseLeave={() => setIsHoveringFooter(false)}
         >
-          {clusters.map((cluster, i) => {
-            const isSelected = i === navState.left || i === navState.right
-            if (isSelected) return null
+          <motion.div
+            drag="x"
+            dragConstraints={footerRef}
+            style={{ x: footerX }}
+            className="flex justify-start items-center gap-[2.5vw] h-full pr-[50px] w-max cursor-grab active:cursor-grabbing"
+          >
+            {clusters.map((cluster, i) => {
+              const isSelected = i === navState.left || i === navState.right
+              if (isSelected) return null
 
-            return (
-              <motion.div
-                key={cluster.id + '_footer_' + i}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{
-                  opacity: 0.8,
-                  scale: 1,
-                  y: 0,
-                }}
-                whileHover={{ scale: 1.05, rotate: 2, y: -5 }}
-                transition={{ duration: 0.4 }}
-                onClick={() => replaceCluster(i)}
-                className="w-[14vw] h-[14vw] md:w-[12vw] md:h-[12vw] flex-shrink-0 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-[#111] cursor-pointer border border-gray-700/30"
-              >
-                <img
-                  src={cluster.image}
-                  alt={cluster.title}
-                  className="w-full h-full object-contain p-2 pointer-events-none"
-                />
-              </motion.div>
-            )
-          })}
-        </motion.div>
-      </div>
+              return (
+                <motion.div
+                  key={cluster.id + '_footer_' + i}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{
+                    opacity: 0.8,
+                    scale: 1,
+                    y: 0,
+                  }}
+                  whileHover={{ scale: 1.1, rotate: 3, y: -10, opacity: 1 }}
+                  transition={{ duration: 0.4, ease: 'easeOut' }}
+                  onClick={() => replaceCluster(i)}
+                  className="w-[12vh] h-[12vh] md:w-[15vh] md:h-[15vh] flex-shrink-0 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-[#111] cursor-pointer border border-gray-700/30"
+                >
+                  <img
+                    src={cluster.image}
+                    alt={cluster.title}
+                    className="w-full h-full object-contain p-2 pointer-events-none"
+                  />
+                </motion.div>
+              )
+            })}
+          </motion.div>
+        </div>
 
-      <div className="fixed bottom-10 right-10 z-50">
-        <motion.button
-          whileHover={{ scale: 1.1, boxShadow: '0 0 25px rgba(244, 83, 144, 0.7)' }}
-          whileTap={{ scale: 0.9 }}
-          onMouseEnter={() => setCartHovered(true)}
-          onMouseLeave={() => setCartHovered(false)}
-          onClick={() => setIsCartOpen(true)}
-          className="w-[35px] h-[35px] md:w-[50px] md:h-[50px] cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
-          style={{
-            backgroundColor: cartHovered ? '#F45390' : '#B3828B',
-            boxShadow: cartHovered
-              ? '0 0 20px rgba(244, 83, 144, 0.5)'
-              : '0 0 10px rgba(0,0,0,0.3)',
-          }}
-          title="Vai alla Cassa"
-        >
-          <img
-            src={
-              cartHovered
-                ? '/images/drops/carrellorosa_optimized.webp'
-                : '/images/drops/carrello_optimized.webp'
-            }
-            alt="Carrello"
-            className="w-full h-full object-contain"
-          />
-        </motion.button>
+        {/* Cart Button: fixed on the right of the same row */}
+        <div className="flex-shrink-0 pointer-events-auto">
+          <motion.button
+            whileHover={{ scale: 1.1, boxShadow: '0 0 25px rgba(244, 83, 144, 0.7)' }}
+            whileTap={{ scale: 0.9 }}
+            onMouseEnter={() => setCartHovered(true)}
+            onMouseLeave={() => setCartHovered(false)}
+            onClick={() => setIsCartOpen(true)}
+            className="w-[45px] h-[45px] md:w-[60px] md:h-[60px] cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
+            style={{
+              backgroundColor: cartHovered ? '#F45390' : '#B3828B',
+              boxShadow: cartHovered
+                ? '0 0 20px rgba(244, 83, 144, 0.5)'
+                : '0 0 10px rgba(0,0,0,0.3)',
+            }}
+            title="Vai alla Cassa"
+          >
+            <img
+              src={
+                cartHovered
+                  ? '/images/drops/carrellorosa_optimized.webp'
+                  : '/images/drops/carrello_optimized.webp'
+              }
+              alt="Carrello"
+              className="w-full h-full object-contain"
+            />
+          </motion.button>
+        </div>
       </div>
 
       {/* ── EXPANDED CLUSTER OVERLAY ──────────────────── */}
@@ -512,6 +549,8 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
           expandedDeckIndex !== null ? currentSubclusters[expandedDeckIndex].title : ''
         }
         artworks={expandedDeckIndex !== null ? currentSubclusters[expandedDeckIndex].artworks : []}
+        clusterId={expandedClusterId}
+        deckIndex={expandedDeckIndex}
       />
     </div>
   )

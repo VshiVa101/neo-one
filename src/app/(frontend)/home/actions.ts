@@ -137,3 +137,37 @@ export async function fetchAdjacentArtworks(currentNid: string, subclusterId: st
     currentIndex: index,
   }
 }
+
+export async function fetchCartSettings() {
+  const payload = await getPayload({ config: configPromise })
+  const settings = await payload.findGlobal({
+    slug: 'cart-settings',
+  })
+  return settings
+}
+
+export async function submitCart(data: { name: string; email: string; message: string; items: any[] }) {
+  const payload = await getPayload({ config: configPromise })
+
+  try {
+    const submission = await payload.create({
+      collection: 'submissions',
+      data: {
+        name: data.name,
+        email: data.email,
+        message: data.message,
+        items: data.items.map(item => ({
+          title: item.title,
+          nid: item.nid,
+          quantity: item.quantity,
+        })),
+      },
+    })
+
+    return { success: true, id: submission.id }
+  } catch (error) {
+    console.error('Submission error:', error)
+    return { success: false, error: 'Errore durante l\'invio. Riprova più tardi.' }
+  }
+}
+

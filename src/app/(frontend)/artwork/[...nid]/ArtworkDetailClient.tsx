@@ -79,6 +79,21 @@ export const ArtworkDetailClient = ({
     }
   }, [isZoomOpen])
 
+  // Gestione tasto ESC fisico
+  React.useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isZoomOpen) {
+          setIsZoomOpen(false)
+        } else {
+          goBack('/home')
+        }
+      }
+    }
+    window.addEventListener('keydown', handleEsc)
+    return () => window.removeEventListener('keydown', handleEsc)
+  }, [isZoomOpen, goBack])
+
   return (
     <>
       {/* ── MODALE OVERLAY ZOOM A SCHERMO INTERO ── */}
@@ -137,7 +152,7 @@ export const ArtworkDetailClient = ({
               {prevNid ? (
                 <motion.button
                   className="pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#d99f9f] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-colors"
-                  onClick={() => router.push(`/artwork/${prevNid}`)}
+                  onClick={() => router.push(`/artwork/${encodeURIComponent(prevNid)}`)}
                   onMouseEnter={() => setPrevHovered(true)}
                   onMouseLeave={() => setPrevHovered(false)}
                   whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
@@ -180,9 +195,9 @@ export const ArtworkDetailClient = ({
                   const touchEndX = e.changedTouches[0].clientX
                   const deltaX = touchEndX - touchStartX.current
                   if (deltaX > 50 && prevNid) {
-                    router.push(`/artwork/${prevNid}`)
+                    router.push(`/artwork/${encodeURIComponent(prevNid)}`)
                   } else if (deltaX < -50 && nextNid) {
-                    router.push(`/artwork/${nextNid}`)
+                    router.push(`/artwork/${encodeURIComponent(nextNid)}`)
                   }
                   touchStartX.current = null
                 }}
@@ -254,7 +269,7 @@ export const ArtworkDetailClient = ({
               {nextNid ? (
                 <motion.button
                   className="pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#d99f9f] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-colors"
-                  onClick={() => router.push(`/artwork/${nextNid}`)}
+                  onClick={() => router.push(`/artwork/${encodeURIComponent(nextNid)}`)}
                   onMouseEnter={() => setNextHovered(true)}
                   onMouseLeave={() => setNextHovered(false)}
                   whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
@@ -286,7 +301,7 @@ export const ArtworkDetailClient = ({
                 whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => goBack('/home')}
-                className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#d99f9f] rounded-full flex items-center justify-center outline-none border border-[#d99f9f] shadow-[0_0_10px_rgba(0,0,0,1)] z-20"
+                className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#d99f9f] rounded-full flex items-center justify-center outline-none border border-[#d99f9f] shadow-[0_0_10px_rgba(0,0,0,1)] z-20 transition-colors duration-300"
                 title="Torna alla Gallery"
               >
                 <img

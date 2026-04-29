@@ -9,10 +9,19 @@ export const CartSettings: GlobalConfig = {
   },
   fields: [
     {
+      name: 'artistEmail',
+      label: 'Email dell\'Artista',
+      type: 'email',
+      required: false,
+      admin: {
+        description: 'L\'indirizzo email dove Neo riceverà le notifiche dei nuovi messaggi e ordini.',
+      },
+    },
+    {
       name: 'shippingPaymentNotice',
       label: 'Avviso Shipping & Pagamenti',
       type: 'richText',
-      required: true,
+      required: false,
       editor: lexicalEditor({}),
       admin: {
         description: 'Messaggio visibile nel form di comunicazione / carrello. Spiega come funzionano spedizioni e pagamenti.',

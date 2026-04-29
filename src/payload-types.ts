@@ -73,6 +73,7 @@ export interface Config {
     categories: Category;
     artworks: Artwork;
     signals: Signal;
+    submissions: Submission;
     pages: Page;
     posts: Post;
     redirects: Redirect;
@@ -98,6 +99,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     artworks: ArtworksSelect<false> | ArtworksSelect<true>;
     signals: SignalsSelect<false> | SignalsSelect<true>;
+    submissions: SubmissionsSelect<false> | SubmissionsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -435,6 +437,29 @@ export interface Signal {
    * Override su ordine cronologico.
    */
   sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "submissions".
+ */
+export interface Submission {
+  id: number;
+  name: string;
+  email: string;
+  message?: string | null;
+  /**
+   * Opere selezionate nel carrello al momento dell'invio.
+   */
+  items?:
+    | {
+        title?: string | null;
+        nid?: string | null;
+        quantity?: number | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1114,6 +1139,10 @@ export interface PayloadLockedDocument {
         value: number | Signal;
       } | null)
     | ({
+        relationTo: 'submissions';
+        value: number | Submission;
+      } | null)
+    | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
@@ -1384,6 +1413,25 @@ export interface SignalsSelect<T extends boolean = true> {
       };
   eventCTA?: T;
   sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "submissions_select".
+ */
+export interface SubmissionsSelect<T extends boolean = true> {
+  name?: T;
+  email?: T;
+  message?: T;
+  items?:
+    | T
+    | {
+        title?: T;
+        nid?: T;
+        quantity?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1876,9 +1924,13 @@ export interface CalendarSetting {
 export interface CartSetting {
   id: number;
   /**
+   * L'indirizzo email dove Neo riceverà le notifiche dei nuovi messaggi e ordini.
+   */
+  artistEmail?: string | null;
+  /**
    * Messaggio visibile nel form di comunicazione / carrello. Spiega come funzionano spedizioni e pagamenti.
    */
-  shippingPaymentNotice: {
+  shippingPaymentNotice?: {
     root: {
       type: string;
       children: {
@@ -1892,7 +1944,7 @@ export interface CartSetting {
       version: number;
     };
     [k: string]: unknown;
-  };
+  } | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1964,6 +2016,7 @@ export interface CalendarSettingsSelect<T extends boolean = true> {
  * via the `definition` "cart-settings_select".
  */
 export interface CartSettingsSelect<T extends boolean = true> {
+  artistEmail?: T;
   shippingPaymentNotice?: T;
   updatedAt?: T;
   createdAt?: T;

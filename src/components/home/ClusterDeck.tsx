@@ -160,7 +160,7 @@ export const ClusterDeck = ({ subclusterTitle, artworks, onExpand }: ClusterDeck
                     if (onExpand) {
                       onExpand(artwork)
                     } else {
-                      router.push(`/artwork/${artwork.id}`)
+                      router.push(`/artwork/${encodeURIComponent(artwork.id)}`)
                     }
                   } else {
                     // Cliccando una carta visibile non principale, si potrebbe scorrere fino ad essa

@@ -141,7 +141,7 @@ export const NeoUncensoredHero: React.FC<HeroProps> = () => {
   const reducedMotion = usePrefersReducedMotion()
 
   const EXPLOSION_MS = 980
-  
+
   const [introVisible, setIntroVisible] = useState(true)
   const [closing, setClosing] = useState(false)
   const [showHome, setShowHome] = useState(false)
@@ -151,7 +151,7 @@ export const NeoUncensoredHero: React.FC<HeroProps> = () => {
   const [explosionOrigin, setExplosionOrigin] = useState({ x: 0, y: 0 })
   const [explosionActive, setExplosionActive] = useState(false)
   const eyeContainerRef = useRef<HTMLDivElement>(null)
-  
+
   // Audio per la reazione a catena
   const triggerChainExplosion = () => {
     const playSound = (volume: number) => {
@@ -426,7 +426,7 @@ export const NeoUncensoredHero: React.FC<HeroProps> = () => {
                 />
               }
             >
-              <ThreeEye onClick={handleEyeClick} />
+              <ThreeEye onClick={handleEyeClick} jumpscare={true} />
             </Suspense>
           </div>
         </div>

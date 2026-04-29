@@ -36,7 +36,7 @@ export default async function SubclusterPage({ params: paramsPromise }: Args) {
   const artworksRes = await payload.find({
     collection: 'artworks',
     where: {
-      category: {
+      subcluster: {
         equals: subcluster.id,
       },
     },
@@ -71,7 +71,7 @@ export default async function SubclusterPage({ params: paramsPromise }: Args) {
             <div key={art.id} className="group cursor-pointer">
               <div className="aspect-square w-full overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-white/5 bg-[#111]">
                 <img
-                   // @ts-ignore - Assuming Media is populated
+                  // @ts-ignore - Assuming Media is populated
                   src={typeof art.mainImage !== 'string' ? art.mainImage?.url : ''}
                   alt={art.title ?? undefined}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
@@ -84,10 +84,18 @@ export default async function SubclusterPage({ params: paramsPromise }: Args) {
                 </div>
                 <div className="text-right">
                   <p className="text-[1vw] font-neo text-[#768b1a]">{art.priceInfo ?? ''}</p>
-                  <p className={`text-[0.6vw] uppercase px-2 py-1 rounded inline-block mt-1 ${
-                    art.availability === 'comprabile' ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'
-                  }`}>
-                    {art.availability === 'comprabile' ? 'Disponibile' : art.availability === 'ordinabile' ? 'Ordinabile' : 'Non disponibile'}
+                  <p
+                    className={`text-[0.6vw] uppercase px-2 py-1 rounded inline-block mt-1 ${
+                      art.availability === 'comprabile'
+                        ? 'bg-green-900/30 text-green-400'
+                        : 'bg-red-900/30 text-red-400'
+                    }`}
+                  >
+                    {art.availability === 'comprabile'
+                      ? 'Disponibile'
+                      : art.availability === 'ordinabile'
+                        ? 'Ordinabile'
+                        : 'Non disponibile'}
                   </p>
                 </div>
               </div>

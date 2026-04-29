@@ -7,14 +7,15 @@ import { ArtworkDetailClient } from './ArtworkDetailClient'
 
 export const dynamic = 'force-dynamic'
 
-export default async function ArtworkDetailPage(props: { params: Promise<{ nid: string }> }) {
+export default async function ArtworkDetailPage(props: { params: Promise<{ nid: string[] }> }) {
   const params = await props.params
-  const artwork = await fetchArtworkByNid(params.nid)
+  const nidString = Array.isArray(params.nid) ? params.nid.join('/') : params.nid
+  const artwork = await fetchArtworkByNid(nidString)
 
   if (!artwork) return notFound()
 
   const { prevNid, nextNid, currentIndex } = await fetchAdjacentArtworks(
-    params.nid,
+    nidString,
     artwork.subclusterId ?? null,
   )
 
@@ -32,8 +33,13 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
 
       {/* ── AREA TOP: Occhio e NID in alto, sfondo nero globale trasparisce ── */}
       <div className="flex flex-col items-center flex-shrink-0 z-[500] relative">
-        <div className="relative w-[10vh] h-[10vh] lg:w-[14vh] lg:h-[14vh] mb-1 drop-shadow-[0_0_20px_rgba(118,139,26,0.3)]">
-          <EyeScene targetRoute="/home" showCircularText={false} globalTracking={true} />
+        <div className="relative w-[14vh] h-[14vh] lg:w-[18vh] lg:h-[18vh] mb-1 drop-shadow-[0_0_20px_rgba(118,139,26,0.3)]">
+          <EyeScene
+            targetRoute="/home"
+            showCircularText={false}
+            globalTracking={true}
+            scaleMultiplier={1.3}
+          />
         </div>
         <span className="font-neo text-2xl lg:text-3xl tracking-widest font-bold leading-none text-[#768b1a] drop-shadow-[0_0_10px_rgba(118,139,26,0.6)]">
           {displayTitle}

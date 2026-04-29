@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BrandedTitle } from '@/components/BrandedTitle'
+import { fetchCartSettings, submitCart } from '@/app/(frontend)/home/actions'
 
 interface CartItem {
   nid: string
@@ -41,14 +42,28 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
+  const [shippingNotice, setShippingNotice] = useState('')
+  const [emailTouched, setEmailTouched] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
   
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  const showEmailError = emailTouched && email.length > 0 && !isEmailValid
 
   // Persist in localStorage
   useEffect(() => {
     try {
       const stored = localStorage.getItem('neo-cart')
       if (stored) setItems(JSON.parse(stored))
+      
+      // Fetch dynamic settings from Payload
+      fetchCartSettings().then(settings => {
+        if (settings?.shippingPaymentNotice) {
+          // Extraction basic text from Lexical if possible, or just use as is if we have a renderer
+          // For now, let's just use the state. We'll handle rendering in the UI.
+          setShippingNotice(settings.shippingPaymentNotice)
+        }
+      })
     } catch {}
   }, [])
 
@@ -80,6 +95,39 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     )
   }
 
+  const handleSubmit = async () => {
+    if (!isEmailValid || isSubmitting) return
+
+    setIsSubmitting(true)
+    try {
+      const res = await submitCart({
+        name,
+        email,
+        message,
+        items: items.map(i => ({ title: i.title, nid: i.nid, quantity: i.quantity }))
+      })
+
+      if (res.success) {
+        setIsSuccess(true)
+        setItems([])
+        setName('')
+        setEmail('')
+        setMessage('')
+        // Chiudi dopo 3 secondi
+        setTimeout(() => {
+          setIsCartOpen(false)
+          setIsSuccess(false)
+        }, 3000)
+      } else {
+        alert(res.error)
+      }
+    } catch (err) {
+      alert("Errore durante l'invio.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <CartContext.Provider
       value={{
@@ -100,14 +148,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-xl flex items-start justify-center p-6 md:p-12 lg:p-20 overflow-y-auto custom-scrollbar"
+            className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-xl flex flex-col items-center p-6 md:p-12 lg:p-20 overflow-y-auto custom-scrollbar"
           >
             {/* Close Button */}
             <motion.button
-              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileHover={{ scale: 1.1, rotate: 90, backgroundColor: '#F45390' }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsCartOpen(false)}
-              className="fixed top-6 right-6 lg:top-10 lg:right-10 w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center bg-[#d99f9f] rounded-full z-[1010] shadow-[0_0_20px_rgba(0,0,0,0.5)]"
+              className="fixed top-6 right-6 lg:top-10 lg:right-10 w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center bg-[#d99f9f] rounded-full z-[1010] shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-colors duration-300"
             >
               <img src="/images/ui/esccc.webp" className="w-1/2 h-1/2 object-contain" />
             </motion.button>
@@ -185,15 +233,32 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                 </div>
               </div>
 
-              {/* Neo's Proposal (Static Message) */}
+              {/* Informazioni Section */}
               <div className="flex flex-col gap-2">
-                <h3 className="font-neo text-[#768b1a] text-xl lg:text-2xl tracking-widest uppercase">Proposta di Neo</h3>
-                <p className="font-neo text-white text-sm lg:text-base tracking-wide leading-relaxed lowercase opacity-80">
-                  ciao, sono neo. ogni opera è un pezzo unico o parte di una tiratura limitatissima. 
-                  se hai scelto qualcosa, significa che abbiamo una vibrazione in comune. 
-                  scrivimi qui sotto cosa ti ha colpito e ti ricontatterò per definire i dettagli della spedizione e del possesso. 
-                  nessuna censura, solo arte.
-                </p>
+                <h3 className="font-neo text-[#768b1a] text-xl lg:text-2xl tracking-widest uppercase">Informazioni</h3>
+                <div className="font-neo text-white text-sm lg:text-base tracking-wide leading-relaxed lowercase opacity-80">
+                  {shippingNotice ? (
+                    typeof shippingNotice === 'string' ? (
+                      <p>{shippingNotice}</p>
+                    ) : (
+                      // If it's Lexical JSON, we'd ideally use a renderer. 
+                      // Here we provide a fallback message if it's complex, 
+                      // but usually it will be rendered or we can extract text.
+                      <p>
+                        {/* Fallback extraction for Lexical */}
+                        {(shippingNotice as any)?.root?.children?.[0]?.children?.[0]?.text || 
+                         "ciao, sono neo. controlla le tue impostazioni nel pannello admin."}
+                      </p>
+                    )
+                  ) : (
+                    <p>
+                      ciao, sono neo. ogni opera è un pezzo unico o parte di una tiratura limitatissima. 
+                      se hai scelto qualcosa, significa che abbiamo una vibrazione in comune. 
+                      scrivimi qui sotto cosa ti ha colpito e ti ricontatterò per definire i dettagli della spedizione e del possesso. 
+                      nessuna censura, solo arte.
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* Contact Form */}
@@ -204,7 +269,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                     <textarea 
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      placeholder="scrivi qui..."
+                      placeholder="flame,insulti,e messaggi minatori saranno collezzionati"
                       className="w-full bg-white/5 border border-white/10 p-4 font-neo text-white text-sm focus:outline-none focus:border-[#768b1a] transition-colors min-h-[150px] resize-none lowercase"
                     />
                   </div>
@@ -228,21 +293,58 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="email..."
-                      className="w-full bg-white/5 border border-white/10 p-4 font-neo text-white text-sm focus:outline-none focus:border-[#768b1a] transition-colors lowercase"
+                      onBlur={() => setEmailTouched(true)}
+                      placeholder={showEmailError ? "non è una email...." : "email..."}
+                      className={`w-full bg-white/5 border p-4 font-neo text-white text-sm focus:outline-none transition-colors lowercase ${
+                        showEmailError 
+                        ? "border-[#F45390] text-[#F45390] placeholder-[#F45390]" 
+                        : "border-white/10 focus:border-[#768b1a]"
+                      }`}
                     />
+                    <AnimatePresence>
+                      {showEmailError && (
+                        <motion.span
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          className="font-neo text-[#F45390] text-[10px] uppercase tracking-widest mt-1"
+                        >
+                          non è una email....
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                   </div>
 
                   {/* Submit Button (V) */}
                   <div className="flex justify-center lg:justify-start mt-4">
-                    <motion.button
-                      disabled={!isEmailValid}
-                      whileHover={isEmailValid ? { scale: 1.1 } : {}}
-                      whileTap={isEmailValid ? { scale: 0.9 } : {}}
-                      className={`w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.5)] ${isEmailValid ? 'bg-[#768b1a] cursor-pointer' : 'bg-gray-800 opacity-20 cursor-not-allowed'}`}
-                    >
-                      <img src="/images/ui/check.webp" className="w-1/2 h-1/2 object-contain" />
-                    </motion.button>
+                    {isSuccess ? (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="font-neo text-[#768b1a] text-lg lg:text-xl tracking-widest uppercase flex items-center gap-4"
+                      >
+                        <img src="/images/ui/check.webp" className="w-12 h-12 object-contain grayscale-0" />
+                        vibrazione inviata...
+                      </motion.div>
+                    ) : (
+                      <motion.button
+                        disabled={!isEmailValid || isSubmitting}
+                        whileHover={isEmailValid && !isSubmitting ? { scale: 1.1 } : {}}
+                        whileTap={isEmailValid && !isSubmitting ? { scale: 0.9 } : {}}
+                        onClick={handleSubmit}
+                        className={`w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.5)] ${
+                          isEmailValid && !isSubmitting 
+                            ? 'bg-[#768b1a] cursor-pointer' 
+                            : 'bg-gray-800 opacity-20 cursor-not-allowed'
+                        }`}
+                      >
+                        {isSubmitting ? (
+                          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                          <img src="/images/ui/check.webp" className="w-1/2 h-1/2 object-contain" />
+                        )}
+                      </motion.button>
+                    )}
                   </div>
                 </div>
               </div>

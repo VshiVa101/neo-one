@@ -5,8 +5,8 @@ import React from 'react'
 import localFont from 'next/font/local'
 
 import { AdminBar } from '@/components/AdminBar'
-import { Providers } from '@/providers'
-import { InitTheme } from '@/providers/Theme/InitTheme'
+import { Providers as AppProviders } from '@/providers'
+import { defaultTheme, themeLocalStorageKey } from '@/providers/Theme/ThemeSelector/types'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { draftMode } from 'next/headers'
 
@@ -31,12 +31,50 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html className={cn(mergedFontNeo.variable)} lang="en" suppressHydrationWarning>
       <head>
-        <InitTheme />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+      (function () {
+        function getImplicitPreference() {
+          var mediaQuery = '(prefers-color-scheme: dark)'
+          var mql = window.matchMedia(mediaQuery)
+          var hasImplicitPreference = typeof mql.matches === 'boolean'
+
+          if (hasImplicitPreference) {
+            return mql.matches ? 'dark' : 'light'
+          }
+
+          return null
+        }
+
+        function themeIsValid(theme) {
+          return theme === 'light' || theme === 'dark'
+        }
+
+        var themeToSet = '${defaultTheme}'
+        var preference = window.localStorage.getItem('${themeLocalStorageKey}')
+
+        if (themeIsValid(preference)) {
+          themeToSet = preference
+        } else {
+          var implicitPreference = getImplicitPreference()
+
+          if (implicitPreference) {
+            themeToSet = implicitPreference
+          }
+        }
+
+        document.documentElement.setAttribute('data-theme', themeToSet)
+      })();
+      `,
+          }}
+          id="theme-script"
+        />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>
       <body className="font-neo bg-black text-white selection:bg-white selection:text-black">
-        <Providers>
+        <AppProviders>
           <CartProvider>
             <TransitionProvider>
               <AdminBar
@@ -54,7 +92,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               
             </TransitionProvider>
           </CartProvider>
-        </Providers>
+        </AppProviders>
       </body>
     </html>
   )

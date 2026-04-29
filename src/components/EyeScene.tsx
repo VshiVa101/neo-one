@@ -23,6 +23,7 @@ interface EyeModelProps {
   onReady?: () => void
   isUnlocked?: boolean
   scaleMultiplier?: number
+  onClick?: () => void
 }
 
 // Carichiamo la versione ottimizzata con supporto Draco
@@ -40,6 +41,7 @@ const EyeModel = ({
   onReady,
   isUnlocked = true,
   scaleMultiplier = 1,
+  onClick,
 }: EyeModelProps) => {
   const eyeRef = useRef<THREE.Group>(null)
   const animationRef = useRef<THREE.Group>(null)
@@ -68,7 +70,7 @@ const EyeModel = ({
     returnAudio.current = loadAudio('/media/return.mp3', 0.5)
   }, [])
 
-  const baseScale = Math.min(viewport.width, viewport.height) * 0.1 * (scaleMultiplier || 1)
+  const baseScale = Math.min(viewport.width, viewport.height) * 0.125 * (scaleMultiplier || 1)
 
   useEffect(() => {
     if (scene && onReady) {
@@ -137,7 +139,7 @@ const EyeModel = ({
     animationRef.current.rotation.y = vibrationX
     animationRef.current.rotation.z = rollZ
 
-    const currentTargetLocal = hovered ? baseScale * 4.2 : baseScale
+    const currentTargetLocal = hovered ? baseScale * 2.5 : baseScale
     eyeRef.current.scale.setScalar(
       THREE.MathUtils.lerp(eyeRef.current.scale.x, currentTargetLocal, 0.15),
     )
@@ -145,6 +147,13 @@ const EyeModel = ({
 
   const handleClick = () => {
     if (!isUnlocked) return
+    
+    // Se è fornito un onClick esterno (es. per chiudere la gallery), usiamo quello
+    if (onClick) {
+      onClick()
+      return
+    }
+
     if (hovered) setHovered(false)
     setIsIgnoringPointer(true)
     triggerTransition()
@@ -305,6 +314,7 @@ interface EyeSceneProps {
   onReady?: () => void
   isUnlocked?: boolean
   scaleMultiplier?: number
+  onClick?: () => void
 }
 
 export const EyeScene = ({
@@ -315,6 +325,7 @@ export const EyeScene = ({
   onReady,
   isUnlocked = true,
   scaleMultiplier = 1,
+  onClick,
 }: EyeSceneProps) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const globalMouse = useRef<EyePointerState>({
@@ -428,6 +439,7 @@ export const EyeScene = ({
             onReady={onReady}
             isUnlocked={isUnlocked}
             scaleMultiplier={scaleMultiplier}
+            onClick={onClick}
           />
         </Suspense>
       </Canvas>

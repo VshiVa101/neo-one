@@ -9,9 +9,10 @@ interface EyeGlobeProps {
   onClick?: () => void
   isHovered?: boolean
   mousePosition: { x: number; y: number }
+  jumpscare?: boolean
 }
 
-function EyeGlobe({ onClick, isHovered, mousePosition }: EyeGlobeProps) {
+function EyeGlobe({ onClick, isHovered, mousePosition, jumpscare }: EyeGlobeProps) {
   const meshRef = useRef<THREE.Mesh>(null)
   const groupRef = useRef<THREE.Group>(null)
 
@@ -51,10 +52,15 @@ function EyeGlobe({ onClick, isHovered, mousePosition }: EyeGlobeProps) {
       delta * 3,
     )
 
-    // Hover effect - subtle pulse
+    // Hover effect - jumpscare or subtle pulse
     if (isHovered && meshRef.current) {
-      const scale = 1 + Math.sin(state.clock.elapsedTime * 3) * 0.02
-      meshRef.current.scale.setScalar(scale)
+      if (jumpscare) {
+        // Massive expansion to touch the outer text ring (approx 4.5x)
+        meshRef.current.scale.lerp(new THREE.Vector3(4.5, 4.5, 4.5), delta * 8)
+      } else {
+        const scale = 1 + Math.sin(state.clock.elapsedTime * 3) * 0.02
+        meshRef.current.scale.setScalar(scale)
+      }
     } else if (meshRef.current) {
       meshRef.current.scale.lerp(new THREE.Vector3(1, 1, 1), delta * 5)
     }
@@ -101,7 +107,12 @@ function Scene({ onClick, isHovered, mousePosition }: EyeGlobeProps) {
       <pointLight position={[3, -2, 2]} intensity={0.5} color="#A3FF12" />
 
       {/* Eye globe */}
-      <EyeGlobe onClick={onClick} isHovered={isHovered} mousePosition={mousePosition} />
+      <EyeGlobe 
+        onClick={onClick} 
+        isHovered={isHovered} 
+        mousePosition={mousePosition} 
+        jumpscare={jumpscare} 
+      />
     </>
   )
 }
@@ -109,9 +120,10 @@ function Scene({ onClick, isHovered, mousePosition }: EyeGlobeProps) {
 interface ThreeEyeProps {
   onClick?: () => void
   className?: string
+  jumpscare?: boolean
 }
 
-export const ThreeEye: React.FC<ThreeEyeProps> = ({ onClick, className = '' }) => {
+export const ThreeEye: React.FC<ThreeEyeProps> = ({ onClick, className = '', jumpscare = false }) => {
   const [isHovered, setIsHovered] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const containerRef = useRef<HTMLDivElement>(null)
@@ -152,7 +164,12 @@ export const ThreeEye: React.FC<ThreeEyeProps> = ({ onClick, className = '' }) =
           powerPreference: 'high-performance',
         }}
       >
-        <Scene onClick={onClick} isHovered={isHovered} mousePosition={mousePosition} />
+        <Scene 
+          onClick={onClick} 
+          isHovered={isHovered} 
+          mousePosition={mousePosition} 
+          jumpscare={jumpscare} 
+        />
       </Canvas>
     </div>
   )
