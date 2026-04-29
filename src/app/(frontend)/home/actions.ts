@@ -64,17 +64,48 @@ export async function fetchClusterSubclusters(clusterId: string): Promise<Subclu
 export async function fetchArtworkByNid(nid: string) {
   noStore()
   const payload = await getPayload({ config: configPromise })
+  
+  // Decodifichiamo l'URL (es. %20 -> spazio) prima di pulire
+  const decodedNid = decodeURIComponent(nid)
+  const cleanNid = decodedNid.trim()
 
-  const { docs } = await payload.find({
+  console.log(`[Neo-One] Requesting artwork (decoded): "${cleanNid}"`)
+
+  // 1. Try by NID (preferred)
+  let { docs } = await payload.find({
     collection: 'artworks',
-    where: { nid: { equals: nid } },
+    where: { nid: { equals: cleanNid } },
     depth: 1,
     limit: 1,
   })
 
-  if (!docs || docs.length === 0) return null
+  // 2. Try by ID (fallback)
+  if (!docs || docs.length === 0) {
+    // Check if it's a number (for Postgres/SQLite IDs) or a valid ID string
+    const isNumeric = /^\d+$/.test(cleanNid)
+    const queryId = isNumeric ? parseInt(cleanNid, 10) : cleanNid
+
+    try {
+      const { docs: idDocs } = await payload.find({
+        collection: 'artworks',
+        where: { id: { equals: queryId } },
+        depth: 1,
+        limit: 1,
+      })
+      docs = idDocs
+    } catch (e) {
+      // ID lookup might fail if queryId format is invalid for the DB
+      console.warn(`[Neo-One] ID lookup failed for "${cleanNid}"`)
+    }
+  }
+
+  if (!docs || docs.length === 0) {
+    console.error(`[Neo-One] Artwork NOT FOUND: "${cleanNid}"`)
+    return null
+  }
 
   const art = docs[0]
+  console.log(`[Neo-One] Found artwork: ${art.nid} (ID: ${art.id})`)
   const subcluster = art.subcluster as any
 
   return {
@@ -120,6 +151,7 @@ export async function fetchAdjacentArtworks(currentNid: string, subclusterId: st
   if (!subclusterId) return { prevNid: null, nextNid: null, currentIndex: null }
 
   const payload = await getPayload({ config: configPromise })
+  const decodedNid = decodeURIComponent(currentNid).trim()
 
   const { docs } = await payload.find({
     collection: 'artworks',
@@ -129,7 +161,7 @@ export async function fetchAdjacentArtworks(currentNid: string, subclusterId: st
     limit: 200,
   })
 
-  const index = docs.findIndex(a => String(a.nid) === String(currentNid))
+  const index = docs.findIndex(a => String(a.nid) === String(decodedNid))
   if (index === -1) return { prevNid: null, nextNid: null, currentIndex: null }
 
   return {

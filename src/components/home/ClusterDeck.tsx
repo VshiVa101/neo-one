@@ -14,9 +14,10 @@ interface ClusterDeckProps {
   subclusterTitle: string
   artworks: MockArtwork[]
   onExpand?: (artwork: MockArtwork) => void
+  isDeckActive?: boolean
 }
 
-export const ClusterDeck = ({ subclusterTitle, artworks, onExpand }: ClusterDeckProps) => {
+export const ClusterDeck = ({ subclusterTitle, artworks, onExpand, isDeckActive }: ClusterDeckProps) => {
   const router = useRouter()
   // Indice della carta correntemente selezionata (Main Card)
   const [activeIndex, setActiveIndex] = useState(0)
@@ -126,10 +127,19 @@ export const ClusterDeck = ({ subclusterTitle, artworks, onExpand }: ClusterDeck
       }}
     >
       {/* Intestazione del Subcluster / Deck */}
-      <div className="text-center z-50 mb-[12vh] lg:mb-[10vh] shrink-0 pointer-events-none">
-        <h3 className="font-neo text-white text-[6vw] lg:text-[1.8vw] xl:text-[1.5vw] tracking-widest uppercase drop-shadow-md leading-none">
-          {subclusterTitle}
-        </h3>
+      <div className="text-center z-50 mb-[12vh] lg:mb-[10vh] h-[2rem] flex items-center justify-center shrink-0 pointer-events-none">
+        <AnimatePresence>
+          {isDeckActive && (
+            <motion.h3
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="font-neo text-white text-[6vw] lg:text-[1.8vw] xl:text-[1.5vw] tracking-widest uppercase drop-shadow-md leading-none"
+            >
+              {subclusterTitle}
+            </motion.h3>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Area del Mazzo */}

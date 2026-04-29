@@ -523,6 +523,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                             subclusterTitle={sub.title}
                             artworks={sub.artworks}
                             onExpand={() => setExpandedDeckIndex(idx)}
+                            isDeckActive={isActive}
                           />
                         </motion.div>
                       )
