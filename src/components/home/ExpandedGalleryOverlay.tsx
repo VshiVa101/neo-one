@@ -39,38 +39,20 @@ export const ExpandedGalleryOverlay = ({
           exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
           className="fixed inset-0 z-[200] bg-black/90 overflow-y-auto overflow-x-hidden custom-scrollbar"
         >
-          {/* Header Galleria */}
-          <div className="sticky top-0 left-0 w-full p-8 flex flex-col items-start z-[210] pt-[4vh] md:pt-[6vh] bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none">
-            {/* Header con titolo e X - Lasciamo lo spazio centrale per l'Occhio Globale che è z-500 */}
-            <div className="flex flex-row items-start justify-between w-full pb-8 pointer-events-none">
-              {/* Titolo */}
-              <div className="flex flex-col pointer-events-auto">
-                <h2 className="font-neo text-[#F45390] text-3xl md:text-5xl tracking-[0.2em] uppercase drop-shadow-[0_0_10px_rgba(244,83,144,0.5)]">
-                  {subclusterTitle}
-                </h2>
-                <div className="h-0.5 w-24 md:w-48 bg-[#768b1a] mt-2 md:mt-4 shadow-[0_0_10px_#768b1a]" />
-              </div>
-
-              {/* Spacer centrale per l'Occhio Globale (z-500) */}
-              <div className="flex-1" />
-
-              {/* Close Button X - Posizione fissa per sicurezza click */}
-              <motion.button
-                whileHover={{ scale: 1.1, rotate: 90, backgroundColor: '#F45390' }}
-                whileTap={{ scale: 0.9 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClose();
-                }}
-                className="absolute top-4 right-4 md:top-8 md:right-8 w-10 h-10 md:w-14 md:h-14 flex items-center justify-center bg-[#d99f9f] rounded-full shadow-[0_0_15px_rgba(0,0,0,0.5)] z-[250] pointer-events-auto cursor-pointer transition-colors duration-300"
-              >
-                <img src="/images/ui/esccc.webp" className="w-1/2 h-1/2 object-contain" />
-              </motion.button>
+          {/* HEADER STICKY (Titolo + Spazio Occhio) */}
+          <div className="sticky top-0 z-[250] w-full flex flex-col items-center pointer-events-none pt-[2vh] md:pt-[4vh] bg-gradient-to-b from-black via-black/80 to-transparent">
+            <div className="flex flex-col items-center pointer-events-auto">
+              <h2 className="font-neo text-[#F45390] text-xl md:text-5xl tracking-[0.2em] uppercase text-center drop-shadow-[0_0_10px_rgba(244,83,144,0.5)]">
+                {subclusterTitle}
+              </h2>
+              <div className="h-0.5 w-16 md:w-48 bg-[#768b1a] mt-2 md:mt-4 shadow-[0_0_10px_#768b1a]" />
             </div>
+            {/* Spacer per l'Occhio (fixed a top-10vh/16vh) */}
+            <div className="h-[24vh] md:h-[45vh] pointer-events-none" />
           </div>
 
-          {/* Griglia Opere */}
-          <div className="max-w-7xl mx-auto px-4 md:px-8 pb-24 mt-[5vh] md:mt-[10vh]">
+          {/* Griglia Opere (Scrollable) */}
+          <div className="relative z-[200] max-w-7xl mx-auto px-4 md:px-8 pb-12 -mt-[15vh] md:-mt-[30vh]">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
               {artworks.map((artwork, i) => (
                 <motion.div
@@ -82,7 +64,7 @@ export const ExpandedGalleryOverlay = ({
                     scale: 1.03,
                     boxShadow: '0 0 30px rgba(118, 139, 26, 0.4)',
                   }}
-                  className="group relative aspect-square sm:aspect-auto h-[450px] border border-white/10 overflow-hidden cursor-pointer bg-black"
+                  className="group relative aspect-square sm:aspect-auto h-auto sm:h-[450px] border border-white/10 overflow-hidden cursor-pointer bg-black"
                   onClick={() => {
                     const params = new URLSearchParams()
                     if (clusterId) params.set('cluster', String(clusterId))
@@ -112,6 +94,21 @@ export const ExpandedGalleryOverlay = ({
                 </motion.div>
               ))}
             </div>
+          </div>
+
+          {/* TASTO ESC STICKY BOTTOM */}
+          <div className="sticky bottom-6 left-6 md:bottom-10 md:left-10 z-[300] w-fit ml-6 mb-6 md:ml-10 md:mb-10 pointer-events-auto">
+            <motion.button
+              whileHover={{ scale: 1.1, rotate: 90, backgroundColor: '#F45390' }}
+              whileTap={{ scale: 0.9 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#d99f9f] rounded-full shadow-[0_0_20px_rgba(0,0,0,0.8)] cursor-pointer transition-colors duration-300"
+            >
+              <img src="/images/ui/esccc.webp" className="w-1/2 h-1/2 object-contain" />
+            </motion.button>
           </div>
 
           {/* Footer Gallery */}

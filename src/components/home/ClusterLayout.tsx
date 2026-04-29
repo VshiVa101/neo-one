@@ -268,7 +268,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   return (
     <div className="w-full h-screen relative z-10 overflow-hidden">
       {/* ── OCCHIO TOP CENTER (responsivo con vh) ── */}
-      <div className="fixed top-[2vh] md:top-[4vh] left-1/2 -translate-x-1/2 w-[12vh] h-[12vh] md:w-[28vh] md:h-[28vh] z-[500]">
+      <div className={`fixed ${expandedDeckIndex !== null ? 'top-[10vh] md:top-[16vh]' : 'top-[2vh] md:top-[4vh]'} left-1/2 -translate-x-1/2 w-[12vh] h-[12vh] md:w-[28vh] md:h-[28vh] z-[500] transition-all duration-500`}>
         {shouldRenderBackgroundEye ? (
           <EyeScene
             targetRoute="/home"
