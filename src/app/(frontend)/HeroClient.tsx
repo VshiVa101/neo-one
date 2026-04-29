@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { MatrixGateway } from '@/components/MatrixGateway'
 import { EyeScene } from '@/components/EyeScene'
-import { useTransition } from '@/context/TransitionContext'
+import { useTransition } from '@/contexts/TransitionContext'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function HeroClient() {

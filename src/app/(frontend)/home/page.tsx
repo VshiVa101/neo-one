@@ -4,27 +4,7 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { Suspense } from 'react'
 
-// Helper function per estrarre l'URL in modo sicuro (Cloudinary focus)
-const getImageUrl = (media: any, defaultUrl: string) => {
-  let imageUrl = defaultUrl
-  if (media && typeof media === 'object') {
-    if (media.thumbnailURL && typeof media.thumbnailURL === 'string') {
-      imageUrl = media.thumbnailURL.replace(/\/upload\/[^\/]+\//, '/upload/f_auto,q_auto/')
-    } else if (media.url) {
-      imageUrl = media.url
-      if (!imageUrl.startsWith('/') && !imageUrl.startsWith('http')) {
-        if (!imageUrl.includes('api/media')) {
-          imageUrl = '/api/media/file/' + imageUrl
-        } else {
-          imageUrl = '/' + imageUrl
-        }
-      }
-    } else if (media.filename) {
-      imageUrl = '/api/media/file/' + media.filename
-    }
-  }
-  return imageUrl
-}
+import { getImageUrl } from '@/utilities/getMediaUrl'
 
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
@@ -86,3 +66,4 @@ export default async function HomePage() {
     </main>
   )
 }
+

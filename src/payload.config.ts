@@ -4,6 +4,7 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig } from 'payload'
+import { resendAdapter } from '@payloadcms/email-resend'
 import { fileURLToPath } from 'url'
 
 import { Media } from './collections/Media'
@@ -33,7 +34,13 @@ export default buildConfig({
     },
     user: Users.slug,
   },
+  email: resendAdapter({
+    defaultFromAddress: process.env.EMAIL_FROM_ADDRESS || 'system@neo-one.art',
+    defaultFromName: 'Neo-One Art Hub',
+    apiKey: process.env.RESEND_API_KEY || '',
+  }),
   editor: lexicalEditor({}),
+
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI,

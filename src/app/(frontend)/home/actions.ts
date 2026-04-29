@@ -5,27 +5,8 @@ import configPromise from '@payload-config'
 import { SubclusterData } from '@/components/home/ClusterLayout'
 import { unstable_noStore as noStore } from 'next/cache'
 
-// Helper per risolvere in un bel path diretto l'immagine di cloudinary
-const getImageUrl = (media: any, defaultUrl: string) => {
-  let imageUrl = defaultUrl
-  if (media && typeof media === 'object') {
-    if (media.thumbnailURL && typeof media.thumbnailURL === 'string') {
-      imageUrl = media.thumbnailURL.replace(/\/upload\/[^\/]+\//, '/upload/f_auto,q_auto/')
-    } else if (media.url) {
-      imageUrl = media.url
-      if (!imageUrl.startsWith('/') && !imageUrl.startsWith('http')) {
-        if (!imageUrl.includes('api/media')) {
-          imageUrl = '/api/media/file/' + imageUrl
-        } else {
-          imageUrl = '/' + imageUrl
-        }
-      }
-    } else if (media.filename) {
-      imageUrl = '/api/media/file/' + media.filename
-    }
-  }
-  return imageUrl
-}
+import { getImageUrl } from '@/utilities/getMediaUrl'
+
 
 export async function fetchClusterSubclusters(clusterId: string): Promise<SubclusterData[]> {
   noStore()

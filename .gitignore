@@ -30,3 +30,15 @@ node_modules/
 *.tsbuildinfo
 *.log
 
+# Heavy asset folders (source files, not needed in production)
+asset neo ottimizzato/
+hi-frames/
+
+# Backups (local only)
+backups/
+
+# Scratch / debug files
+scratch/
+
+# Desktop metadata
+desktop.ini

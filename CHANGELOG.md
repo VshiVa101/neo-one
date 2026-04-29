@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-04-29
+
+### 🚀 THE TURNING POINT: SYSTEM CONSOLIDATION & STABILIZATION
+Questo è il commit di riferimento per la stabilità del progetto. Segna il passaggio da sviluppo esplorativo a sistema di produzione.
+
+- **Core Infrastructure**: Allineate tutte le dipendenze `@payloadcms/*` alla versione `3.80.0` per garantire stabilità e compatibilità del modulo email.
+- **Project Cleanup**: Rimossi oltre 60MB di asset duplicati e codice orfano del template. Pulizia profonda delle directory `public/` e `src/app/(frontend)`.
+- **Documentation Master**: Creato `docs/NEO_MASTER_RULES.md` come singola fonte di verità per lo sviluppo futuro. Archiviati 6+ file di documentazione obsoleta in `docs/archive/`.
+- **Email Engine**: Implementato e configurato l'adapter Resend per l'invio delle notifiche dal form Checkout/Inquiry.
+- **Development DX**: Aggiunto comando `pnpm backup` per esportazioni atomiche del database e consolidate le utility di gestione immagini (`getImageUrl`).
+- **Git Hardening**: Ottimizzato `.gitignore` per escludere file di sistema, log e asset sorgente pesanti, rendendo il repository snello e pronto al versionamento professionale.
+
 ## [1.1.2] - 2026-04-27
 
 - **Bugfix / Core UX**: Reworked `EyeScene` 3D eye tracking so desktop follows the cursor continuously and mobile points to user touches, holds the target briefly, then returns to idle floating.

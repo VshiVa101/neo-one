@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useTransition } from '@/context/TransitionContext'
+import { useTransition } from '@/contexts/TransitionContext'
 import Image from 'next/image'
 
 export const TransitionOverlay = () => {

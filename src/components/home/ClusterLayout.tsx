@@ -8,7 +8,7 @@ import { fetchClusterSubclusters } from '@/app/(frontend)/home/actions'
 import { ExpandedGalleryOverlay } from '@/components/home/ExpandedGalleryOverlay'
 import { MiniMatrixLoader } from '@/components/MiniMatrixLoader'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { useTransition } from '@/context/TransitionContext'
+import { useTransition } from '@/contexts/TransitionContext'
 import { BrandedTitle } from '@/components/BrandedTitle'
 import { useCart } from '@/contexts/CartContext'
 

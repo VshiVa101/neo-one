@@ -14,7 +14,7 @@ import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
 
 // Transition Component & Context
-import { TransitionProvider } from '@/context/TransitionContext'
+import { TransitionProvider } from '@/contexts/TransitionContext'
 import { TransitionOverlay } from '@/components/TransitionOverlay'
 import { CartProvider } from '@/contexts/CartContext'
 
@@ -103,6 +103,6 @@ export const metadata: Metadata = {
   openGraph: mergeOpenGraph(),
   twitter: {
     card: 'summary_large_image',
-    creator: '@payloadcms',
+    creator: '@neo_one_art',
   },
 }

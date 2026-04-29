@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
+    "backup": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/backup-data.ts",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
@@ -26,6 +27,7 @@
     "@jhb.software/payload-cloudinary-plugin": "^0.3.3",
     "@payloadcms/admin-bar": "3.80.0",
     "@payloadcms/db-postgres": "3.80.0",
+    "@payloadcms/email-resend": "3.80.0",
     "@payloadcms/live-preview-react": "3.80.0",
     "@payloadcms/next": "3.80.0",
     "@payloadcms/plugin-cloud-storage": "3.80.0",

@@ -4,7 +4,7 @@ import React, { useRef, useState, useEffect, Suspense, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Html, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
-import { useTransition } from '@/context/TransitionContext'
+import { useTransition } from '@/contexts/TransitionContext'
 import { useRouter } from 'next/navigation'
 
 type EyePointerState = {
