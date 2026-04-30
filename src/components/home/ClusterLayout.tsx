@@ -32,7 +32,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { isTransitioning } = useTransition()
-  const { setIsCartOpen } = useCart()
+  const { isCartOpen, setIsCartOpen } = useCart()
 
   // Se siamo nella landing page (/), montiamo l'occhio dello sfondo SOLO quando inizia la transizione.
   // Questo evita di avere 2 Canvas WebGL contemporaneamente al caricamento iniziale.
@@ -179,7 +179,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       // Usiamo sia il check sul target che lo stato isHoveringFooter per massima sicurezza
       const target = e.target as HTMLElement
       const isOverFooter = target?.closest?.('.home-footer-container')
-      if (isOverFooter || isHoveringFooter || expandedClusterId) return
+      if (isOverFooter || isHoveringFooter || expandedClusterId || isCartOpen) return
 
       e.preventDefault()
       if (isScrolling) return
@@ -259,7 +259,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         footer.removeEventListener('wheel', handleFooterWheel)
       }
     }
-  }, [expandedClusterId, clusters.length, footerX])
+  }, [expandedClusterId, clusters.length, footerX, isCartOpen, isHoveringFooter])
 
   // I due cluster in primo piano (estratti dai due indici indipendenti)
   const leftCluster = clusters[navState.left]

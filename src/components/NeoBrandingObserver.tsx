@@ -32,7 +32,26 @@ export function NeoBrandingObserver() {
       }
 
       if (node.nodeType === Node.TEXT_NODE && node.nodeValue?.trim()) {
-        const text = node.nodeValue
+        let text = node.nodeValue
+
+        // Sostituzione globale caratteri accentati (non supportati dal font Neo)
+        text = text
+          .replace(/[ÈÉ]/g, "E'")
+          .replace(/[èé]/g, "e'")
+          .replace(/À/g, "A'")
+          .replace(/à/g, "a'")
+          .replace(/Ò/g, "O'")
+          .replace(/ò/g, "o'")
+          .replace(/Ù/g, "U'")
+          .replace(/ù/g, "u'")
+          .replace(/Ì/g, "I'")
+          .replace(/ì/g, "i'")
+
+        // Applichiamo la sostituzione al nodo originale se è cambiato
+        if (text !== node.nodeValue) {
+          node.nodeValue = text
+        }
+
         const regex = /([one])/gi
 
         if (regex.test(text)) {

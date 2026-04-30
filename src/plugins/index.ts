@@ -23,7 +23,10 @@ const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
   return doc?.slug ? `${url}/${doc.slug}` : url
 }
 
+import { neoAccentsPlugin } from './NeoAccentsPlugin'
+
 export const plugins: Plugin[] = [
+  neoAccentsPlugin,
   redirectsPlugin({
     collections: ['pages', 'posts'],
     overrides: {

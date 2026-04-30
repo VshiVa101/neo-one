@@ -14,9 +14,22 @@ interface BrandedTitleProps {
 export const BrandedTitle = ({ text }: { text: string }) => {
   if (!text) return null
 
+  // Sostituzione preventiva caratteri accentati per il font Neo
+  const sanitizedText = text
+    .replace(/[ÈÉ]/g, "E'")
+    .replace(/[èé]/g, "e'")
+    .replace(/À/g, "A'")
+    .replace(/à/g, "a'")
+    .replace(/Ò/g, "O'")
+    .replace(/ò/g, "o'")
+    .replace(/Ù/g, "U'")
+    .replace(/ù/g, "u'")
+    .replace(/Ì/g, "I'")
+    .replace(/ì/g, "i'")
+
   // Regex per catturare o, n, e (case-insensitive)
   const regex = /([one])/gi
-  const parts = text.split(regex)
+  const parts = sanitizedText.split(regex)
 
   return (
     <>
