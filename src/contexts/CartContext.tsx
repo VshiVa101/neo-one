@@ -37,7 +37,7 @@ export const useCart = () => useContext(CartContext)
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
-  
+
   // Form State
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -46,7 +46,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [emailTouched, setEmailTouched] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
-  
+
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   const showEmailError = emailTouched && email.length > 0 && !isEmailValid
 
@@ -55,9 +55,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const stored = localStorage.getItem('neo-cart')
       if (stored) setItems(JSON.parse(stored))
-      
+
       // Fetch dynamic settings from Payload
-      fetchCartSettings().then(settings => {
+      fetchCartSettings().then((settings) => {
         if (settings?.shippingPaymentNotice) {
           // Extraction basic text from Lexical if possible, or just use as is if we have a renderer
           // For now, let's just use the state. We'll handle rendering in the UI.
@@ -104,7 +104,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         name,
         email,
         message,
-        items: items.map(i => ({ title: i.title, nid: i.nid, quantity: i.quantity }))
+        items: items.map((i) => ({ title: i.title, nid: i.nid, quantity: i.quantity })),
       })
 
       if (res.success) {
@@ -141,7 +141,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       }}
     >
       {children}
-      
+
       <AnimatePresence>
         {isCartOpen && (
           <motion.div
@@ -155,12 +155,15 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
               whileHover={{ scale: 1.1, rotate: 90, backgroundColor: '#F45390' }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsCartOpen(false)}
-              className="fixed top-6 right-6 lg:top-10 lg:right-10 w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center bg-[#d99f9f] rounded-full z-[1010] shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-colors duration-300"
+              className="fixed bottom-4 left-4 lg:bottom-6 lg:left-6 w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center bg-[#d99f9f] rounded-full z-[1010] shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-colors duration-300"
             >
               <img src="/images/ui/esccc.webp" className="w-1/2 h-1/2 object-contain" />
             </motion.button>
 
-            <div className="w-full max-w-4xl flex flex-col gap-8 lg:gap-12 py-12 neo-skip-branding" data-neo-skip="true">
+            <div
+              className="w-full max-w-4xl flex flex-col gap-8 lg:gap-12 py-12 neo-skip-branding"
+              data-neo-skip="true"
+            >
               {/* Cart Items */}
               {/* Cart Items Area */}
               <div className="flex flex-col gap-6">
@@ -191,7 +194,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                           alt={item.title}
                           className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                         />
-                        
+
                         {/* Quantity Controls Overlay */}
                         <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-3">
                           <div className="flex items-center gap-4">
@@ -235,27 +238,29 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
               {/* Informazioni Section */}
               <div className="flex flex-col gap-2">
-                <h3 className="font-neo text-[#768b1a] text-xl lg:text-2xl tracking-widest uppercase">Informazioni</h3>
+                <h3 className="font-neo text-[#768b1a] text-xl lg:text-2xl tracking-widest uppercase">
+                  Informazioni
+                </h3>
                 <div className="font-neo text-white text-sm lg:text-base tracking-wide leading-relaxed lowercase opacity-80">
                   {shippingNotice ? (
                     typeof shippingNotice === 'string' ? (
                       <p>{shippingNotice}</p>
                     ) : (
-                      // If it's Lexical JSON, we'd ideally use a renderer. 
-                      // Here we provide a fallback message if it's complex, 
+                      // If it's Lexical JSON, we'd ideally use a renderer.
+                      // Here we provide a fallback message if it's complex,
                       // but usually it will be rendered or we can extract text.
                       <p>
                         {/* Fallback extraction for Lexical */}
-                        {(shippingNotice as any)?.root?.children?.[0]?.children?.[0]?.text || 
-                         "ciao, sono neo. controlla le tue impostazioni nel pannello admin."}
+                        {(shippingNotice as any)?.root?.children?.[0]?.children?.[0]?.text ||
+                          'ciao, sono neo. controlla le tue impostazioni nel pannello admin.'}
                       </p>
                     )
                   ) : (
                     <p>
-                      ciao, sono neo. ogni opera è un pezzo unico o parte di una tiratura limitatissima. 
-                      se hai scelto qualcosa, significa che abbiamo una vibrazione in comune. 
-                      scrivimi qui sotto cosa ti ha colpito e ti ricontatterò per definire i dettagli della spedizione e del possesso. 
-                      nessuna censura, solo arte.
+                      ciao, sono neo. ogni opera è un pezzo unico o parte di una tiratura
+                      limitatissima. se hai scelto qualcosa, significa che abbiamo una vibrazione in
+                      comune. scrivimi qui sotto cosa ti ha colpito e ti ricontatterò per definire i
+                      dettagli della spedizione e del possesso. nessuna censura, solo arte.
                     </p>
                   )}
                 </div>
@@ -265,8 +270,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
                 <div className="flex flex-col gap-6">
                   <div className="flex flex-col gap-2">
-                    <label className="font-neo text-white/40 text-[10px] uppercase tracking-[0.3em]">Messaggio per l'artista</label>
-                    <textarea 
+                    <label className="font-neo text-white/40 text-[10px] uppercase tracking-[0.3em]">
+                      Messaggio per l'artista
+                    </label>
+                    <textarea
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="flame,insulti,e messaggi minatori saranno collezzionati"
@@ -277,8 +284,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
                 <div className="flex flex-col gap-6">
                   <div className="flex flex-col gap-2">
-                    <label className="font-neo text-white/40 text-[10px] uppercase tracking-[0.3em]">Il tuo nome</label>
-                    <input 
+                    <label className="font-neo text-white/40 text-[10px] uppercase tracking-[0.3em]">
+                      Il tuo nome
+                    </label>
+                    <input
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -288,17 +297,19 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <label className="font-neo text-white/40 text-[10px] uppercase tracking-[0.3em]">La tua email</label>
-                    <input 
+                    <label className="font-neo text-white/40 text-[10px] uppercase tracking-[0.3em]">
+                      La tua email
+                    </label>
+                    <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       onBlur={() => setEmailTouched(true)}
-                      placeholder={showEmailError ? "non è una email...." : "email..."}
+                      placeholder={showEmailError ? 'non è una email....' : 'email...'}
                       className={`w-full bg-white/5 border p-4 font-neo text-white text-sm focus:outline-none transition-colors lowercase ${
-                        showEmailError 
-                        ? "border-[#F45390] text-[#F45390] placeholder-[#F45390]" 
-                        : "border-white/10 focus:border-[#768b1a]"
+                        showEmailError
+                          ? 'border-[#F45390] text-[#F45390] placeholder-[#F45390]'
+                          : 'border-white/10 focus:border-[#768b1a]'
                       }`}
                     />
                     <AnimatePresence>
@@ -323,7 +334,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                         animate={{ scale: 1 }}
                         className="font-neo text-[#768b1a] text-lg lg:text-xl tracking-widest uppercase flex items-center gap-4"
                       >
-                        <img src="/images/ui/check.webp" className="w-12 h-12 object-contain grayscale-0" />
+                        <img
+                          src="/images/ui/check.webp"
+                          className="w-12 h-12 object-contain grayscale-0"
+                        />
                         vibrazione inviata...
                       </motion.div>
                     ) : (
@@ -333,8 +347,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                         whileTap={isEmailValid && !isSubmitting ? { scale: 0.9 } : {}}
                         onClick={handleSubmit}
                         className={`w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.5)] ${
-                          isEmailValid && !isSubmitting 
-                            ? 'bg-[#768b1a] cursor-pointer' 
+                          isEmailValid && !isSubmitting
+                            ? 'bg-[#768b1a] cursor-pointer'
                             : 'bg-gray-800 opacity-20 cursor-not-allowed'
                         }`}
                       >

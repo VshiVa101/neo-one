@@ -6,6 +6,7 @@ import { MatrixGateway } from '@/components/MatrixGateway'
 import { EyeScene } from '@/components/EyeScene'
 import { useTransition } from '@/contexts/TransitionContext'
 import { motion, AnimatePresence } from 'framer-motion'
+import { MiniMatrixLoader } from '@/components/MiniMatrixLoader'
 
 export default function HeroClient() {
   const router = useRouter()
@@ -104,9 +105,7 @@ export default function HeroClient() {
         {/* Loading micro-state se l'occhio ci mette troppo */}
         {!isEyeReady && (
           <div className="absolute inset-0 flex items-center justify-center z-[5] pointer-events-none">
-            <p className="font-neo text-gray-800 text-[10px] tracking-[1em] uppercase animate-pulse">
-              Inizializzazione Sguardo...
-            </p>
+            <MiniMatrixLoader />
           </div>
         )}
       </motion.main>

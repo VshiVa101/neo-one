@@ -5,6 +5,7 @@ import configPromise from '@payload-config'
 import { Suspense } from 'react'
 
 import { getImageUrl } from '@/utilities/getMediaUrl'
+import { MiniMatrixLoader } from '@/components/MiniMatrixLoader'
 
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
@@ -57,11 +58,11 @@ export default async function HomePage() {
         className="absolute inset-0 w-screen h-screen object-cover z-0 opacity-40 brightness-75 scale-100 md:scale-105"
       />
       {mappedClusters.length >= 2 ? (
-        <Suspense fallback={<div className="z-10 text-[#768b1a] font-neo animate-pulse">CARICAMENTO CLUSTER...</div>}>
+        <Suspense fallback={<MiniMatrixLoader />}>
           <ClusterLayout clusters={mappedClusters} />
         </Suspense>
       ) : (
-        <div className="z-10 text-white font-neo tracking-widest">CARICAMENTO CLUSTER IN CORSO...</div>
+        <MiniMatrixLoader />
       )}
     </main>
   )

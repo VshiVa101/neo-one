@@ -268,7 +268,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   return (
     <div className="w-full h-screen relative z-10 overflow-hidden">
       {/* ── OCCHIO TOP CENTER (responsivo con vh) ── */}
-      <div className={`fixed ${expandedDeckIndex !== null ? 'top-[10vh] md:top-[16vh]' : 'top-[2vh] md:top-[4vh]'} left-1/2 -translate-x-1/2 w-[12vh] h-[12vh] md:w-[28vh] md:h-[28vh] z-[500] transition-all duration-500`}>
+      <div className="fixed top-[2vh] md:top-[4vh] left-1/2 -translate-x-1/2 w-[12vh] h-[12vh] md:w-[28vh] md:h-[28vh] z-[500] transition-all duration-500">
         {shouldRenderBackgroundEye ? (
           <EyeScene
             targetRoute="/home"
@@ -413,35 +413,35 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
             })}
           </motion.div>
         </div>
+      </div>
 
-        {/* Cart Button: fixed on the right of the same row */}
-        <div className="flex-shrink-0 pointer-events-auto">
-          <motion.button
-            whileHover={{ scale: 1.1, boxShadow: '0 0 25px rgba(244, 83, 144, 0.7)' }}
-            whileTap={{ scale: 0.9 }}
-            onMouseEnter={() => setCartHovered(true)}
-            onMouseLeave={() => setCartHovered(false)}
-            onClick={() => setIsCartOpen(true)}
-            className="w-[45px] h-[45px] md:w-[60px] md:h-[60px] cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
-            style={{
-              backgroundColor: cartHovered ? '#F45390' : '#B3828B',
-              boxShadow: cartHovered
-                ? '0 0 20px rgba(244, 83, 144, 0.5)'
-                : '0 0 10px rgba(0,0,0,0.3)',
-            }}
-            title="Vai alla Cassa"
-          >
-            <img
-              src={
-                cartHovered
-                  ? '/images/drops/carrellorosa_optimized.webp'
-                  : '/images/drops/carrello_optimized.webp'
-              }
-              alt="Carrello"
-              className="w-full h-full object-contain"
-            />
-          </motion.button>
-        </div>
+      {/* ── CART BUTTON FIXED (Sempre presente, bottom-right) ── */}
+      <div className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[400] pointer-events-auto">
+        <motion.button
+          whileHover={{ scale: 1.1, boxShadow: '0 0 25px rgba(244, 83, 144, 0.7)' }}
+          whileTap={{ scale: 0.9 }}
+          onMouseEnter={() => setCartHovered(true)}
+          onMouseLeave={() => setCartHovered(false)}
+          onClick={() => setIsCartOpen(true)}
+          className="w-[45px] h-[45px] md:w-[60px] md:h-[60px] cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
+          style={{
+            backgroundColor: cartHovered ? '#F45390' : '#B3828B',
+            boxShadow: cartHovered
+              ? '0 0 20px rgba(244, 83, 144, 0.5)'
+              : '0 0 10px rgba(0,0,0,0.3)',
+          }}
+          title="Vai alla Cassa"
+        >
+          <img
+            src={
+              cartHovered
+                ? '/images/drops/carrellorosa_optimized.webp'
+                : '/images/drops/carrello_optimized.webp'
+            }
+            alt="Carrello"
+            className="w-full h-full object-contain"
+          />
+        </motion.button>
       </div>
 
       {/* ── EXPANDED CLUSTER OVERLAY ──────────────────── */}
@@ -453,7 +453,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-25 bg-black/80 backdrop-blur-md flex flex-col pt-[26vh] overflow-hidden"
+            className="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md flex flex-col pt-[26vh] overflow-hidden"
             onClick={() => setExpandedClusterId(null)}
             onTouchStart={(e) => {
               touchStartX.current = e.touches[0].clientX
@@ -470,7 +470,20 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               touchStartX.current = null
             }}
           >
-            {/* Il tasto Chiudi (X) è rimosso. Si chiude tramite la gesture sull'Occhio centrale */}
+            {/* TASTO ESC FIXED BOTTOM LEFT (Anche per la visione a mazzi) */}
+            <div className="fixed bottom-6 left-6 md:bottom-10 md:left-10 z-[300] pointer-events-auto">
+              <motion.button
+                whileHover={{ scale: 1.1, rotate: 90, backgroundColor: '#F45390' }}
+                whileTap={{ scale: 0.9 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpandedClusterId(null);
+                }}
+                className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#d99f9f] rounded-full shadow-[0_0_20px_rgba(0,0,0,0.8)] cursor-pointer transition-colors duration-300"
+              >
+                <img src="/images/ui/esccc.webp" className="w-1/2 h-1/2 object-contain" />
+              </motion.button>
+            </div>
 
             {isLoadingExpanded ? (
               // SPINNER NEO-1 - Forzato al centro assoluto dello schermo
