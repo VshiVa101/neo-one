@@ -1,22 +1,12 @@
-import { Config, Plugin, Field, fieldAffectsData } from 'payload'
+import { Config, Plugin, Field } from 'payload'
+import { normalizeNeoText } from '@/utilities/normalizeNeoText'
 
 /**
  * Utility per convertire caratteri accentati non supportati dal font Neo
  * in combinazioni di lettera + apostrofo.
  */
 export const formatNeoAccents = (value: any) => {
-  if (typeof value !== 'string') return value
-  return value
-    .replace(/[ÈÉ]/g, "E'")
-    .replace(/[èé]/g, "e'")
-    .replace(/À/g, "A'")
-    .replace(/à/g, "a'")
-    .replace(/Ò/g, "O'")
-    .replace(/ò/g, "o'")
-    .replace(/Ù/g, "U'")
-    .replace(/ù/g, "u'")
-    .replace(/Ì/g, "I'")
-    .replace(/ì/g, "i'")
+  return normalizeNeoText(value)
 }
 
 /**
@@ -24,20 +14,18 @@ export const formatNeoAccents = (value: any) => {
  */
 const addHookToFields = (fields: Field[]): Field[] => {
   return fields.map((field) => {
-    // Se il campo salva dati ed è di tipo testo/textarea, aggiungiamo il hook
-    if (fieldAffectsData(field)) {
-      if (field.type === 'text' || field.type === 'textarea') {
-        const existingHooks = field.hooks?.beforeChange || []
-        return {
-          ...field,
-          hooks: {
-            ...field.hooks,
-            beforeChange: [
-              ...existingHooks,
-              ({ value }) => formatNeoAccents(value),
-            ],
-          },
-        }
+    // Se il campo è di tipo testo/textarea, aggiungiamo il hook
+    if (field.type === 'text' || field.type === 'textarea') {
+      const existingHooks = field.hooks?.beforeChange || []
+      return {
+        ...field,
+        hooks: {
+          ...field.hooks,
+          beforeChange: [
+            ...existingHooks,
+            ({ value }) => formatNeoAccents(value),
+          ],
+        },
       }
     }
 

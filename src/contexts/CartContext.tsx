@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BrandedTitle } from '@/components/BrandedTitle'
 import { fetchCartSettings, submitCart } from '@/app/(frontend)/home/actions'
+import { normalizeNeoString } from '@/utilities/normalizeNeoText'
 
 interface CartItem {
   nid: string
@@ -148,22 +149,24 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-xl flex flex-col items-center p-6 md:p-12 lg:p-20 overflow-y-auto custom-scrollbar"
+            className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-xl"
           >
             {/* Close Button */}
             <motion.button
               whileHover={{ scale: 1.1, rotate: 90, backgroundColor: '#F45390' }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsCartOpen(false)}
-              className="fixed bottom-4 left-4 lg:bottom-6 lg:left-6 w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center bg-[#d99f9f] rounded-full z-[1010] shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-colors duration-300"
+              className="fixed bottom-4 left-4 lg:bottom-6 lg:left-6 w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center bg-[#d99f9f] rounded-full z-[1100] shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-colors duration-300"
             >
               <img src="/images/ui/esccc.webp" className="w-1/2 h-1/2 object-contain" />
             </motion.button>
 
-            <div
-              className="w-full max-w-4xl flex flex-col gap-8 lg:gap-12 py-12 neo-skip-branding"
-              data-neo-skip="true"
-            >
+            <div className="absolute inset-0 overflow-y-auto custom-scrollbar">
+              <div
+                className="w-full min-h-full flex flex-col items-center p-6 md:p-12 lg:p-20"
+                data-neo-skip="true"
+              >
+                <div className="w-full max-w-4xl flex flex-col gap-8 lg:gap-12 py-12 neo-skip-branding">
               {/* Cart Items */}
               {/* Cart Items Area */}
               <div className="flex flex-col gap-6">
@@ -181,7 +184,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                 <div className="flex flex-row flex-wrap gap-4 lg:gap-6 mt-4 min-h-[120px] lg:min-h-[160px] items-start">
                   {items.length === 0 ? (
                     <p className="font-neo text-white/30 text-sm tracking-widest uppercase">
-                      Il tuo carrello è vuoto
+                      {normalizeNeoString('Il tuo carrello è vuoto')}
                     </p>
                   ) : (
                     items.map((item) => (
@@ -244,23 +247,24 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                 <div className="font-neo text-white text-sm lg:text-base tracking-wide leading-relaxed lowercase opacity-80">
                   {shippingNotice ? (
                     typeof shippingNotice === 'string' ? (
-                      <p>{shippingNotice}</p>
+                      <p>{normalizeNeoString(shippingNotice)}</p>
                     ) : (
                       // If it's Lexical JSON, we'd ideally use a renderer.
                       // Here we provide a fallback message if it's complex,
                       // but usually it will be rendered or we can extract text.
                       <p>
                         {/* Fallback extraction for Lexical */}
-                        {(shippingNotice as any)?.root?.children?.[0]?.children?.[0]?.text ||
-                          'ciao, sono neo. controlla le tue impostazioni nel pannello admin.'}
+                        {normalizeNeoString(
+                          (shippingNotice as any)?.root?.children?.[0]?.children?.[0]?.text ||
+                            'ciao, sono neo. controlla le tue impostazioni nel pannello admin.',
+                        )}
                       </p>
                     )
                   ) : (
                     <p>
-                      ciao, sono neo. ogni opera è un pezzo unico o parte di una tiratura
-                      limitatissima. se hai scelto qualcosa, significa che abbiamo una vibrazione in
-                      comune. scrivimi qui sotto cosa ti ha colpito e ti ricontatterò per definire i
-                      dettagli della spedizione e del possesso. nessuna censura, solo arte.
+                      {normalizeNeoString(
+                        'ciao, sono neo. ogni opera è un pezzo unico o parte di una tiratura limitatissima. se hai scelto qualcosa, significa che abbiamo una vibrazione in comune. scrivimi qui sotto cosa ti ha colpito e ti ricontatterò per definire i dettagli della spedizione e del possesso. nessuna censura, solo arte.',
+                      )}
                     </p>
                   )}
                 </div>
@@ -305,7 +309,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       onBlur={() => setEmailTouched(true)}
-                      placeholder={showEmailError ? 'non è una email....' : 'email...'}
+                      placeholder={showEmailError ? normalizeNeoString('non è una email....') : 'email...'}
                       className={`w-full bg-white/5 border p-4 font-neo text-white text-sm focus:outline-none transition-colors lowercase ${
                         showEmailError
                           ? 'border-[#F45390] text-[#F45390] placeholder-[#F45390]'
@@ -320,7 +324,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                           exit={{ opacity: 0 }}
                           className="font-neo text-[#F45390] text-[10px] uppercase tracking-widest mt-1"
                         >
-                          non è una email....
+                          {normalizeNeoString('non è una email....')}
                         </motion.span>
                       )}
                     </AnimatePresence>
@@ -361,6 +365,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                     )}
                   </div>
                 </div>
+              </div>
+            </div>
               </div>
             </div>
           </motion.div>

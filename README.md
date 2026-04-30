@@ -1,5 +1,12 @@
 # Neo-One Art Hub
 
+## Release v1.1.3 (2026-04-30)
+
+- Fixed desktop cart behavior: wheel scrolling now works inside cart overlay and no longer gets blocked by home layout wheel interception.
+- Updated cart close button (`esc`) to remain truly fixed while cart content scrolls.
+- Added centralized text normalization for Neo font compatibility via `src/utilities/normalizeNeoText.ts`, reused by Payload plugin and frontend components.
+- Stabilized Payload accent plugin runtime compatibility and applied accent normalization in cart UI strings and notices.
+
 ## Release v1.1.2 (2026-04-27)
 
 - Fixed the 3D Eye interaction system: desktop cursor tracking, mobile touch targeting, model cloning per instance, and separated living animations from look-at tracking.

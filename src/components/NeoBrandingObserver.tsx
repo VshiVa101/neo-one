@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { normalizeNeoString } from '@/utilities/normalizeNeoText'
 
 const PINK = '#F45390'
 const GREEN = '#809829'
@@ -35,17 +36,7 @@ export function NeoBrandingObserver() {
         let text = node.nodeValue
 
         // Sostituzione globale caratteri accentati (non supportati dal font Neo)
-        text = text
-          .replace(/[ÈÉ]/g, "E'")
-          .replace(/[èé]/g, "e'")
-          .replace(/À/g, "A'")
-          .replace(/à/g, "a'")
-          .replace(/Ò/g, "O'")
-          .replace(/ò/g, "o'")
-          .replace(/Ù/g, "U'")
-          .replace(/ù/g, "u'")
-          .replace(/Ì/g, "I'")
-          .replace(/ì/g, "i'")
+        text = normalizeNeoString(text)
 
         // Applichiamo la sostituzione al nodo originale se è cambiato
         if (text !== node.nodeValue) {
