@@ -44,7 +44,7 @@ export default async function HomePage() {
       slug: doc.slug,
       desc: doc.manifesto,
       image: getImageUrl(doc.coverImage, '/images/drops/BN-cluster.png'),
-      titleColor: doc.primaryColor || '#768b1a',
+      titleColor: doc.primaryColor || '#809829',
       descColor: doc.secondaryColor || '#fc5896',
     }
   })

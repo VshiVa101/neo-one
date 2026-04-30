@@ -156,9 +156,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
               whileHover={{ scale: 1.1, rotate: 90, backgroundColor: '#F45390' }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsCartOpen(false)}
-              className="fixed bottom-4 left-4 lg:bottom-6 lg:left-6 w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center bg-[#d99f9f] rounded-full z-[1100] shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-colors duration-300"
+              className="neo-interface-btn fixed bottom-4 left-4 lg:bottom-6 lg:left-6 w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center bg-[#B3828B] rounded-full z-[1100] transition-colors duration-300"
             >
-              <img src="/images/ui/esccc.webp" className="w-1/2 h-1/2 object-contain" />
+              <img src="/images/ui/esccc.webp" className="w-[62%] h-[62%] object-contain" />
             </motion.button>
 
             <div className="absolute inset-0 overflow-y-auto custom-scrollbar">
@@ -211,7 +211,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                             </motion.button>
                             <span className="font-neo text-white text-lg">{item.quantity}</span>
                             <motion.button
-                              whileHover={{ scale: 1.2, color: '#768b1a' }}
+                              whileHover={{ scale: 1.2, color: '#809829' }}
                               whileTap={{ scale: 0.8 }}
                               onClick={() => updateQuantity(item.nid, 1)}
                               className="text-white text-xl font-neo p-2"
@@ -241,7 +241,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
               {/* Informazioni Section */}
               <div className="flex flex-col gap-2">
-                <h3 className="font-neo text-[#768b1a] text-xl lg:text-2xl tracking-widest uppercase">
+                <h3 className="font-neo text-[#809829] text-xl lg:text-2xl tracking-widest uppercase">
                   Informazioni
                 </h3>
                 <div className="font-neo text-white text-sm lg:text-base tracking-wide leading-relaxed lowercase opacity-80">
@@ -281,7 +281,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="flame,insulti,e messaggi minatori saranno collezzionati"
-                      className="w-full bg-white/5 border border-white/10 p-4 font-neo text-white text-sm focus:outline-none focus:border-[#768b1a] transition-colors min-h-[150px] resize-none lowercase"
+                      className="w-full bg-white/5 border border-white/10 p-4 font-neo text-white text-sm focus:outline-none focus:border-[#809829] transition-colors min-h-[150px] resize-none lowercase"
                     />
                   </div>
                 </div>
@@ -296,7 +296,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="nome..."
-                      className="w-full bg-white/5 border border-white/10 p-4 font-neo text-white text-sm focus:outline-none focus:border-[#768b1a] transition-colors lowercase"
+                      className="w-full bg-white/5 border border-white/10 p-4 font-neo text-white text-sm focus:outline-none focus:border-[#809829] transition-colors lowercase"
                     />
                   </div>
 
@@ -313,7 +313,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                       className={`w-full bg-white/5 border p-4 font-neo text-white text-sm focus:outline-none transition-colors lowercase ${
                         showEmailError
                           ? 'border-[#F45390] text-[#F45390] placeholder-[#F45390]'
-                          : 'border-white/10 focus:border-[#768b1a]'
+                          : 'border-white/10 focus:border-[#809829]'
                       }`}
                     />
                     <AnimatePresence>
@@ -336,7 +336,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="font-neo text-[#768b1a] text-lg lg:text-xl tracking-widest uppercase flex items-center gap-4"
+                        className="font-neo text-[#809829] text-lg lg:text-xl tracking-widest uppercase flex items-center gap-4"
                       >
                         <img
                           src="/images/ui/check.webp"
@@ -350,9 +350,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                         whileHover={isEmailValid && !isSubmitting ? { scale: 1.1 } : {}}
                         whileTap={isEmailValid && !isSubmitting ? { scale: 0.9 } : {}}
                         onClick={handleSubmit}
-                        className={`w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.5)] ${
+                        className={`neo-interface-btn w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center rounded-full transition-all duration-300 ${
                           isEmailValid && !isSubmitting
-                            ? 'bg-[#768b1a] cursor-pointer'
+                            ? 'bg-[#809829] cursor-pointer'
                             : 'bg-gray-800 opacity-20 cursor-not-allowed'
                         }`}
                       >

@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Link2, Pause, Volume2 } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
 import { BrandedTitle } from '@/components/BrandedTitle'
 import { useNavigationHistory } from '@/hooks/useNavigationHistory'
@@ -20,7 +21,10 @@ interface ArtworkDetailClientProps {
   prevNid: string | null
   nextNid: string | null
   clusterId?: string | null
+  clusterSlug?: string | null
   deckIndex?: number | null
+  audioSnippetUrl?: string | null
+  fullAudioUrl?: string | null
 }
 
 export const ArtworkDetailClient = ({
@@ -36,7 +40,10 @@ export const ArtworkDetailClient = ({
   prevNid,
   nextNid,
   clusterId,
+  clusterSlug,
   deckIndex,
+  audioSnippetUrl,
+  fullAudioUrl,
 }: ArtworkDetailClientProps) => {
   const router = useRouter()
   const { goBackToGallery } = useNavigationHistory()
@@ -52,7 +59,39 @@ export const ArtworkDetailClient = ({
   const [addedToCart, setAddedToCart] = useState(false)
   const [isFlipped, setIsFlipped] = useState(false)
   const [infoHovered, setInfoHovered] = useState(false)
+  const [isPreviewPlaying, setIsPreviewPlaying] = useState(false)
   const touchStartX = React.useRef<number | null>(null)
+  const previewAudioRef = React.useRef<HTMLAudioElement | null>(null)
+
+  const isRumoreCluster = clusterSlug?.toLowerCase() === 'rumore'
+
+  const handleAudioPreview = async () => {
+    if (!audioSnippetUrl) return
+
+    // Toggle play/pause if the same preview is already loaded
+    if (previewAudioRef.current) {
+      if (previewAudioRef.current.paused) {
+        await previewAudioRef.current.play().catch(() => {
+          window.open(audioSnippetUrl, '_blank', 'noopener,noreferrer')
+        })
+        setIsPreviewPlaying(true)
+      } else {
+        previewAudioRef.current.pause()
+        setIsPreviewPlaying(false)
+      }
+      return
+    }
+
+    const audio = new Audio(audioSnippetUrl)
+    audio.preload = 'auto'
+    audio.volume = 0.8
+    audio.onended = () => setIsPreviewPlaying(false)
+    previewAudioRef.current = audio
+    await audio.play().then(
+      () => setIsPreviewPlaying(true),
+      () => window.open(audioSnippetUrl, '_blank', 'noopener,noreferrer'),
+    )
+  }
 
   const handlePurchase = () => {
     addToCart({ nid, title, image })
@@ -115,6 +154,15 @@ export const ArtworkDetailClient = ({
     return () => window.removeEventListener('keydown', handleEsc)
   }, [isZoomOpen, goBackToGallery, clusterId, deckIndex])
 
+  React.useEffect(() => {
+    return () => {
+      if (previewAudioRef.current) {
+        previewAudioRef.current.pause()
+        previewAudioRef.current = null
+      }
+    }
+  }, [])
+
   return (
     <>
       {/* ── MODALE OVERLAY ZOOM A SCHERMO INTERO ── */}
@@ -159,7 +207,7 @@ export const ArtworkDetailClient = ({
             {/* Logo Neo-One */}
             <div className="relative z-10 w-[90%] aspect-[3/1] mb-12 flex items-center justify-center">
               <div
-                className="w-full h-full bg-[#768b1a] drop-shadow-[0_0_20px_rgba(118,139,26,0.8)]"
+                className="w-full h-full bg-[#809829] drop-shadow-[0_0_20px_rgba(128,152,41,0.8)]"
                 style={{
                   WebkitMaskImage: 'url(/images/ui/logo-neoone-blackmetal-bianco.png)',
                   WebkitMaskSize: '100% 100%',
@@ -172,11 +220,11 @@ export const ArtworkDetailClient = ({
             <div className="relative z-10 w-full flex justify-center mt-8">
               {prevNid ? (
                 <motion.button
-                  className="pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#d99f9f] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-colors"
+                  className="neo-interface-btn pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#B3828B] rounded-full flex items-center justify-center transition-colors"
                   onClick={() => router.push(getNavUrl(prevNid))}
                   onMouseEnter={() => setPrevHovered(true)}
                   onMouseLeave={() => setPrevHovered(false)}
-                  whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
+                  whileHover={{ scale: 1.15, backgroundColor: '#809829' }}
                   whileTap={{ scale: 0.9 }}
                 >
                   <img
@@ -185,7 +233,7 @@ export const ArtworkDetailClient = ({
                         ? '/images/ui/direction-arrow-green.webp'
                         : '/images/ui/direction-arrow-pink.webp'
                     }
-                    className="w-[50%] object-contain rotate-180"
+                    className="w-[62%] h-[62%] object-contain rotate-180"
                     draggable={false}
                   />
                 </motion.button>
@@ -276,7 +324,7 @@ export const ArtworkDetailClient = ({
             {/* Logo Neo-One */}
             <div className="relative z-10 w-[90%] aspect-[3/1] mb-12 flex items-center justify-center">
               <div
-                className="w-full h-full bg-[#768b1a] drop-shadow-[0_0_20px_rgba(118,139,26,0.8)]"
+                className="w-full h-full bg-[#809829] drop-shadow-[0_0_20px_rgba(128,152,41,0.8)]"
                 style={{
                   WebkitMaskImage: 'url(/images/ui/logo-neoone-blackmetal-bianco.png)',
                   WebkitMaskSize: '100% 100%',
@@ -289,11 +337,11 @@ export const ArtworkDetailClient = ({
             <div className="relative z-10 w-full flex justify-center mt-8">
               {nextNid ? (
                 <motion.button
-                  className="pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#d99f9f] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-colors"
+                  className="neo-interface-btn pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#B3828B] rounded-full flex items-center justify-center transition-colors"
                   onClick={() => router.push(getNavUrl(nextNid))}
                   onMouseEnter={() => setNextHovered(true)}
                   onMouseLeave={() => setNextHovered(false)}
-                  whileHover={{ scale: 1.15, backgroundColor: '#768b1a' }}
+                  whileHover={{ scale: 1.15, backgroundColor: '#809829' }}
                   whileTap={{ scale: 0.9 }}
                 >
                   <img
@@ -302,7 +350,7 @@ export const ArtworkDetailClient = ({
                         ? '/images/ui/direction-arrow-green.webp'
                         : '/images/ui/direction-arrow-pink.webp'
                     }
-                    className="w-[50%] object-contain"
+                    className="w-[62%] h-[62%] object-contain"
                     draggable={false}
                   />
                 </motion.button>
@@ -322,7 +370,7 @@ export const ArtworkDetailClient = ({
                 whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
                 whileTap={{ scale: 0.9 }}
                 onClick={handleExitToGallery}
-                className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#d99f9f] rounded-full flex items-center justify-center outline-none border border-[#d99f9f] shadow-[0_0_10px_rgba(0,0,0,1)] z-20 transition-colors duration-300"
+                className="neo-interface-btn w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex items-center justify-center outline-none z-20 transition-colors duration-300"
                 title="Torna alla Gallery"
               >
                 <img
@@ -333,13 +381,14 @@ export const ArtworkDetailClient = ({
 
               {/* Info Flip Button */}
               <motion.button
-                className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-transparent rounded-full flex items-center justify-center focus:outline-none"
+                className="neo-interface-btn w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex items-center justify-center focus:outline-none transition-colors duration-300"
                 onClick={(e) => {
                   e.stopPropagation()
                   setIsFlipped(!isFlipped)
                 }}
                 onMouseEnter={() => setInfoHovered(true)}
                 onMouseLeave={() => setInfoHovered(false)}
+                style={{ backgroundColor: infoHovered ? '#809829' : '#B3828B' }}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 title="Dettagli Opera"
@@ -347,21 +396,50 @@ export const ArtworkDetailClient = ({
                 <img
                   src={infoHovered ? '/images/ui/inforverde.webp' : '/images/ui/inforosa.webp'}
                   alt="Info"
-                  className="w-[90%] h-[90%] object-contain drop-shadow-[0_0_10px_rgba(0,0,0,1)]"
+                  className="w-[66%] h-[66%] object-contain drop-shadow-[0_0_10px_rgba(0,0,0,1)]"
                 />
               </motion.button>
             </div>
 
             {/* GRUPPO: PRE-ORDER + CARRELLO */}
             <div className="flex flex-row items-center gap-3 lg:gap-6">
+              {isRumoreCluster && audioSnippetUrl && (
+                <motion.button
+                  whileHover={{ scale: 1.1, backgroundColor: '#809829' }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleAudioPreview}
+                  className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
+                  title="Prova Audio"
+                >
+                  {isPreviewPlaying ? (
+                    <Pause className="w-[58%] h-[58%] text-black drop-shadow-[0_0_6px_rgba(0,0,0,0.8)]" />
+                  ) : (
+                    <Volume2 className="w-[58%] h-[58%] text-black drop-shadow-[0_0_6px_rgba(0,0,0,0.8)]" />
+                  )}
+                </motion.button>
+              )}
+
+              {isRumoreCluster && fullAudioUrl && (
+                <motion.button
+                  whileHover={{ scale: 1.1, backgroundColor: '#809829' }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => window.open(fullAudioUrl, '_blank', 'noopener,noreferrer')}
+                  className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
+                  title="Link Audio Completo"
+                >
+                  <Link2 className="w-[58%] h-[58%] text-black drop-shadow-[0_0_6px_rgba(0,0,0,0.8)]" />
+                </motion.button>
+              )}
+
               {/* Pulsante PRE-ORDER LOGO */}
               <motion.button
                 onClick={handlePurchase}
                 onMouseEnter={() => setPurchaseHovered(true)}
                 onMouseLeave={() => setPurchaseHovered(false)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative outline-none flex justify-center py-1 lg:py-2 flex-1 max-w-[40vw] lg:max-w-[25vw]"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
+                style={{ backgroundColor: purchaseHovered || addedToCart ? '#809829' : '#B3828B' }}
               >
                 <img
                   src={
@@ -370,7 +448,7 @@ export const ArtworkDetailClient = ({
                       : '/images/ui/pre-orderrosa.webp'
                   }
                   alt="Purchase"
-                  className="h-[50px] lg:h-[70px] w-auto max-w-full object-contain drop-shadow-[0_0_15px_rgba(244,83,144,0.4)] transition-all duration-300"
+                  className="w-[72%] h-[72%] object-contain drop-shadow-[0_0_15px_rgba(244,83,144,0.4)] transition-all duration-300"
                 />
               </motion.button>
 
@@ -381,15 +459,15 @@ export const ArtworkDetailClient = ({
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setIsCartOpen(true)}
-                className="relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#d99f9f] rounded-full flex outline-none border border-[#d99f9f] hover:border-[#768b1a] justify-center items-center cursor-pointer shadow-[0_0_10px_rgba(0,0,0,1)]"
+                className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer"
               >
                 <img
                   src="/images/ui/carrello.webp"
-                  className="w-[50%] h-[50%] object-contain relative z-10"
+                  className="w-[62%] h-[62%] object-contain relative z-10"
                 />
                 {/* Contatore ESTERNO */}
                 {count > 0 && (
-                  <span className="absolute -top-2 -right-2 w-[22px] h-[22px] lg:w-[24px] lg:h-[24px] flex items-center justify-center bg-[#768b1a] rounded-full font-neo text-[10px] lg:text-sm text-black font-bold border lg:border-2 border-black z-20 shadow-[0_0_5px_rgba(118,139,26,0.8)]">
+                  <span className="absolute -top-2 -right-2 w-[22px] h-[22px] lg:w-[24px] lg:h-[24px] flex items-center justify-center bg-[#809829] rounded-full font-neo text-[10px] lg:text-sm text-black font-bold border lg:border-2 border-black z-20 shadow-[0_0_5px_rgba(128,152,41,0.8)]">
                     {count}
                   </span>
                 )}

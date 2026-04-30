@@ -2,7 +2,6 @@ import React from 'react'
 import { fetchArtworkByNid, fetchAdjacentArtworks } from '@/app/(frontend)/home/actions'
 import { notFound } from 'next/navigation'
 import { EyeScene } from '@/components/EyeScene'
-import { AcidAudioPlayer } from '@/components/audio/AcidAudioPlayer'
 import { ArtworkDetailClient } from './ArtworkDetailClient'
 
 export const dynamic = 'force-dynamic'
@@ -63,14 +62,13 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
           prevNid={prevNid}
           nextNid={nextNid}
           clusterId={artwork.clusterId}
+          clusterSlug={artwork.clusterSlug}
           deckIndex={artwork.deckIndex}
+          audioSnippetUrl={artwork.audioSnippetUrl}
+          fullAudioUrl={artwork.fullAudioUrl}
         />
       </div>
 
-      {/* ── AUDIO PLAYER (solo se URL presente) ── */}
-      {artwork.audioSnippetUrl && (
-        <AcidAudioPlayer url={artwork.audioSnippetUrl} title={`OPERA ${artwork.nid}`} />
-      )}
     </main>
   )
 }

@@ -76,11 +76,11 @@ export const ExpandedGalleryOverlay = ({
                       <p className="font-neo text-white text-base lg:text-lg tracking-widest uppercase mb-1 drop-shadow-md">
                         {artwork.title}
                       </p>
-                      <div className="h-0.5 w-8 lg:w-12 bg-[#768b1a] shadow-[0_0_10px_#768b1a] group-hover:w-full transition-all duration-500" />
+                      <div className="h-0.5 w-8 lg:w-12 bg-[#809829] shadow-[0_0_10px_#809829] group-hover:w-full transition-all duration-500" />
                     </div>
 
                     {/* Numero opera */}
-                    <div className="absolute top-4 right-4 font-neo text-[#768b1a] text-xs italic drop-shadow-[0_0_5px_rgba(118,139,26,0.5)]">
+                    <div className="absolute top-4 right-4 font-neo text-[#809829] text-xs italic drop-shadow-[0_0_5px_rgba(128,152,41,0.5)]">
                       [{String(i + 1).padStart(3, '0')}]
                     </div>
                   </motion.div>
@@ -89,7 +89,7 @@ export const ExpandedGalleryOverlay = ({
             </div>
 
             {/* Sfumatura Verde Acido dal Basso (Obra) - STICKY nel contenitore di scroll */}
-            <div className="sticky bottom-0 z-[210] w-full h-[35vh] bg-gradient-to-t from-[#768b1a]/80 via-[#768b1a]/30 to-transparent pointer-events-none" />
+            <div className="sticky bottom-0 z-[210] w-full h-[35vh] bg-gradient-to-t from-[#809829]/80 via-[#809829]/30 to-transparent pointer-events-none" />
           </div>
 
           {/* LAYER UI FISSO: Titolo e Tasto ESC (Non scorrono mai) */}
@@ -99,7 +99,7 @@ export const ExpandedGalleryOverlay = ({
               <h2 className="font-neo text-[#F45390] text-xl md:text-4xl tracking-[0.2em] uppercase drop-shadow-[0_0_10px_rgba(244,83,144,0.5)]">
                 {subclusterTitle}
               </h2>
-              <div className="h-0.5 w-16 md:w-32 bg-[#768b1a] mt-1 md:mt-2 shadow-[0_0_10px_#768b1a]" />
+              <div className="h-0.5 w-16 md:w-32 bg-[#809829] mt-1 md:mt-2 shadow-[0_0_10px_#809829]" />
             </div>
 
             {/* Tasto ESC Bottom-Left */}
@@ -111,9 +111,9 @@ export const ExpandedGalleryOverlay = ({
                   e.stopPropagation();
                   onClose();
                 }}
-                className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#d99f9f] rounded-full shadow-[0_0_20px_rgba(0,0,0,0.8)] cursor-pointer transition-colors duration-300"
+                className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#B3828B] rounded-full cursor-pointer transition-colors duration-300"
               >
-                <img src="/images/ui/esccc.webp" className="w-1/2 h-1/2 object-contain" />
+                <img src="/images/ui/esccc.webp" className="w-[62%] h-[62%] object-contain" />
               </motion.button>
             </div>
           </div>

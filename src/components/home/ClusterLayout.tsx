@@ -423,7 +423,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
           onMouseEnter={() => setCartHovered(true)}
           onMouseLeave={() => setCartHovered(false)}
           onClick={() => setIsCartOpen(true)}
-          className="w-[45px] h-[45px] md:w-[60px] md:h-[60px] cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
+          className="neo-interface-btn w-[45px] h-[45px] md:w-[60px] md:h-[60px] cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
           style={{
             backgroundColor: cartHovered ? '#F45390' : '#B3828B',
             boxShadow: cartHovered
@@ -479,9 +479,9 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                   e.stopPropagation();
                   setExpandedClusterId(null);
                 }}
-                className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#d99f9f] rounded-full shadow-[0_0_20px_rgba(0,0,0,0.8)] cursor-pointer transition-colors duration-300"
+                className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#B3828B] rounded-full cursor-pointer transition-colors duration-300"
               >
-                <img src="/images/ui/esccc.webp" className="w-1/2 h-1/2 object-contain" />
+                <img src="/images/ui/esccc.webp" className="w-[62%] h-[62%] object-contain" />
               </motion.button>
             </div>
 

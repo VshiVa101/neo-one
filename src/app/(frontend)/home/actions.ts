@@ -107,6 +107,26 @@ export async function fetchArtworkByNid(nid: string) {
   const art = docs[0]
   console.log(`[Neo-One] Found artwork: ${art.nid} (ID: ${art.id})`)
   const subcluster = art.subcluster as any
+  const clusterIdRaw =
+    typeof subcluster === 'object' && subcluster?.cluster
+      ? typeof subcluster.cluster === 'object'
+        ? subcluster.cluster.id
+        : subcluster.cluster
+      : null
+
+  let clusterSlug: string | null = null
+  if (clusterIdRaw) {
+    try {
+      const cluster = await payload.findByID({
+        collection: 'clusters',
+        id: String(clusterIdRaw),
+        depth: 0,
+      })
+      clusterSlug = cluster?.slug || null
+    } catch {
+      clusterSlug = null
+    }
+  }
 
   return {
     id: art.id.toString(),
@@ -124,9 +144,8 @@ export async function fetchArtworkByNid(nid: string) {
     subclusterId: typeof subcluster === 'object' && subcluster !== null
       ? subcluster.id?.toString()
       : subcluster?.toString() || null,
-    clusterId: typeof subcluster === 'object' && subcluster?.cluster
-      ? (typeof subcluster.cluster === 'object' ? subcluster.cluster.id : subcluster.cluster).toString()
-      : null,
+    clusterId: clusterIdRaw ? String(clusterIdRaw) : null,
+    clusterSlug,
     deckIndex: await (async () => {
       const cId = typeof subcluster === 'object' && subcluster?.cluster
         ? (typeof subcluster.cluster === 'object' ? subcluster.cluster.id : subcluster.cluster)
