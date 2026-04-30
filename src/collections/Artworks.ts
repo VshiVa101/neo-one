@@ -114,12 +114,13 @@ export const Artworks: CollectionConfig = {
     },
 
     {
-      name: 'audioSnippetUrl',
-      label: 'URL Sample Audio',
-      type: 'text',
+      name: 'sampleAudio',
+      label: 'Sample Audio (Upload)',
+      type: 'upload',
+      relationTo: 'media',
       admin: {
         position: 'sidebar',
-        description: 'URL a un file audio breve (es. MP3 su Dropbox/Drive). Perfetto per il cluster Rumore.',
+        description: 'Carica un file audio breve (es. MP3). Perfetto per il cluster Rumore.',
       },
     },
     {

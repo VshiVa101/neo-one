@@ -139,7 +139,7 @@ export async function fetchArtworkByNid(nid: string) {
     year: art.creationDate || '2024',
     availability: art.availability,
     priceInfo: art.priceInfo || 'DISPONIBILITÀ SU RICHIESTA',
-    audioSnippetUrl: art.audioSnippetUrl || null,
+    audioSnippetUrl: art.sampleAudio ? getImageUrl(art.sampleAudio, '') : null,
     fullAudioUrl: art.fullAudioUrl || null,
     subclusterId: typeof subcluster === 'object' && subcluster !== null
       ? subcluster.id?.toString()

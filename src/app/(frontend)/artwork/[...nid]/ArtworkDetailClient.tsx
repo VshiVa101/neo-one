@@ -71,10 +71,10 @@ export const ArtworkDetailClient = ({
     // Toggle play/pause if the same preview is already loaded
     if (previewAudioRef.current) {
       if (previewAudioRef.current.paused) {
-        await previewAudioRef.current.play().catch(() => {
-          window.open(audioSnippetUrl, '_blank', 'noopener,noreferrer')
-        })
-        setIsPreviewPlaying(true)
+        await previewAudioRef.current.play().then(
+          () => setIsPreviewPlaying(true),
+          () => setIsPreviewPlaying(false),
+        )
       } else {
         previewAudioRef.current.pause()
         setIsPreviewPlaying(false)
@@ -89,7 +89,7 @@ export const ArtworkDetailClient = ({
     previewAudioRef.current = audio
     await audio.play().then(
       () => setIsPreviewPlaying(true),
-      () => window.open(audioSnippetUrl, '_blank', 'noopener,noreferrer'),
+      () => setIsPreviewPlaying(false),
     )
   }
 
