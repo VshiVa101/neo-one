@@ -84,6 +84,18 @@
       max-width: var(--breakpoint-2xl);
     }
   }
+
+  /* Keep scrolling behavior but never show visual scrollbars */
+  .custom-scrollbar {
+    -ms-overflow-style: none; /* IE / old Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none; /* Chrome / Safari / Opera */
+  }
 }
 
 :root {

@@ -286,9 +286,9 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       </div>
 
       {/* ── MAIN STAGE: 2 cluster grandi + descrizioni ── */}
-      <div className="absolute top-[16vh] md:top-[32vh] left-0 w-full h-auto md:h-[44vh] flex flex-col md:flex-row items-center md:items-start justify-center gap-6 md:gap-[4vw] px-6 md:px-[5vw] overflow-y-auto md:overflow-hidden custom-scrollbar z-10">
+      <div className="absolute top-[16vh] md:top-[32vh] left-0 w-full h-auto md:h-[44vh] flex flex-col md:flex-row items-center md:items-start justify-center gap-6 md:gap-[4vw] px-4 md:px-[5vw] overflow-y-auto overflow-x-hidden md:overflow-hidden custom-scrollbar z-10">
         {/* ── CLUSTER SINISTRO + descrizione ──── */}
-        <div className="flex flex-row items-center lg:items-start gap-4 lg:gap-[2vw]">
+        <div className="w-full max-w-[92vw] md:max-w-none flex flex-row items-center lg:items-start gap-3 lg:gap-[2vw]">
           <AnimatePresence mode="wait">
             <motion.div
               key={leftCluster.id + '_main_left'}
@@ -316,7 +316,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 15 }}
               transition={{ duration: 0.4, delay: 0.3 }}
-              className="pt-2 lg:pt-[1vw] max-w-[50vw] lg:max-w-[14vw]"
+              className="pt-2 lg:pt-[1vw] min-w-0 flex-1 max-w-[42vw] lg:max-w-[14vw]"
             >
               <h2 className="text-xl md:text-3xl lg:text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none branded-title">
                 <BrandedTitle text={leftCluster.title} />
@@ -329,7 +329,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         </div>
 
         {/* ── CLUSTER DESTRO + descrizione ──── */}
-        <div className="flex flex-row items-center lg:items-start gap-4 lg:gap-[2vw]">
+        <div className="w-full max-w-[92vw] md:max-w-none flex flex-row items-center lg:items-start gap-3 lg:gap-[2vw]">
           <AnimatePresence mode="wait">
             <motion.div
               key={rightCluster.id + '_main_right'}
@@ -357,7 +357,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 15 }}
               transition={{ duration: 0.4, delay: 0.3 }}
-              className="pt-2 lg:pt-[1vw] max-w-[50vw] lg:max-w-[14vw]"
+              className="pt-2 lg:pt-[1vw] min-w-0 flex-1 max-w-[42vw] lg:max-w-[14vw]"
             >
               <h2 className="text-xl md:text-3xl lg:text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none branded-title">
                 <BrandedTitle text={rightCluster.title} />
