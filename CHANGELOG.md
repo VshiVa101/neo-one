@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1] - 2026-05-07
+
+### 🧹 STABILIZZAZIONE WORKFLOW & ALLINEAMENTO METADATI
+Release di stabilizzazione: allineati tutti i metadati di progetto (version, changelog, checklist) a v1.2.1.
+
+- **Meta**: `package.json` version allineato a `1.2.1`.
+- **Docs**: `DEPLOYMENT_CHECKLIST.md` aggiornato a v1.2.1 / 2026-05-07.
+- **Docs**: `NEO_ALIGNMENT.md` recuperato da archivio in `docs/` per handoff multi-agente.
+- **Chore**: `CHANGELOG.md` entry [1.2.1] creata. Git stash di test non pronti droppato.
+- **Cleanup**: working tree pulito, build `v1.2.1` gia' deployata su Vercel.
+
 ## [1.2.0] - 2026-04-29
 
 ### 🚀 THE TURNING POINT: SYSTEM CONSOLIDATION & STABILIZATION
@@ -17,7 +28,7 @@ Questo è il commit di riferimento per la stabilità del progetto. Segna il pass
 ## [1.1.2] - 2026-04-27
 
 - **Bugfix / Core UX**: Reworked `EyeScene` 3D eye tracking so desktop follows the cursor continuously and mobile points to user touches, holds the target briefly, then returns to idle floating.
-- **3D Architecture**: Separated eye tracking from “living” animations by using an outer tracking group and an inner animation group, preserving capovolgimento lento, fast roll/vortex, and periodic vibration without letting them block pointer response.
+- **3D Architecture**: Separated eye tracking from "living" animations by using an outer tracking group and an inner animation group, preserving capovolgimento lento, fast roll/vortex, and periodic vibration without letting them block pointer response.
 - **Reliability**: Cloned the cached GLB scene per `EyeScene` instance to avoid Object3D contention when multiple eyes/canvases are mounted during transitions or across routes.
 - **Navigation Fix**: Restored default click navigation for non-landing eye instances while keeping the landing Hero explicitly locked behind the Matrix gateway.
 - **Documentation**: Added/updated internal alignment notes for future model handoffs, versioning continuity, 3D-eye implementation constraints, and safe release practice.

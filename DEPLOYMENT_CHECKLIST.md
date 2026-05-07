@@ -1,13 +1,13 @@
-# 🚀 Neo-One Vercel Deployment Checklist
+﻿# ðŸš€ Neo-One Vercel Deployment Checklist
 
-**Release:** v1.1.2
+**Release:** v1.2.1
 **Status:** Deployed
-**Date:** April 27, 2026
+**Date:** May 7, 2026
 **GitHub Repo:** https://github.com/VshiVa101/neo-one.git
 
 ---
 
-## ✅ Pre-Deployment (COMPLETATO)
+## âœ… Pre-Deployment (COMPLETATO)
 
 - [x] Codice pushato su GitHub
 - [x] Database Neon online e configurato
@@ -16,12 +16,12 @@
 - [x] MASTER_SPEC.md aggiornato
 - [x] Footer/Header Globals creati e Types rigenerati
 - [x] `CHANGELOG.md` aggiornato per la release corrente
-- [x] `docs/NEO_ALIGNMENT.md` presente come documento di handoff e continuità multi-modello
-- [x] `docs/walkthrough.md` allineato alle interazioni UI/3D più recenti
+- [x] `docs/NEO_ALIGNMENT.md` presente come documento di handoff e continuitÃ  multi-modello
+- [x] `docs/walkthrough.md` allineato alle interazioni UI/3D piÃ¹ recenti
 
 ---
 
-## 🧭 Checklist Pre-Push Main
+## ðŸ§­ Checklist Pre-Push Main
 
 Prima di ogni push su `origin main`:
 
@@ -37,20 +37,20 @@ Prima di ogni push su `origin main`:
 - [ ] Fare commit con messaggio chiaro
 - [ ] Pushare su `origin main` per triggerare Vercel
 
-## 🎯 Deployment Steps
+## ðŸŽ¯ Deployment Steps
 
 ### Step 1: Vercel Import
 1. Vai a https://vercel.com/dashboard
-2. Clicca **"Add New"** → **"Project"**
+2. Clicca **"Add New"** â†’ **"Project"**
 3. Seleziona **"Import Git Repository"**
 4. Importa il repo dal tuo account GitHub
 5. Clicca **"Import"**
 
 ### Step 2: Configure Build
 Vercel auto-rileva Next.js. Lascia i default:
-- Framework: `Next.js` ✅
-- Root Directory: `./` ✅
-- Build Command: `pnpm build` ✅
+- Framework: `Next.js` âœ…
+- Root Directory: `./` âœ…
+- Build Command: `pnpm build` âœ…
 
 ### Step 3: Environment Variables
 Aggiungi le variabili dal tuo file `.env` locale **PRIMA** di cliccare Deploy.
@@ -65,22 +65,22 @@ Variabili necessarie:
 - `CRON_SECRET`
 - `PREVIEW_SECRET`
 
-> ⚠️ NON committare mai valori di env vars nel repository. Usa sempre la dashboard di Vercel.
+> âš ï¸ NON committare mai valori di env vars nel repository. Usa sempre la dashboard di Vercel.
 
 ### Step 4: Deploy
 1. Clicca **"Deploy"**
 2. Aspetta 3-5 minuti
-3. Quando vedi ✅ **"Deployment successful"** → FATTO
+3. Quando vedi âœ… **"Deployment successful"** â†’ FATTO
 
 ### Step 5: Verifica
-- Apri l'URL che Vercel ti dà
+- Apri l'URL che Vercel ti dÃ 
 - Verifica che il sito carichi
 - Prova ad andare a `/admin`
 - Login con le credenziali create via `scripts/create-neo-user.ts`
 
 ---
 
-## 🔐 Creare un Account Admin
+## ðŸ” Creare un Account Admin
 
 ```bash
 # Passa email e password come variabili d'ambiente
@@ -91,12 +91,12 @@ pnpm exec tsx scripts/create-neo-user.ts
 
 ---
 
-## 🔄 Post-Deployment
+## ðŸ”„ Post-Deployment
 
 1. Ogni push su `origin main` auto-triggera redeploy su Vercel
-2. Neo vedrà i cambiamenti live in ~2-3 minuti se la build passa
+2. Neo vedrÃ  i cambiamenti live in ~2-3 minuti se la build passa
 3. Se la build fallisce, leggere prima i log Vercel e riprodurre localmente con `pnpm build`
-4. Il dominio custom si collega dopo (Settings → Domains)
+4. Il dominio custom si collega dopo (Settings â†’ Domains)
 5. Dopo fix critici di UX/interazione, verificare manualmente almeno:
    - landing `/`
    - `/home`
@@ -107,7 +107,7 @@ pnpm exec tsx scripts/create-neo-user.ts
 
 ---
 
-## 🛠️ Troubleshooting
+## ðŸ› ï¸ Troubleshooting
 
 **Build fallisce su Vercel:**
 1. Controlla che tutte le env vars siano settate
@@ -120,4 +120,4 @@ pnpm exec tsx scripts/create-neo-user.ts
 
 ---
 
-Ultimo aggiornamento: 27 Aprile 2026 — Release v1.1.2, aggiunta checklist pre-push main e allineamento documentazione interna.
+Ultimo aggiornamento: 7 Maggio 2026 — Release v1.2.1, stabilizzazione workflow e allineamento metadati progetto.

@@ -271,7 +271,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       <div className="fixed top-[2vh] md:top-[4vh] left-1/2 -translate-x-1/2 w-[12vh] h-[12vh] md:w-[28vh] md:h-[28vh] z-[500] transition-all duration-500">
         {shouldRenderBackgroundEye ? (
           <EyeScene
-            targetRoute="/home"
+            targetRoute="/calendar"
             showCircularText={false}
             globalTracking={true}
             scaleMultiplier={1.3}
