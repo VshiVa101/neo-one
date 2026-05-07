@@ -1,0 +1,60 @@
+# Dipendenze
+node_modules/
+.pnp
+.pnp.js
+
+# Build e output
+dist/
+build/
+out/
+.next/
+.nuxt/
+.vuepress/dist
+.serverless/
+.cache/
+
+# File di lock (ENORMI consumatori di token)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# Log e database
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.sqlite
+*.db
+
+# Media e Assets grandi
+*.mp4
+*.webm
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.pdf
+*.zip
+*.tar.gz
+
+# Configurazioni locali e IDE
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# File minimizzati
+*.min.js
+*.min.css
