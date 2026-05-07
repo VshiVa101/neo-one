@@ -46,7 +46,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [shippingNotice, setShippingNotice] = useState<any>('')
   const [emailTouched, setEmailTouched] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
+  const [isDissolving, setIsDissolving] = useState(false)
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   const showEmailError = emailTouched && email.length > 0 && !isEmailValid
@@ -97,35 +97,35 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const handleSubmit = async () => {
-    if (!isEmailValid || isSubmitting) return
+    if (!isEmailValid || !(items.length > 0 || message) || isSubmitting) return
 
     setIsSubmitting(true)
     try {
       const res = await submitCart({
-        name,
+        name: name || 'Anonimo',
         email,
         message,
         items: items.map((i) => ({ title: i.title, nid: i.nid, quantity: i.quantity })),
       })
 
       if (res.success) {
-        setIsSuccess(true)
-        setItems([])
-        setName('')
-        setEmail('')
-        setMessage('')
-        // Chiudi dopo 3 secondi
+        setIsSubmitting(false)
+        setIsDissolving(true)
         setTimeout(() => {
+          setItems([])
+          setName('')
+          setEmail('')
+          setMessage('')
+          setIsDissolving(false)
           setIsCartOpen(false)
-          setIsSuccess(false)
-        }, 3000)
+        }, 1200)
       } else {
+        setIsSubmitting(false)
         alert(res.error)
       }
     } catch (err) {
-      alert("Errore durante l'invio.")
-    } finally {
       setIsSubmitting(false)
+      alert("Errore durante l'invio.")
     }
   }
 
@@ -153,12 +153,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           >
             {/* Close Button */}
             <motion.button
-              whileHover={{ scale: 1.1, rotate: 90, backgroundColor: '#F45390' }}
+              whileHover={{ scale: 1.1, rotate: 90, backgroundColor: '#F45390', boxShadow: '0 0 25px rgba(244, 83, 144, 0.6)' }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsCartOpen(false)}
               className="neo-interface-btn fixed bottom-4 left-4 lg:bottom-6 lg:left-6 w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center bg-[#B3828B] rounded-full z-[1100] transition-colors duration-300"
             >
-              <img src="/images/ui/esccc.webp" className="w-[62%] h-[62%] object-contain" />
+              <img src="/images/ui/esccc.webp" className="w-[62%] h-[62%] object-contain" style={{ transform: 'scale(1.5)' }} />
             </motion.button>
 
             <div className="absolute inset-0 overflow-y-auto custom-scrollbar">
@@ -166,7 +166,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                 className="w-full min-h-full flex flex-col items-center p-6 md:p-12 lg:p-20"
                 data-neo-skip="true"
               >
-                <div className="w-full max-w-4xl flex flex-col gap-8 lg:gap-12 py-12 neo-skip-branding">
+                <div className={`w-full max-w-4xl flex flex-col gap-8 lg:gap-12 py-12 neo-skip-branding ${isDissolving ? 'cart-dissolving' : ''}`}>
               {/* Cart Items */}
               {/* Cart Items Area */}
               <div className="flex flex-col gap-6">
@@ -174,11 +174,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                   <h2 className="font-neo text-[#F45390] text-3xl lg:text-5xl tracking-[0.2em] uppercase branded-title">
                     <BrandedTitle text="Carrello" />
                   </h2>
-                  {items.length > 0 && (
-                    <span className="font-neo text-white/50 text-[10px] uppercase tracking-widest">
-                      {items.reduce((acc, item) => acc + item.quantity, 0)} articoli selezionati
-                    </span>
-                  )}
+                  <span className="font-neo text-white/50 text-lg lg:text-2xl tracking-widest">
+                    TOT {items.reduce((acc, item) => acc + item.quantity, 0)}
+                  </span>
                 </div>
 
                 <div className="flex flex-row flex-wrap gap-4 lg:gap-6 mt-4 min-h-[120px] lg:min-h-[160px] items-start">
@@ -190,49 +188,37 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                     items.map((item) => (
                       <div
                         key={item.nid}
-                        className="relative group w-24 h-24 lg:w-40 lg:h-40 border border-white/10 overflow-hidden bg-[#111] transition-all duration-300 hover:border-[#F45390]/50"
+                        className="flex items-center gap-2 lg:gap-4"
                       >
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                        />
+                        <div className="w-24 h-24 lg:w-36 lg:h-36 border border-white/10 overflow-hidden bg-[#111] flex-shrink-0">
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="w-full h-full object-cover grayscale"
+                          />
+                        </div>
 
-                        {/* Quantity Controls Overlay */}
-                        <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-3">
-                          <div className="flex items-center gap-4">
+                        <div className="flex flex-col items-center gap-2">
+                          <span className="font-neo text-white text-xl lg:text-2xl">{item.quantity}</span>
+                          <div className="flex flex-col gap-1.5">
                             <motion.button
-                              whileHover={{ scale: 1.2, color: '#F45390' }}
-                              whileTap={{ scale: 0.8 }}
-                              onClick={() => updateQuantity(item.nid, -1)}
-                              className="text-white text-xl font-neo p-2"
-                            >
-                              -
-                            </motion.button>
-                            <span className="font-neo text-white text-lg">{item.quantity}</span>
-                            <motion.button
-                              whileHover={{ scale: 1.2, color: '#809829' }}
-                              whileTap={{ scale: 0.8 }}
+                              whileHover={{ scale: 1.15, backgroundColor: '#809829', boxShadow: '0 0 20px rgba(128, 152, 41, 0.5)' }}
+                              whileTap={{ scale: 0.85 }}
                               onClick={() => updateQuantity(item.nid, 1)}
-                              className="text-white text-xl font-neo p-2"
+                              className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-white/10 flex items-center justify-center text-white font-neo text-sm lg:text-base transition-colors duration-200"
                             >
                               +
                             </motion.button>
+                            <motion.button
+                              whileHover={{ scale: 1.15, backgroundColor: '#F45390', boxShadow: '0 0 20px rgba(244, 83, 144, 0.5)' }}
+                              whileTap={{ scale: 0.85 }}
+                              onClick={() => updateQuantity(item.nid, -1)}
+                              className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-white/10 flex items-center justify-center text-white font-neo text-sm lg:text-base transition-colors duration-200"
+                            >
+                              -
+                            </motion.button>
                           </div>
-                          <button
-                            onClick={() => removeFromCart(item.nid)}
-                            className="font-neo text-white/40 text-[9px] uppercase tracking-tighter hover:text-white transition-colors"
-                          >
-                            Rimuovi tutto
-                          </button>
                         </div>
-
-                        {/* Badge per quantità visibile se > 1 e non hovered */}
-                        {item.quantity > 1 && (
-                          <div className="absolute top-1 right-1 bg-[#F45390] text-black font-neo text-[10px] w-5 h-5 flex items-center justify-center rounded-full group-hover:opacity-0 transition-opacity">
-                            {item.quantity}
-                          </div>
-                        )}
                       </div>
                     ))
                   )}
@@ -332,37 +318,45 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
                   {/* Submit Button (V) */}
                   <div className="flex justify-center lg:justify-start mt-4">
-                    {isSuccess ? (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="font-neo text-[#809829] text-lg lg:text-xl tracking-widest uppercase flex items-center gap-4"
-                      >
-                        <img
-                          src="/images/ui/check.webp"
-                          className="w-12 h-12 object-contain grayscale-0"
-                        />
-                        vibrazione inviata...
-                      </motion.div>
-                    ) : (
                       <motion.button
-                        disabled={!isEmailValid || isSubmitting}
-                        whileHover={isEmailValid && !isSubmitting ? { scale: 1.1 } : {}}
-                        whileTap={isEmailValid && !isSubmitting ? { scale: 0.9 } : {}}
+                        disabled={!isEmailValid || !(items.length > 0 || message) || isSubmitting}
+                        whileHover={
+                          (items.length > 0 || message) && isEmailValid && !isSubmitting
+                            ? { scale: 1.1, boxShadow: '0 0 30px rgba(128, 152, 41, 0.8), 0 0 60px rgba(128, 152, 41, 0.3)' }
+                            : (items.length > 0 || message) && !isSubmitting
+                              ? { scale: 1.1, backgroundColor: '#F45390', boxShadow: '0 0 30px rgba(244, 83, 144, 0.8), 0 0 60px rgba(244, 83, 144, 0.3)' }
+                              : {}
+                        }
+                        whileTap={
+                          (items.length > 0 || message) && isEmailValid && !isSubmitting
+                            ? { scale: 0.9 }
+                            : {}
+                        }
                         onClick={handleSubmit}
                         className={`neo-interface-btn w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center rounded-full transition-all duration-300 ${
-                          isEmailValid && !isSubmitting
+                          (items.length > 0 || message) && isEmailValid && !isSubmitting
                             ? 'bg-[#809829] cursor-pointer'
-                            : 'bg-gray-800 opacity-20 cursor-not-allowed'
+                            : items.length > 0 || message
+                              ? 'bg-[#B3828B]/50 cursor-pointer'
+                              : 'bg-gray-800 opacity-30 cursor-not-allowed'
                         }`}
                       >
                         {isSubmitting ? (
                           <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         ) : (
-                          <img src="/images/ui/check.webp" className="w-1/2 h-1/2 object-contain" />
+                          <img
+                            src={
+                              (items.length > 0 || message) && isEmailValid
+                                ? '/images/ui/invia-mailverde.webp'
+                                : items.length > 0 || message
+                                  ? '/images/ui/invia-mailrosa.webp'
+                                  : '/images/ui/invia-ssmail.webp'
+                            }
+                            className="w-1/2 h-1/2 object-contain"
+                            style={{ transform: 'scale(1.5)' }}
+                          />
                         )}
                       </motion.button>
-                    )}
                   </div>
                 </div>
               </div>

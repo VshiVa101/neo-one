@@ -446,7 +446,7 @@ export interface Signal {
  */
 export interface Submission {
   id: number;
-  name: string;
+  name?: string | null;
   email: string;
   message?: string | null;
   /**

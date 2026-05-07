@@ -5,12 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { MockArtwork } from './ClusterDeck'
 import { useRouter } from 'next/navigation'
 
-import { EyeScene } from '@/components/EyeScene'
-
 interface ExpandedGalleryOverlayProps {
   isOpen: boolean
   onClose: () => void
-  subclusterTitle: string
   artworks: MockArtwork[]
   clusterId?: string | number | null
   deckIndex?: number | null
@@ -19,7 +16,6 @@ interface ExpandedGalleryOverlayProps {
 export const ExpandedGalleryOverlay = ({
   isOpen,
   onClose,
-  subclusterTitle,
   artworks,
   clusterId,
   deckIndex,
@@ -88,19 +84,12 @@ export const ExpandedGalleryOverlay = ({
               </div>
             </div>
 
-            {/* Sfumatura Verde Acido dal Basso (Obra) - STICKY nel contenitore di scroll */}
-            <div className="sticky bottom-0 z-[210] w-full h-[35vh] bg-gradient-to-t from-[#809829]/80 via-[#809829]/30 to-transparent pointer-events-none" />
           </div>
 
-          {/* LAYER UI FISSO: Titolo e Tasto ESC (Non scorrono mai) */}
+          {/* LAYER UI FISSO: Sfumatura dal basso e Tasto ESC (Non scorrono mai) */}
           <div className="absolute inset-0 pointer-events-none z-[300]">
-            {/* Titolo Top-Left */}
-            <div className="absolute top-[2vh] md:top-[4vh] left-6 md:left-12 flex flex-col items-start pointer-events-auto">
-              <h2 className="font-neo text-[#F45390] text-xl md:text-4xl tracking-[0.2em] uppercase drop-shadow-[0_0_10px_rgba(244,83,144,0.5)]">
-                {subclusterTitle}
-              </h2>
-              <div className="h-0.5 w-16 md:w-32 bg-[#809829] mt-1 md:mt-2 shadow-[0_0_10px_#809829]" />
-            </div>
+            {/* Sfumatura Verde Acido dal Basso - ancorata al viewport */}
+            <div className="absolute bottom-0 w-full h-[18vh] bg-gradient-to-t from-[#809829]/40 via-[#809829]/15 to-transparent" />
 
             {/* Tasto ESC Bottom-Left */}
             <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 pointer-events-auto">
@@ -113,7 +102,7 @@ export const ExpandedGalleryOverlay = ({
                 }}
                 className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#B3828B] rounded-full cursor-pointer transition-colors duration-300"
               >
-                <img src="/images/ui/esccc.webp" className="w-[62%] h-[62%] object-contain" />
+                <img src="/images/ui/esccc.webp" className="w-[62%] h-[62%] object-contain" style={{ transform: 'scale(1.5)' }} />
               </motion.button>
             </div>
           </div>

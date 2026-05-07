@@ -3,7 +3,6 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Link2, Pause, Volume2 } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
 import { BrandedTitle } from '@/components/BrandedTitle'
 import { useNavigationHistory } from '@/hooks/useNavigationHistory'
@@ -59,6 +58,7 @@ export const ArtworkDetailClient = ({
   const [addedToCart, setAddedToCart] = useState(false)
   const [isFlipped, setIsFlipped] = useState(false)
   const [infoHovered, setInfoHovered] = useState(false)
+  const [linkHovered, setLinkHovered] = useState(false)
   const [isPreviewPlaying, setIsPreviewPlaying] = useState(false)
   const touchStartX = React.useRef<number | null>(null)
   const previewAudioRef = React.useRef<HTMLAudioElement | null>(null)
@@ -361,118 +361,125 @@ export const ArtworkDetailClient = ({
           </div>
         </div>
         {/* ── BOTTOM BAR STRUTTURALE (SOLO BOTTONI, Responsive) ── */}
-        <div className="w-full lg:w-[90vw] mt-2 lg:mt-6 pb-4 lg:pb-0 z-30 bg-transparent lg:bg-black/80 rounded-lg lg:border border-transparent lg:border-white/5 lg:py-3 lg:px-6 flex flex-row items-center justify-center lg:shadow-[0_0_20px_rgba(0,0,0,0.8)]">
-          <div className="w-full flex flex-row items-center justify-evenly lg:justify-center px-4 lg:px-0 gap-2 lg:gap-12">
-            {/* GRUPPO: X + INFO */}
-            <div className="flex flex-row items-center gap-3 lg:gap-8">
-              {/* Tasto Back - Esc */}
+        <div className="w-full lg:w-[90vw] mt-2 lg:mt-6 pb-4 lg:pb-0 z-30 flex flex-row items-center justify-center">
+          <div className="w-full flex flex-row items-center justify-evenly px-2 lg:px-0 gap-3 lg:gap-6">
+            {/* Tasto Back - Esc */}
+            <motion.button
+              whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleExitToGallery}
+              className="neo-interface-btn w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex items-center justify-center outline-none z-20 transition-colors duration-300"
+              title="Torna alla Gallery"
+            >
+              <img
+                src="/images/ui/esccc.webp"
+                className="w-[55%] h-[55%] object-contain opacity-80"
+                style={{ transform: 'scale(1.5)' }}
+              />
+            </motion.button>
+
+            {/* Info Flip Button */}
+            <motion.button
+              className="neo-interface-btn w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex items-center justify-center focus:outline-none transition-colors duration-300"
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsFlipped(!isFlipped)
+              }}
+              onMouseEnter={() => setInfoHovered(true)}
+              onMouseLeave={() => setInfoHovered(false)}
+              style={{ backgroundColor: infoHovered ? '#F45390' : '#B3828B' }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              title="Dettagli Opera"
+            >
+              <img
+                src={infoHovered ? '/images/ui/inforverde.webp' : '/images/ui/inforosa.webp'}
+                alt="Info"
+                className="w-[66%] h-[66%] object-contain drop-shadow-[0_0_10px_rgba(0,0,0,1)]"
+                style={{ transform: 'scale(1.5)' }}
+              />
+            </motion.button>
+
+            {isRumoreCluster && audioSnippetUrl && (
               <motion.button
-                whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
+                whileHover={{ scale: 1.1, backgroundColor: '#809829' }}
                 whileTap={{ scale: 0.9 }}
-                onClick={handleExitToGallery}
-                className="neo-interface-btn w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex items-center justify-center outline-none z-20 transition-colors duration-300"
-                title="Torna alla Gallery"
-              >
-                <img
-                  src="/images/ui/esccc.webp"
-                  className="w-[55%] h-[55%] object-contain opacity-80"
-                />
-              </motion.button>
-
-              {/* Info Flip Button */}
-              <motion.button
-                className="neo-interface-btn w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex items-center justify-center focus:outline-none transition-colors duration-300"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setIsFlipped(!isFlipped)
-                }}
-                onMouseEnter={() => setInfoHovered(true)}
-                onMouseLeave={() => setInfoHovered(false)}
-                style={{ backgroundColor: infoHovered ? '#809829' : '#B3828B' }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                title="Dettagli Opera"
-              >
-                <img
-                  src={infoHovered ? '/images/ui/inforverde.webp' : '/images/ui/inforosa.webp'}
-                  alt="Info"
-                  className="w-[66%] h-[66%] object-contain drop-shadow-[0_0_10px_rgba(0,0,0,1)]"
-                />
-              </motion.button>
-            </div>
-
-            {/* GRUPPO: PRE-ORDER + CARRELLO */}
-            <div className="flex flex-row items-center gap-3 lg:gap-6">
-              {isRumoreCluster && audioSnippetUrl && (
-                <motion.button
-                  whileHover={{ scale: 1.1, backgroundColor: '#809829' }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={handleAudioPreview}
-                  className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
-                  title="Prova Audio"
-                >
-                  {isPreviewPlaying ? (
-                    <Pause className="w-[58%] h-[58%] text-black drop-shadow-[0_0_6px_rgba(0,0,0,0.8)]" />
-                  ) : (
-                    <Volume2 className="w-[58%] h-[58%] text-black drop-shadow-[0_0_6px_rgba(0,0,0,0.8)]" />
-                  )}
-                </motion.button>
-              )}
-
-              {isRumoreCluster && fullAudioUrl && (
-                <motion.button
-                  whileHover={{ scale: 1.1, backgroundColor: '#809829' }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => window.open(fullAudioUrl, '_blank', 'noopener,noreferrer')}
-                  className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
-                  title="Link Audio Completo"
-                >
-                  <Link2 className="w-[58%] h-[58%] text-black drop-shadow-[0_0_6px_rgba(0,0,0,0.8)]" />
-                </motion.button>
-              )}
-
-              {/* Pulsante PRE-ORDER LOGO */}
-              <motion.button
-                onClick={handlePurchase}
-                onMouseEnter={() => setPurchaseHovered(true)}
-                onMouseLeave={() => setPurchaseHovered(false)}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                onClick={handleAudioPreview}
                 className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
-                style={{ backgroundColor: purchaseHovered || addedToCart ? '#809829' : '#B3828B' }}
+                title="Prova Audio"
               >
                 <img
-                  src={
-                    purchaseHovered || addedToCart
-                      ? '/images/ui/pre-orderverde.webp'
-                      : '/images/ui/pre-orderrosa.webp'
-                  }
-                  alt="Purchase"
-                  className="w-[72%] h-[72%] object-contain drop-shadow-[0_0_15px_rgba(244,83,144,0.4)] transition-all duration-300"
+                  src="/images/ui/volume.webp"
+                  alt="Volume"
+                  className="w-[62%] h-[62%] object-contain"
+                  style={{ transform: 'scale(1.5)' }}
                 />
               </motion.button>
+            )}
 
-              {/* Carrello */}
+            {isRumoreCluster && fullAudioUrl && (
               <motion.button
-                onMouseEnter={() => setCartHovered(true)}
-                onMouseLeave={() => setCartHovered(false)}
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ scale: 1.1, backgroundColor: '#809829' }}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => setIsCartOpen(true)}
-                className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer"
+                onMouseEnter={() => setLinkHovered(true)}
+                onMouseLeave={() => setLinkHovered(false)}
+                onClick={() => window.open(fullAudioUrl, '_blank', 'noopener,noreferrer')}
+                className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
+                title="Link Audio Completo"
               >
                 <img
-                  src="/images/ui/carrello.webp"
-                  className="w-[62%] h-[62%] object-contain relative z-10"
+                  src={linkHovered ? '/images/ui/condividiverde.webp' : '/images/ui/condivcidi.webp'}
+                  alt="Link"
+                  className="w-[62%] h-[62%] object-contain"
+                  style={{ transform: 'scale(1.5)' }}
                 />
-                {/* Contatore ESTERNO */}
-                {count > 0 && (
-                  <span className="absolute -top-2 -right-2 w-[22px] h-[22px] lg:w-[24px] lg:h-[24px] flex items-center justify-center bg-[#809829] rounded-full font-neo text-[10px] lg:text-sm text-black font-bold border lg:border-2 border-black z-20 shadow-[0_0_5px_rgba(128,152,41,0.8)]">
-                    {count}
-                  </span>
-                )}
               </motion.button>
-            </div>
+            )}
+
+            {/* Pulsante PRE-ORDER LOGO */}
+            <motion.button
+              onClick={handlePurchase}
+              onMouseEnter={() => setPurchaseHovered(true)}
+              onMouseLeave={() => setPurchaseHovered(false)}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
+              style={{ backgroundColor: addedToCart ? '#809829' : purchaseHovered ? '#F45390' : '#B3828B' }}
+            >
+              <img
+                src="/images/ui/euros.webp"
+                alt="Purchase"
+                className="w-[72%] h-[72%] object-contain transition-all duration-300"
+                style={{ transform: 'scale(1.5)' }}
+              />
+            </motion.button>
+
+            {/* Carrello */}
+            <motion.button
+              onMouseEnter={() => setCartHovered(true)}
+              onMouseLeave={() => setCartHovered(false)}
+              whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setIsCartOpen(true)}
+              className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer"
+            >
+              <img
+                src={
+                  cartHovered
+                    ? '/images/drops/carrellorosa_optimized.webp'
+                    : count > 0
+                      ? '/images/ui/carrelloverde.webp'
+                      : '/images/ui/carrello.webp'
+                }
+                alt="Carrello"
+                className="w-[62%] h-[62%] object-contain relative z-10"
+                style={{ transform: 'scale(1.5)' }}
+              />
+              {/* Contatore ESTERNO */}
+              <span className="absolute -top-2 -right-2 w-[22px] h-[22px] lg:w-[24px] lg:h-[24px] flex items-center justify-center bg-[#809829] rounded-full font-neo text-[10px] lg:text-sm text-black font-bold border lg:border-2 border-black z-20 shadow-[0_0_5px_rgba(128,152,41,0.8)]">
+                {count}
+              </span>
+            </motion.button>
           </div>
         </div>
       </div>

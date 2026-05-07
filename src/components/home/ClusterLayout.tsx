@@ -7,7 +7,7 @@ import { ClusterDeck, MockArtwork } from '@/components/home/ClusterDeck'
 import { fetchClusterSubclusters } from '@/app/(frontend)/home/actions'
 import { ExpandedGalleryOverlay } from '@/components/home/ExpandedGalleryOverlay'
 import { MiniMatrixLoader } from '@/components/MiniMatrixLoader'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useTransition } from '@/contexts/TransitionContext'
 import { BrandedTitle } from '@/components/BrandedTitle'
 import { useCart } from '@/contexts/CartContext'
@@ -32,7 +32,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { isTransitioning } = useTransition()
-  const { isCartOpen, setIsCartOpen } = useCart()
+  const { isCartOpen, setIsCartOpen, count } = useCart()
 
   // Se siamo nella landing page (/), montiamo l'occhio dello sfondo SOLO quando inizia la transizione.
   // Questo evita di avere 2 Canvas WebGL contemporaneamente al caricamento iniziale.
@@ -61,7 +61,9 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
     pool: 2,
   })
 
+  const router = useRouter()
   const [cartHovered, setCartHovered] = useState(false)
+  const [infoHovered, setInfoHovered] = useState(false)
   const [isHoveringFooter, setIsHoveringFooter] = useState(false)
 
   // Stato del Mock Cluster espanso (null = chiuso, 'id_del_cluster' = aperto)
@@ -371,11 +373,11 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       </div>
 
       {/* ── FOOTER & CART ROW ──────────────────── */}
-      <div className="absolute bottom-[1vh] md:bottom-[2vh] left-0 w-full flex items-center px-[5vw] gap-6 z-20 pointer-events-none">
+      <div className="fixed bottom-6 md:bottom-10 left-0 w-full flex items-center px-[5vw] gap-6 z-20 pointer-events-none">
         {/* Footer: scrollable thumbnails */}
         <div
           ref={footerRef}
-          className="flex-1 h-[15vh] md:h-[20vh] pt-[1vh] md:pt-[2vh] overflow-hidden select-none home-footer-container pointer-events-auto"
+          className="flex-1 h-[14vh] md:h-[16vh] overflow-hidden select-none home-footer-container pointer-events-auto"
           onMouseEnter={() => setIsHoveringFooter(true)}
           onMouseLeave={() => setIsHoveringFooter(false)}
         >
@@ -415,20 +417,54 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         </div>
       </div>
 
-      {/* ── CART BUTTON FIXED (Sempre presente, bottom-right) ── */}
-      <div className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[400] pointer-events-auto">
+      {/* ── BOTTOM-RIGHT BUTTONS: Info (Calendar) + Cart ── */}
+      <div className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[400] pointer-events-auto flex flex-col items-center gap-3">
+        {!expandedClusterId && expandedDeckIndex === null && (
         <motion.button
-          whileHover={{ scale: 1.1, boxShadow: '0 0 25px rgba(244, 83, 144, 0.7)' }}
+          animate={{
+            scale: infoHovered ? 1.5 : 1,
+          }}
+          transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+          whileTap={{ scale: 0.9 }}
+          onMouseEnter={() => setInfoHovered(true)}
+          onMouseLeave={() => setInfoHovered(false)}
+          onClick={() => router.push('/calendar')}
+          className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
+          style={{
+            backgroundColor: infoHovered ? '#F45390' : '#B3828B',
+            boxShadow: infoHovered
+              ? '0 0 30px rgba(244, 83, 144, 0.8), 0 0 60px rgba(244, 83, 144, 0.3)'
+              : '0 0 10px rgba(0,0,0,0.3)',
+            zIndex: infoHovered ? 401 : undefined,
+          }}
+          title="Calendario"
+        >
+          <img
+            src="/images/drops/inforosa.webp"
+            alt="Info"
+            className="w-full h-full object-contain"
+            style={{ transform: 'scale(1.5)' }}
+          />
+        </motion.button>
+        )}
+
+        {/* Cart Button */}
+        <motion.button
+          animate={{
+            scale: cartHovered ? 1.5 : 1,
+          }}
+          transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
           whileTap={{ scale: 0.9 }}
           onMouseEnter={() => setCartHovered(true)}
           onMouseLeave={() => setCartHovered(false)}
           onClick={() => setIsCartOpen(true)}
-          className="neo-interface-btn w-[45px] h-[45px] md:w-[60px] md:h-[60px] cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
+          className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300 relative"
           style={{
             backgroundColor: cartHovered ? '#F45390' : '#B3828B',
             boxShadow: cartHovered
-              ? '0 0 20px rgba(244, 83, 144, 0.5)'
+              ? '0 0 30px rgba(244, 83, 144, 0.8), 0 0 60px rgba(244, 83, 144, 0.3)'
               : '0 0 10px rgba(0,0,0,0.3)',
+            zIndex: cartHovered ? 401 : undefined,
           }}
           title="Vai alla Cassa"
         >
@@ -436,11 +472,17 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
             src={
               cartHovered
                 ? '/images/drops/carrellorosa_optimized.webp'
-                : '/images/drops/carrello_optimized.webp'
+                : count > 0
+                  ? '/images/drops/carrelloverde_optimized.webp'
+                  : '/images/drops/carrello_optimized.webp'
             }
             alt="Carrello"
             className="w-full h-full object-contain"
+            style={{ transform: 'scale(1.5)' }}
           />
+          <span className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-[#809829] rounded-full font-neo text-[8px] md:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)]">
+            {count}
+          </span>
         </motion.button>
       </div>
 
@@ -481,7 +523,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                 }}
                 className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#B3828B] rounded-full cursor-pointer transition-colors duration-300"
               >
-                <img src="/images/ui/esccc.webp" className="w-[62%] h-[62%] object-contain" />
+                <img src="/images/ui/esccc.webp" className="w-[62%] h-[62%] object-contain" style={{ transform: 'scale(1.5)' }} />
               </motion.button>
             </div>
 
@@ -493,12 +535,14 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                 {/* I tasti freccia < > sono stati rimossi. Usa il mouse ai lati per scorrere o lo swipe touch. */}
                 {/* Striscia Orizzontale dei Mazzi di Subcluster in Stile Coverflow */}
                 <div className="relative w-full h-[70vh] flex items-center justify-center">
-                  {currentSubclusters.length === 0 ? (
+                  {currentSubclusters.filter((sub) => sub.artworks && sub.artworks.length > 0).length === 0 ? (
                     <div className="text-white font-neo tracking-widest opacity-50 uppercase">
                       Nessuna Opera Trovata
                     </div>
                   ) : (
-                    currentSubclusters.map((sub, idx) => {
+                    currentSubclusters
+                      .filter((sub) => sub.artworks && sub.artworks.length > 0)
+                      .map((sub, idx) => {
                       const offset = idx - activeDeckIndex
 
                       // Calcola rotazione, opacità e scaling in base alla distanza dal centro
@@ -559,9 +603,6 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
             setExpandedClusterId(null)
           }
         }}
-        subclusterTitle={
-          expandedDeckIndex !== null ? currentSubclusters[expandedDeckIndex]?.title || '' : ''
-        }
         artworks={expandedDeckIndex !== null ? currentSubclusters[expandedDeckIndex]?.artworks || [] : []}
         clusterId={expandedClusterId}
         deckIndex={expandedDeckIndex}

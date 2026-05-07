@@ -354,3 +354,15 @@ html[data-theme='light'] {
   pointer-events: none;
   animation: crt-noise 0.18s steps(2) infinite;
 }
+
+/* ── CART DISSOLVE (Pixelation + Fade) ── */
+@keyframes cart-dissolve {
+  0%   { filter: blur(0px) contrast(1) brightness(1); opacity: 1; }
+  30%  { filter: blur(1.5px) contrast(2.5) brightness(0.9); opacity: 1; }
+  60%  { filter: blur(3px) contrast(4) brightness(0.6); opacity: 0.7; }
+  100% { filter: blur(6px) contrast(6) brightness(0.15); opacity: 0; }
+}
+.cart-dissolving {
+  animation: cart-dissolve 1.2s ease-in-out forwards;
+  pointer-events: none;
+}
