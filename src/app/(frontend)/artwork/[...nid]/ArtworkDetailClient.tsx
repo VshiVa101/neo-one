@@ -195,17 +195,15 @@ export const ArtworkDetailClient = ({
         {/* ── MIDDLE ROW (Le 3 colonne su Desktop, Solo Centro su Mobile) ── */}
         <div className="flex flex-row items-stretch justify-center w-full h-[55vh] md:h-[60vh] lg:h-[65vh] gap-[2vw]">
           {/* 1. LEFT PANEL (Nascosta su Mobile) */}
-          <div className="relative hidden lg:flex w-[22vw] bg-black rounded-lg overflow-hidden flex-col items-center justify-center pointer-events-none">
+          <div className="relative hidden lg:flex w-[22vw] bg-black rounded-lg overflow-hidden flex-col items-center justify-center gap-12 pointer-events-none">
             {/* Zebra BG */}
-            <div className="absolute inset-0">
-              <img
-                src="/images/ui/pink-zebra-bg.webp"
-                alt="bg"
-                className="w-[120%] h-full object-cover -translate-x-[10%]"
-              />
-            </div>
+            <img
+              src="/images/ui/pink-zebra-bg.webp"
+              alt="bg"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
             {/* Logo Neo-One */}
-            <div className="relative z-10 w-[90%] aspect-[3/1] mb-12 flex items-center justify-center">
+            <div className="relative z-10 w-full aspect-[2/1] flex items-center justify-center">
               <div
                 className="w-full h-full bg-[#809829] drop-shadow-[0_0_20px_rgba(128,152,41,0.8)]"
                 style={{
@@ -217,7 +215,7 @@ export const ArtworkDetailClient = ({
               />
             </div>
             {/* Btn Prev */}
-            <div className="relative z-10 w-full flex justify-center mt-8">
+            <div className="relative z-10 w-full flex justify-center">
               {prevNid ? (
                 <motion.button
                   className="neo-interface-btn pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#B3828B] rounded-full flex items-center justify-center transition-colors"
@@ -311,18 +309,16 @@ export const ArtworkDetailClient = ({
           </div>
 
           {/* 3. RIGHT PANEL (Nascosta su Mobile) */}
-          <div className="relative hidden lg:flex w-[22vw] bg-black rounded-lg overflow-hidden flex-col items-center justify-center pointer-events-none">
+          <div className="relative hidden lg:flex w-[22vw] bg-black rounded-lg overflow-hidden flex-col items-center justify-center gap-12 pointer-events-none">
             {/* Zebra BG */}
-            <div className="absolute inset-0">
-              <img
-                src="/images/ui/pink-zebra-bg.webp"
-                alt="bg"
-                className="w-[120%] h-full object-cover translate-x-[10%]"
-              />
-              <div className="absolute inset-0 bg-black/10" />
-            </div>
+            <img
+              src="/images/ui/pink-zebra-bg.webp"
+              alt="bg"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/10" />
             {/* Logo Neo-One */}
-            <div className="relative z-10 w-[90%] aspect-[3/1] mb-12 flex items-center justify-center">
+            <div className="relative z-10 w-full aspect-[2/1] flex items-center justify-center">
               <div
                 className="w-full h-full bg-[#809829] drop-shadow-[0_0_20px_rgba(128,152,41,0.8)]"
                 style={{
@@ -334,7 +330,7 @@ export const ArtworkDetailClient = ({
               />
             </div>
             {/* Btn Next */}
-            <div className="relative z-10 w-full flex justify-center mt-8">
+            <div className="relative z-10 w-full flex justify-center">
               {nextNid ? (
                 <motion.button
                   className="neo-interface-btn pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#B3828B] rounded-full flex items-center justify-center transition-colors"

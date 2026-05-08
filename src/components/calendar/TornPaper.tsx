@@ -23,13 +23,17 @@ const tornClipPath = `polygon(
 export function TornPaper({ children, className = '' }: TornPaperProps) {
   return (
     <motion.div
-      className={`relative bg-[#f5f0e8] text-black ${className}`}
-      style={{ clipPath: tornClipPath }}
+      className={`relative text-black ${className}`}
+      style={{ 
+        clipPath: tornClipPath,
+        backgroundImage: "url('/images/textures/paper-texture-v3.webp')",
+        backgroundSize: 'auto',
+        backgroundRepeat: 'repeat'
+      }}
       initial={{ scaleX: 0 }}
       animate={{ scaleX: 1 }}
       transition={{ type: 'spring', stiffness: 50, damping: 20 }}
     >
-      <div className="absolute inset-0 bg-[#ede5d3] opacity-30 pointer-events-none" />
       <div className="relative z-10">{children}</div>
     </motion.div>
   )

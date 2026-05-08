@@ -55,7 +55,7 @@ export default async function HomePage() {
       <img
         src="/images/drops/bg-home.gif"
         alt="Home Background"
-        className="absolute inset-0 w-screen h-screen object-cover z-0 opacity-40 brightness-75 scale-100 md:scale-105"
+        className="absolute inset-0 w-screen h-screen object-cover z-0 opacity-80 brightness-100"
       />
       {mappedClusters.length >= 2 ? (
         <Suspense fallback={<MiniMatrixLoader />}>

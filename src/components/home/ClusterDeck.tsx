@@ -110,7 +110,7 @@ export const ClusterDeck = ({ subclusterTitle, artworks, onExpand, isDeckActive 
 
   return (
     <div
-      className="flex flex-col items-center justify-start w-[80vw] lg:w-[25vw] xl:w-[20vw] h-full pt-[6vh] lg:pt-[5vh] relative cursor-ns-resize"
+      className="flex flex-col items-center justify-center w-[80vw] lg:w-[25vw] xl:w-[20vw] h-full relative cursor-ns-resize"
       onWheel={handleWheel}
       onTouchStart={(e) => {
         touchStartY.current = e.touches[0].clientY

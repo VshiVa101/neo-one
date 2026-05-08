@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
     qualities: [100],
     dangerouslyAllowLocalIP: process.env.NODE_ENV === 'development',
     remotePatterns: [
+      {
+        hostname: 'res.cloudinary.com',
+        protocol: 'https',
+      },
       ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
         const url = new URL(item)
 

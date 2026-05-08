@@ -30,11 +30,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const { isEnabled } = await draftMode()
 
   return (
-    <html className={cn(mergedFontNeo.variable)} lang="en" suppressHydrationWarning>
+    <html className={cn(mergedFontNeo.variable, 'custom-scrollbar')} lang="en" suppressHydrationWarning>
       <head>
-        <Script
+        <link href="/favicon.ico" rel="icon" sizes="32x32" />
+        <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+      </head>
+      <body className="font-neo bg-black text-white selection:bg-white selection:text-black custom-scrollbar">
+        <script
           id="theme-script"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
       (function () {
@@ -72,10 +75,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       `,
           }}
         />
-        <link href="/favicon.ico" rel="icon" sizes="32x32" />
-        <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
-      </head>
-      <body className="font-neo bg-black text-white selection:bg-white selection:text-black">
         <AppProviders>
           <CartProvider>
             <TransitionProvider>

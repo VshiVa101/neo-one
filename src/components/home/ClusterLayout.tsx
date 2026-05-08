@@ -288,7 +288,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       </div>
 
       {/* ── MAIN STAGE: 2 cluster grandi + descrizioni ── */}
-      <div className="absolute top-[16vh] md:top-[32vh] left-0 w-full h-auto md:h-[44vh] flex flex-col md:flex-row items-center md:items-start justify-center gap-6 md:gap-[4vw] px-4 md:px-[5vw] overflow-y-auto overflow-x-hidden md:overflow-hidden custom-scrollbar z-10">
+      <div className="absolute top-[16vh] md:top-[32vh] left-0 w-full h-auto md:h-auto md:max-h-[calc(100vh-32vh-22vh)] flex flex-col md:flex-row items-center md:items-start justify-center gap-6 md:gap-[4vw] px-4 md:px-[5vw] overflow-y-auto overflow-x-hidden custom-scrollbar z-10 pb-[22vh] md:pb-[22vh]">
         {/* ── CLUSTER SINISTRO + descrizione ──── */}
         <div className="w-full max-w-[92vw] md:max-w-none flex flex-row items-center lg:items-start gap-3 lg:gap-[2vw]">
           <AnimatePresence mode="wait">
@@ -495,7 +495,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md flex flex-col pt-[26vh] overflow-hidden"
+            className="fixed inset-0 z-[150] bg-black/80 flex flex-col justify-center overflow-hidden"
             onClick={() => setExpandedClusterId(null)}
             onTouchStart={(e) => {
               touchStartX.current = e.touches[0].clientX
@@ -534,7 +534,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
               <>
                 {/* I tasti freccia < > sono stati rimossi. Usa il mouse ai lati per scorrere o lo swipe touch. */}
                 {/* Striscia Orizzontale dei Mazzi di Subcluster in Stile Coverflow */}
-                <div className="relative w-full h-[70vh] flex items-center justify-center">
+                <div className="relative w-full h-full flex items-center justify-center">
                   {currentSubclusters.filter((sub) => sub.artworks && sub.artworks.length > 0).length === 0 ? (
                     <div className="text-white font-neo tracking-widest opacity-50 uppercase">
                       Nessuna Opera Trovata
