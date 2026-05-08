@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import type { NeoEvent } from '@/data/calendar-mock'
 import { EyeScene } from '@/components/EyeScene'
+import { BrandedTitle } from '@/components/BrandedTitle'
 
 interface EventDetailProps {
   event: NeoEvent
