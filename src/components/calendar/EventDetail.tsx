@@ -60,10 +60,9 @@ export function EventDetail({ event, onClose }: EventDetailProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
           >
-            <p className="text-white font-neo text-[9px] md:text-[10px] tracking-[0.3em] uppercase text-center leading-relaxed">
-              supp<span className="neo-O text-[#fc5896]">O</span>rta l'art<span className="neo-E text-[#FF82B2]">E</span> u<span className="neo-N text-[#809829]">N</span>d<span className="neo-E text-[#FF82B2]">E</span>rgr<span className="neo-O text-[#fc5896]">O</span>u<br/>
-              <span className="neo-N text-[#809829]">N</span>d. <span className="neo-O text-[#fc5896]">O</span> aim<span className="neo-E text-[#FF82B2]">E</span><span className="neo-N text-[#809829]">N</span><span className="neo-O text-[#fc5896]">O</span> il mi<span className="neo-O text-[#fc5896]">O</span> affitt<span className="neo-O text-[#fc5896]">O</span>.
-            </p>
+            <div className="text-white font-neo text-[9px] md:text-[10px] tracking-[0.3em] uppercase text-center leading-relaxed">
+              <BrandedTitle text="supporta l'arte underground. o aimeno il mio affitto." />
+            </div>
           </motion.div>
         </div>
 
@@ -90,9 +89,9 @@ export function EventDetail({ event, onClose }: EventDetailProps) {
                />
                
                {/* Label Overlay */}
-               <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-20 bg-white text-black px-4 py-1 font-neo text-xs tracking-tighter uppercase whitespace-nowrap rotate-[-2deg] shadow-lg">
-                  STAMPA A MA<span className="text-[#fc5896]">NO</span> !
-               </div>
+                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-20 bg-white text-black px-4 py-1 font-neo text-xs tracking-tighter uppercase whitespace-nowrap rotate-[-2deg] shadow-lg">
+                   <BrandedTitle text="stampa a mano!" />
+                </div>
             </div>
           </motion.div>
 
@@ -124,11 +123,9 @@ export function EventDetail({ event, onClose }: EventDetailProps) {
               animate={{ scale: 1, rotate: -2 }}
               transition={{ delay: 0.6, type: 'spring' }}
             >
-              <p className="text-black font-neo text-sm md:text-lg leading-tight uppercase tracking-tighter">
-                 e ricamata c<span className="text-white">o</span>i <br/>
-                 piedi da u<span className="text-[#39ff14]">n</span>a <br/>
-                 su<span className="text-white">o</span>ra !
-              </p>
+              <div className="text-black font-neo text-sm md:text-lg leading-tight uppercase tracking-tighter">
+                 <BrandedTitle text="e ricamata coi piedi da una suora!" />
+              </div>
             </motion.div>
 
             {/* Black Taped Sticker */}
@@ -139,10 +136,38 @@ export function EventDetail({ event, onClose }: EventDetailProps) {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.7 }}
             >
-               <p className="font-neo text-xs md:text-sm tracking-widest whitespace-nowrap uppercase">
-                  Stupidi gadgEt iN <span className="text-[#fc5896]">O</span>maggio!
-               </p>
+                <div className="font-neo text-xs md:text-sm tracking-widest whitespace-nowrap uppercase">
+                   <BrandedTitle text="Stupidi gadget in omaggio!" />
+                </div>
             </motion.div>
+
+            {/* Event Info (Headline & Desc) */}
+            <motion.div 
+              className="relative z-40 bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-xl max-w-sm"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <h2 className="font-neo text-white text-xl md:text-2xl tracking-widest lowercase mb-3">
+                <BrandedTitle text={event.details.headline} />
+              </h2>
+              <div className="font-neo text-white/70 text-xs md:text-sm leading-relaxed lowercase">
+                <BrandedTitle text={event.details.description} />
+              </div>
+            </motion.div>
+
+            {/* Comic Bubble / Call to Action */}
+            {event.details.comicBubble && (
+              <motion.div
+                className="absolute -bottom-10 -right-4 z-50 bg-[#39ff14] text-black px-6 py-2 font-neo text-xs md:text-sm tracking-widest lowercase shadow-[0_0_20px_rgba(57,255,20,0.4)] rotate-[5deg]"
+                style={{ clipPath: 'polygon(0% 0%, 100% 0%, 100% 75%, 75% 75%, 75% 100%, 50% 75%, 0% 75%)' }}
+                initial={{ opacity: 0, scale: 0.8, x: 20 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                transition={{ delay: 1, type: 'spring' }}
+              >
+                <BrandedTitle text={event.details.comicBubble} />
+              </motion.div>
+            )}
 
           </div>
         </div>
@@ -162,7 +187,7 @@ export function EventDetail({ event, onClose }: EventDetailProps) {
              <div className="bg-black border border-white/20 px-4 py-2 flex items-center gap-3 shadow-xl">
                 <div className="w-2 h-2 rounded-full bg-[#fc5896] animate-pulse" />
                 <span className="text-white font-mono text-[10px] md:text-xs tracking-[0.2em] uppercase">
-                   PRE-ORDER PURCHASE
+                   <BrandedTitle text="pre-order purchase" />
                 </span>
              </div>
            </div>

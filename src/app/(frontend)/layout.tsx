@@ -19,8 +19,6 @@ import { TransitionProvider } from '@/contexts/TransitionContext'
 import { TransitionOverlay } from '@/components/TransitionOverlay'
 import { CartProvider } from '@/contexts/CartContext'
 
-import { NeoBrandingObserver } from '@/components/NeoBrandingObserver'
-
 const mergedFontNeo = localFont({
   src: '../../../public/fonts/MergedFontNEO.otf', // adjust relative path from app/(frontend) to public/fonts/ if needed, or use full path. Actually next/font/local resolves relative to the file.
   variable: '--font-neo',
@@ -30,7 +28,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const { isEnabled } = await draftMode()
 
   return (
-    <html className={cn(mergedFontNeo.variable, 'custom-scrollbar')} lang="en" suppressHydrationWarning>
+    <html className={cn(mergedFontNeo.variable, 'custom-scrollbar')} lang="it" suppressHydrationWarning>
       <head>
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
@@ -85,7 +83,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               />
               
 
-              <NeoBrandingObserver />
               <TransitionOverlay />
               
               {/* Main Content Area */}

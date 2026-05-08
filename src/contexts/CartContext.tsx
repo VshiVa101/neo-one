@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
 import { BrandedTitle } from '@/components/BrandedTitle'
 import { fetchCartSettings, submitCart } from '@/app/(frontend)/home/actions'
 import { normalizeNeoString } from '@/utilities/normalizeNeoText'
@@ -129,6 +130,11 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
+  const [submitHovered, setSubmitHovered] = useState(false)
+
+  const isActive = items.length > 0 || message.length > 0
+  const isBrightPink = message.length > 0 && isEmailValid
+
   return (
     <CartContext.Provider
       value={{
@@ -158,23 +164,19 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
               onClick={() => setIsCartOpen(false)}
               className="neo-interface-btn fixed bottom-4 left-4 lg:bottom-6 lg:left-6 w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center bg-[#B3828B] rounded-full z-[1100] transition-colors duration-300"
             >
-              <img src="/images/ui/esccc.webp" className="w-[62%] h-[62%] object-contain" style={{ transform: 'scale(1.5)' }} />
+              <Image src="/images/ui/esccc.webp" alt="Chiudi" width={64} height={64} className="w-[62%] h-[62%] object-contain" style={{ transform: 'scale(1.5)' }} unoptimized />
             </motion.button>
 
             <div className="absolute inset-0 overflow-y-auto custom-scrollbar">
-              <div
-                className="w-full min-h-full flex flex-col items-center p-6 md:p-12 lg:p-20"
-                data-neo-skip="true"
-              >
-                <div className={`w-full max-w-4xl flex flex-col gap-8 lg:gap-12 py-12 neo-skip-branding ${isDissolving ? 'cart-dissolving' : ''}`}>
-              {/* Cart Items */}
+              <div className="w-full min-h-full flex flex-col items-center p-6 md:p-12 lg:p-20">
+                <div className={`w-full max-w-4xl flex flex-col gap-8 lg:gap-12 py-12 ${isDissolving ? 'cart-dissolving' : ''}`}>
               {/* Cart Items Area */}
               <div className="flex flex-col gap-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-neo text-[#F45390] text-3xl lg:text-5xl tracking-[0.2em] uppercase branded-title">
-                    <BrandedTitle text="Carrello" />
+                  <h2 className="font-neo text-[#809829] text-3xl lg:text-5xl tracking-[0.2em] uppercase">
+                    Carrello
                   </h2>
-                  <span className="font-neo text-white/50 text-lg lg:text-2xl tracking-widest">
+                  <span className="font-neo text-[#809829] text-lg lg:text-2xl tracking-widest">
                     TOT {items.reduce((acc, item) => acc + item.quantity, 0)}
                   </span>
                 </div>
@@ -190,11 +192,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                         key={item.nid}
                         className="flex items-center gap-2 lg:gap-4"
                       >
-                        <div className="w-24 h-24 lg:w-36 lg:h-36 border border-white/10 overflow-hidden bg-[#111] flex-shrink-0">
-                          <img
+                        <div className="w-24 h-24 lg:w-36 lg:h-36 border border-white/10 overflow-hidden bg-[#111] flex-shrink-0 relative">
+                          <Image
                             src={item.image}
                             alt={item.title}
-                            className="w-full h-full object-cover grayscale"
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 96px, 144px"
                           />
                         </div>
 
@@ -230,16 +234,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                 <h3 className="font-neo text-[#809829] text-xl lg:text-2xl tracking-widest uppercase">
                   Informazioni
                 </h3>
-                <div className="font-neo text-white text-sm lg:text-base tracking-wide leading-relaxed lowercase opacity-80">
+                <div className="font-neo text-white text-sm lg:text-base tracking-wide leading-relaxed uppercase opacity-80">
                   {shippingNotice ? (
                     typeof shippingNotice === 'string' ? (
                       <p>{normalizeNeoString(shippingNotice)}</p>
                     ) : (
-                      // If it's Lexical JSON, we'd ideally use a renderer.
-                      // Here we provide a fallback message if it's complex,
-                      // but usually it will be rendered or we can extract text.
                       <p>
-                        {/* Fallback extraction for Lexical */}
                         {normalizeNeoString(
                           (shippingNotice as any)?.root?.children?.[0]?.children?.[0]?.text ||
                             'ciao, sono neo. controlla le tue impostazioni nel pannello admin.',
@@ -267,7 +267,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="flame,insulti,e messaggi minatori saranno collezzionati"
-                      className="w-full bg-white/5 border border-white/10 p-4 font-neo text-white text-sm focus:outline-none focus:border-[#809829] transition-colors min-h-[150px] resize-none lowercase"
+                      className="w-full bg-white/5 border border-white/10 p-4 font-neo text-white text-sm focus:outline-none focus:border-[#809829] transition-colors min-h-[150px] resize-none uppercase"
                     />
                   </div>
                 </div>
@@ -282,7 +282,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="nome..."
-                      className="w-full bg-white/5 border border-white/10 p-4 font-neo text-white text-sm focus:outline-none focus:border-[#809829] transition-colors lowercase"
+                      className="w-full bg-white/5 border border-white/10 p-4 font-neo text-white text-sm focus:outline-none focus:border-[#809829] transition-colors uppercase"
                     />
                   </div>
 
@@ -296,9 +296,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                       onChange={(e) => setEmail(e.target.value)}
                       onBlur={() => setEmailTouched(true)}
                       placeholder={showEmailError ? normalizeNeoString('non è una email....') : 'email...'}
-                      className={`w-full bg-white/5 border p-4 font-neo text-white text-sm focus:outline-none transition-colors lowercase ${
+                      className={`w-full bg-white/5 border p-4 font-neo text-white text-sm focus:outline-none transition-colors uppercase ${
                         showEmailError
-                          ? 'border-[#F45390] text-[#F45390] placeholder-[#F45390]'
+                          ? 'border-[#809829] text-[#809829] placeholder-[#809829]'
                           : 'border-white/10 focus:border-[#809829]'
                       }`}
                     />
@@ -308,7 +308,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0 }}
-                          className="font-neo text-[#F45390] text-[10px] uppercase tracking-widest mt-1"
+                          className="font-neo text-[#809829] text-[10px] uppercase tracking-widest mt-1"
                         >
                           {normalizeNeoString('non è una email....')}
                         </motion.span>
@@ -320,40 +320,47 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                   <div className="flex justify-center lg:justify-start mt-4">
                       <motion.button
                         disabled={!isEmailValid || !(items.length > 0 || message) || isSubmitting}
-                        whileHover={
-                          (items.length > 0 || message) && isEmailValid && !isSubmitting
-                            ? { scale: 1.1, boxShadow: '0 0 30px rgba(128, 152, 41, 0.8), 0 0 60px rgba(128, 152, 41, 0.3)' }
-                            : (items.length > 0 || message) && !isSubmitting
-                              ? { scale: 1.1, backgroundColor: '#F45390', boxShadow: '0 0 30px rgba(244, 83, 144, 0.8), 0 0 60px rgba(244, 83, 144, 0.3)' }
-                              : {}
-                        }
-                        whileTap={
-                          (items.length > 0 || message) && isEmailValid && !isSubmitting
-                            ? { scale: 0.9 }
-                            : {}
-                        }
+                        onMouseEnter={() => setSubmitHovered(true)}
+                        onMouseLeave={() => setSubmitHovered(false)}
+                        animate={{
+                          scale: submitHovered && isActive ? 1.15 : 1,
+                          backgroundColor: submitHovered && isActive 
+                            ? '#809829' 
+                            : isBrightPink 
+                              ? '#F45390' 
+                              : isActive 
+                                ? '#B3828B' 
+                                : '#1a1a1a',
+                          boxShadow: submitHovered && isActive
+                            ? '0 0 30px rgba(128, 152, 41, 0.8), 0 0 60px rgba(128, 152, 41, 0.3)'
+                            : isBrightPink
+                              ? '0 0 20px rgba(244, 83, 144, 0.4)'
+                              : 'none'
+                        }}
+                        transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+                        whileTap={isActive ? { scale: 0.9 } : {}}
                         onClick={handleSubmit}
                         className={`neo-interface-btn w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center rounded-full transition-all duration-300 ${
-                          (items.length > 0 || message) && isEmailValid && !isSubmitting
-                            ? 'bg-[#809829] cursor-pointer'
-                            : items.length > 0 || message
-                              ? 'bg-[#B3828B]/50 cursor-pointer'
-                              : 'bg-gray-800 opacity-30 cursor-not-allowed'
+                          isActive ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
                         }`}
                       >
                         {isSubmitting ? (
                           <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         ) : (
-                          <img
+                          <Image
                             src={
-                              (items.length > 0 || message) && isEmailValid
+                              submitHovered && isActive
                                 ? '/images/ui/invia-mailverde.webp'
-                                : items.length > 0 || message
+                                : isActive
                                   ? '/images/ui/invia-mailrosa.webp'
                                   : '/images/ui/invia-ssmail.webp'
                             }
+                            alt="Invia"
+                            width={40}
+                            height={40}
                             className="w-1/2 h-1/2 object-contain"
                             style={{ transform: 'scale(1.5)' }}
+                            unoptimized
                           />
                         )}
                       </motion.button>

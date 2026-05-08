@@ -1,6 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
+import { BrandedTitle } from '@/components/BrandedTitle'
 import { useState } from 'react'
 import { X, Mail, User, FileText, MessageSquare, Send } from 'lucide-react'
 import type { ContactFormData } from '@/data/calendar-mock'
@@ -65,8 +66,8 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-8">
-              <h2 className="font-neo text-white text-xl md:text-2xl tracking-widest uppercase">
-                CONTACT
+              <h2 className="font-neo text-white text-xl md:text-2xl tracking-widest lowercase">
+                <BrandedTitle text="Contact" />
               </h2>
               <button
                 onClick={onClose}
@@ -84,13 +85,13 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
                 />
                 <input
                   type="text"
-                  placeholder="NOME"
+                  placeholder="nome..."
                   value={formData.name}
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, name: e.target.value }))
                   }
                   required
-                  className={`${inputClass} pl-8`}
+                  className={`${inputClass} pl-8 uppercase`}
                 />
               </div>
 
@@ -101,13 +102,13 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
                 />
                 <input
                   type="email"
-                  placeholder="EMAIL"
+                  placeholder="email..."
                   value={formData.email}
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, email: e.target.value }))
                   }
                   required
-                  className={`${inputClass} pl-8`}
+                  className={`${inputClass} pl-8 uppercase`}
                 />
               </div>
 
@@ -118,13 +119,13 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
                 />
                 <input
                   type="text"
-                  placeholder="OGGETTO"
+                  placeholder="oggetto..."
                   value={formData.subject}
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, subject: e.target.value }))
                   }
                   required
-                  className={`${inputClass} pl-8`}
+                  className={`${inputClass} pl-8 uppercase`}
                 />
               </div>
 
@@ -134,14 +135,14 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
                   className="absolute left-1 top-3 text-[#555]"
                 />
                 <textarea
-                  placeholder="MESSAGGIO"
+                  placeholder="messaggio..."
                   value={formData.message}
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, message: e.target.value }))
                   }
                   required
                   rows={4}
-                  className={`${inputClass} pl-8 resize-none`}
+                  className={`${inputClass} pl-8 resize-none uppercase`}
                 />
               </div>
 
@@ -153,14 +154,14 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
                 whileTap={{ scale: 0.98 }}
               >
                 {status === 'idle' && (
-                  <>
+                  <div className="flex items-center gap-2">
                     <Send size={14} />
-                    INVIA
-                  </>
+                    <BrandedTitle text="invia" />
+                  </div>
                 )}
-                {status === 'sending' && 'INVIO IN CORSO...'}
-                {status === 'sent' && 'INVIATO!'}
-                {status === 'error' && 'ERRORE - RIPROVA'}
+                {status === 'sending' && <BrandedTitle text="invio in corso..." />}
+                {status === 'sent' && <BrandedTitle text="inviato!" />}
+                {status === 'error' && <BrandedTitle text="errore - riprova" />}
               </motion.button>
             </form>
           </motion.div>

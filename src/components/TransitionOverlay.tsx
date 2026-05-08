@@ -58,19 +58,22 @@ export const TransitionOverlay = () => {
                 <>
                     {/* Explosion 1: Eyes al centro */}
                     <div className="absolute inset-0 flex items-center justify-center z-10 w-full h-full">
-                        <img
+                        <Image
                             src="/images/drops/eye-explosion.gif"
-                            alt="Eye Explosion"
-                            className="w-[80vw] h-auto max-w-[800px] object-contain mix-blend-screen"
+                            alt=""
+                            fill
+                            className="object-contain mix-blend-screen"
+                            unoptimized
                         />
                     </div>
 
-                    {/* Explosion 2: Borders ai lati */}
                     <div className="absolute inset-0 z-20 pointer-events-none w-full h-full">
-                        <img
+                        <Image
                             src="/images/drops/border-flames.gif"
-                            alt="Border Flames"
-                            className="w-full h-full object-cover mix-blend-screen opacity-90"
+                            alt=""
+                            fill
+                            className="object-cover mix-blend-screen opacity-90"
+                            unoptimized
                         />
                     </div>
                 </>

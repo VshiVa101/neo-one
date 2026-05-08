@@ -42,7 +42,7 @@ export const BrandedTitle = ({ text }: { text: string }) => {
             </span>
           )
         }
-        return <span key={i}>{lowerPart}</span>
+        return <span key={i}>{part.toLowerCase()}</span>
       })}
     </>
   )

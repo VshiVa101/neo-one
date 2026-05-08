@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
 import { useCart } from '@/contexts/CartContext'
 import { BrandedTitle } from '@/components/BrandedTitle'
 import { useNavigationHistory } from '@/hooks/useNavigationHistory'
@@ -194,25 +195,19 @@ export const ArtworkDetailClient = ({
       <div className="flex flex-col w-full h-full max-w-[100vw] lg:max-w-[95vw] mx-auto justify-center items-center pb-2 relative z-20 px-2 lg:px-0">
         {/* ── MIDDLE ROW (Le 3 colonne su Desktop, Solo Centro su Mobile) ── */}
         <div className="flex flex-row items-stretch justify-center w-full h-[55vh] md:h-[60vh] lg:h-[65vh] gap-[2vw]">
-          {/* 1. LEFT PANEL (Nascosta su Mobile) */}
+          {/* 1. LEFT PANEL (Only on Large Screens) */}
           <div className="relative hidden lg:flex w-[22vw] bg-black rounded-lg overflow-hidden flex-col items-center justify-center gap-12 pointer-events-none">
             {/* Zebra BG */}
-            <img
+            <Image
               src="/images/ui/pink-zebra-bg.webp"
-              alt="bg"
-              className="absolute inset-0 w-full h-full object-cover"
+              alt=""
+              fill
+              className="object-cover"
+              unoptimized
             />
             {/* Logo Neo-One */}
             <div className="relative z-10 w-full aspect-[2/1] flex items-center justify-center">
-              <div
-                className="w-full h-full bg-[#809829] drop-shadow-[0_0_20px_rgba(128,152,41,0.8)]"
-                style={{
-                  WebkitMaskImage: 'url(/images/ui/logo-neoone-blackmetal-bianco.png)',
-                  WebkitMaskSize: '100% 100%',
-                  WebkitMaskRepeat: 'no-repeat',
-                  WebkitMaskPosition: 'center',
-                }}
-              />
+              <div className="w-full h-full bg-[#809829] drop-shadow-[0_0_20px_rgba(128,152,41,0.8)] neo-logo-mask" />
             </div>
             {/* Btn Prev */}
             <div className="relative z-10 w-full flex justify-center">
@@ -225,14 +220,17 @@ export const ArtworkDetailClient = ({
                   whileHover={{ scale: 1.15, backgroundColor: '#809829' }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <img
+                  <Image
                     src={
                       prevHovered
                         ? '/images/ui/direction-arrow-green.webp'
                         : '/images/ui/direction-arrow-pink.webp'
                     }
+                    alt="Precedente"
+                    width={44}
+                    height={44}
                     className="w-[62%] h-[62%] object-contain rotate-180"
-                    draggable={false}
+                    unoptimized
                   />
                 </motion.button>
               ) : (
@@ -241,8 +239,56 @@ export const ArtworkDetailClient = ({
             </div>
           </div>
 
-          {/* 2. CENTER ARTWORK (A tutto schermo senza crop) */}
-          <div className="relative flex-1 bg-black rounded-lg p-1 lg:p-3 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-white/5 overflow-hidden group perspective-[1000px]">
+          {/* 2. CENTER ARTWORK (With floating buttons for MD/SM screens) */}
+          <div className="relative flex-1 mx-2 sm:mx-16 lg:mx-0 bg-black rounded-lg p-1 lg:p-3 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-white/5 overflow-hidden group perspective-[1000px]">
+            {/* Floating Prev Button (Tablet/PC only, hidden on small mobile) */}
+            {prevNid && (
+              <motion.button
+                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-50 hidden sm:flex lg:hidden neo-interface-btn w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] bg-[#B3828B] rounded-full items-center justify-center transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  router.push(getNavUrl(prevNid))
+                }}
+                onMouseEnter={() => setPrevHovered(true)}
+                onMouseLeave={() => setPrevHovered(false)}
+                whileHover={{ scale: 1.15, backgroundColor: '#809829' }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <Image
+                  src={prevHovered ? '/images/ui/direction-arrow-green.webp' : '/images/ui/direction-arrow-pink.webp'}
+                  alt="Precedente"
+                  width={32}
+                  height={32}
+                  className="w-[60%] h-[60%] object-contain rotate-180"
+                  unoptimized
+                />
+              </motion.button>
+            )}
+
+            {/* Floating Next Button (Tablet/PC only, hidden on small mobile) */}
+            {nextNid && (
+              <motion.button
+                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-50 hidden sm:flex lg:hidden neo-interface-btn w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] bg-[#B3828B] rounded-full items-center justify-center transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  router.push(getNavUrl(nextNid))
+                }}
+                onMouseEnter={() => setNextHovered(true)}
+                onMouseLeave={() => setNextHovered(false)}
+                whileHover={{ scale: 1.15, backgroundColor: '#809829' }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <Image
+                  src={nextHovered ? '/images/ui/direction-arrow-green.webp' : '/images/ui/direction-arrow-pink.webp'}
+                  alt="Successiva"
+                  width={32}
+                  height={32}
+                  className="w-[60%] h-[60%] object-contain"
+                  unoptimized
+                />
+              </motion.button>
+            )}
+
             <motion.div
               className="w-full h-full relative"
               animate={{ rotateY: isFlipped ? 180 : 0 }}
@@ -269,11 +315,13 @@ export const ArtworkDetailClient = ({
                   touchStartX.current = null
                 }}
               >
-                <img
+                <Image
                   src={image}
                   alt={`Opera ${nid}`}
-                  className="absolute inset-0 w-full h-full object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-transform duration-700 lg:group-hover:scale-[1.02]"
-                  draggable={false}
+                  fill
+                  className="object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-transform duration-700 lg:group-hover:scale-[1.02]"
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  priority
                 />
               </div>
 
@@ -282,52 +330,46 @@ export const ArtworkDetailClient = ({
                 className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-[#111] rounded-lg border border-white/10"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
-                <h2 className="font-neo text-[#F45390] text-3xl lg:text-5xl tracking-[0.2em] mb-4 uppercase branded-title">
+                <h2 className="font-neo text-white text-3xl lg:text-5xl tracking-[0.2em] mb-4 lowercase branded-title">
                   <BrandedTitle text="Dettagli" />
                 </h2>
-                <p className="font-neo text-white text-xl lg:text-2xl tracking-widest lowercase mb-2 neo-skip-branding">
+                <p className="font-neo text-white text-xl lg:text-2xl tracking-widest lowercase mb-2">
                   {title}
                 </p>
-                <p className="font-neo text-white text-base lg:text-xl tracking-widest lowercase mb-1 neo-skip-branding">
+                <p className="font-neo text-white text-base lg:text-xl tracking-widest lowercase mb-1">
                   {method} / {support}
                 </p>
-                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest lowercase mb-6 neo-skip-branding">
+                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest lowercase mb-6">
                   {dimensions} — {year}
                 </p>
 
-                <h2 className="font-neo text-[#F45390] text-2xl lg:text-4xl tracking-[0.2em] mb-2 uppercase branded-title">
+                <h2 className="font-neo text-white text-2xl lg:text-4xl tracking-[0.2em] mb-2 lowercase branded-title">
                   <BrandedTitle text="Disponibilità" />
                 </h2>
-                <p className="font-neo text-white text-base lg:text-xl tracking-widest lowercase mb-1 neo-skip-branding">
-                  {isAvailable ? 'ACQUISTABILE' : 'ARCHIVIO'}
+                <p className="font-neo text-white text-base lg:text-xl tracking-widest lowercase mb-1">
+                  {isAvailable ? 'acquistabile' : 'archivio'}
                 </p>
-                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest lowercase neo-skip-branding">
+                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest lowercase">
                   {priceInfo}
                 </p>
               </div>
             </motion.div>
           </div>
 
-          {/* 3. RIGHT PANEL (Nascosta su Mobile) */}
+          {/* 3. RIGHT PANEL (Only on Large Screens) */}
           <div className="relative hidden lg:flex w-[22vw] bg-black rounded-lg overflow-hidden flex-col items-center justify-center gap-12 pointer-events-none">
             {/* Zebra BG */}
-            <img
+            <Image
               src="/images/ui/pink-zebra-bg.webp"
-              alt="bg"
-              className="absolute inset-0 w-full h-full object-cover"
+              alt=""
+              fill
+              className="object-cover"
+              unoptimized
             />
             <div className="absolute inset-0 bg-black/10" />
             {/* Logo Neo-One */}
             <div className="relative z-10 w-full aspect-[2/1] flex items-center justify-center">
-              <div
-                className="w-full h-full bg-[#809829] drop-shadow-[0_0_20px_rgba(128,152,41,0.8)]"
-                style={{
-                  WebkitMaskImage: 'url(/images/ui/logo-neoone-blackmetal-bianco.png)',
-                  WebkitMaskSize: '100% 100%',
-                  WebkitMaskRepeat: 'no-repeat',
-                  WebkitMaskPosition: 'center',
-                }}
-              />
+              <div className="w-full h-full bg-[#809829] drop-shadow-[0_0_20px_rgba(128,152,41,0.8)] neo-logo-mask" />
             </div>
             {/* Btn Next */}
             <div className="relative z-10 w-full flex justify-center">
@@ -340,14 +382,17 @@ export const ArtworkDetailClient = ({
                   whileHover={{ scale: 1.15, backgroundColor: '#809829' }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <img
+                  <Image
                     src={
                       nextHovered
                         ? '/images/ui/direction-arrow-green.webp'
                         : '/images/ui/direction-arrow-pink.webp'
                     }
+                    alt="Successiva"
+                    width={44}
+                    height={44}
                     className="w-[62%] h-[62%] object-contain"
-                    draggable={false}
+                    unoptimized
                   />
                 </motion.button>
               ) : (
@@ -356,6 +401,7 @@ export const ArtworkDetailClient = ({
             </div>
           </div>
         </div>
+
         {/* ── BOTTOM BAR STRUTTURALE (SOLO BOTTONI, Responsive) ── */}
         <div className="w-full lg:w-[90vw] mt-2 lg:mt-6 pb-4 lg:pb-0 z-30 flex flex-row items-center justify-center">
           <div className="w-full flex flex-row items-center justify-evenly px-2 lg:px-0 gap-3 lg:gap-6">
@@ -367,10 +413,14 @@ export const ArtworkDetailClient = ({
               className="neo-interface-btn w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex items-center justify-center outline-none z-20 transition-colors duration-300"
               title="Torna alla Gallery"
             >
-              <img
+              <Image
                 src="/images/ui/esccc.webp"
+                alt="ESC"
+                width={36}
+                height={36}
                 className="w-[55%] h-[55%] object-contain opacity-80"
                 style={{ transform: 'scale(1.5)' }}
+                unoptimized
               />
             </motion.button>
 
@@ -388,11 +438,14 @@ export const ArtworkDetailClient = ({
               whileTap={{ scale: 0.9 }}
               title="Dettagli Opera"
             >
-              <img
+              <Image
                 src={infoHovered ? '/images/ui/inforverde.webp' : '/images/ui/inforosa.webp'}
                 alt="Info"
+                width={46}
+                height={46}
                 className="w-[66%] h-[66%] object-contain drop-shadow-[0_0_10px_rgba(0,0,0,1)]"
                 style={{ transform: 'scale(1.5)' }}
+                unoptimized
               />
             </motion.button>
 
@@ -404,11 +457,14 @@ export const ArtworkDetailClient = ({
                 className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
                 title="Prova Audio"
               >
-                <img
+                <Image
                   src="/images/ui/volume.webp"
                   alt="Volume"
+                  width={44}
+                  height={44}
                   className="w-[62%] h-[62%] object-contain"
                   style={{ transform: 'scale(1.5)' }}
+                  unoptimized
                 />
               </motion.button>
             )}
@@ -423,11 +479,14 @@ export const ArtworkDetailClient = ({
                 className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
                 title="Link Audio Completo"
               >
-                <img
+                <Image
                   src={linkHovered ? '/images/ui/condividiverde.webp' : '/images/ui/condivcidi.webp'}
                   alt="Link"
+                  width={44}
+                  height={44}
                   className="w-[62%] h-[62%] object-contain"
                   style={{ transform: 'scale(1.5)' }}
+                  unoptimized
                 />
               </motion.button>
             )}
@@ -442,11 +501,14 @@ export const ArtworkDetailClient = ({
               className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
               style={{ backgroundColor: addedToCart ? '#809829' : purchaseHovered ? '#F45390' : '#B3828B' }}
             >
-              <img
+              <Image
                 src="/images/ui/euros.webp"
-                alt="Purchase"
+                alt="Acquista"
+                width={50}
+                height={50}
                 className="w-[72%] h-[72%] object-contain transition-all duration-300"
                 style={{ transform: 'scale(1.5)' }}
+                unoptimized
               />
             </motion.button>
 
@@ -457,9 +519,9 @@ export const ArtworkDetailClient = ({
               whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsCartOpen(true)}
-              className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer"
+              className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex items-center justify-center outline-none transition-colors duration-300"
             >
-              <img
+              <Image
                 src={
                   cartHovered
                     ? '/images/drops/carrellorosa_optimized.webp'
@@ -468,8 +530,11 @@ export const ArtworkDetailClient = ({
                       : '/images/ui/carrello.webp'
                 }
                 alt="Carrello"
+                width={44}
+                height={44}
                 className="w-[62%] h-[62%] object-contain relative z-10"
                 style={{ transform: 'scale(1.5)' }}
+                unoptimized
               />
               {/* Contatore ESTERNO */}
               <span className="absolute -top-2 -right-2 w-[22px] h-[22px] lg:w-[24px] lg:h-[24px] flex items-center justify-center bg-[#809829] rounded-full font-neo text-[10px] lg:text-sm text-black font-bold border lg:border-2 border-black z-20 shadow-[0_0_5px_rgba(128,152,41,0.8)]">

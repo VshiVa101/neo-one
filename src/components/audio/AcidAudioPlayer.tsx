@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { BrandedTitle } from '@/components/BrandedTitle'
 import { Play, Pause, Volume2, Music } from 'lucide-react'
 
 interface AcidAudioPlayerProps {
@@ -71,8 +72,8 @@ export const AcidAudioPlayer = ({ url, title = 'SONIC DROP' }: AcidAudioPlayerPr
           <span className="font-neo text-[10px] tracking-[0.3em] text-[#F45390] uppercase leading-none mb-1">
             Now Pulsing
           </span>
-          <h3 className="font-neo text-white text-sm tracking-widest uppercase truncate">
-            {title}
+          <h3 className="font-neo text-white text-sm tracking-widest lowercase truncate">
+            <BrandedTitle text={title} />
           </h3>
         </div>
 

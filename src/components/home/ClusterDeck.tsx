@@ -1,14 +1,11 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import React, { useState } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-
-export interface MockArtwork {
-  id: string
-  title: string
-  image: string
-}
+import { DeckHeader } from './DeckHeader'
+import { DeckCard } from './DeckCard'
+import { MockArtwork } from './deckCardStyle'
 
 interface ClusterDeckProps {
   subclusterTitle: string
@@ -17,21 +14,22 @@ interface ClusterDeckProps {
   isDeckActive?: boolean
 }
 
-export const ClusterDeck = ({ subclusterTitle, artworks, onExpand, isDeckActive }: ClusterDeckProps) => {
+export const ClusterDeck = ({
+  subclusterTitle,
+  artworks,
+  onExpand,
+  isDeckActive,
+}: ClusterDeckProps) => {
   const router = useRouter()
-  // Indice della carta correntemente selezionata (Main Card)
   const [activeIndex, setActiveIndex] = useState(0)
-
-  // Ritardo sfoglio debounce
   const scrollTimeout = React.useRef<NodeJS.Timeout | null>(null)
+  const touchStartY = React.useRef<number | null>(null)
 
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     if (scrollTimeout.current) return
-
-    // Settiamo un mini-blocco per evitare scorrimenti doppi
     scrollTimeout.current = setTimeout(() => {
       scrollTimeout.current = null
-    }, 400) // 400ms è la sensibilità dello sfoglio (aggiustabile)
+    }, 400)
 
     if (e.deltaY > 0) {
       setActiveIndex((prev) => (prev + 1) % artworks.length)
@@ -40,77 +38,20 @@ export const ClusterDeck = ({ subclusterTitle, artworks, onExpand, isDeckActive 
     }
   }
 
-  const touchStartY = React.useRef<number | null>(null)
-
-  // Calcola gli stili base a seconda della distanza dall'active index, ORA CIRCOLARE
-  const getCardStyle = (index: number) => {
-    let offset = (index - activeIndex) % artworks.length
-    if (offset < 0) offset += artworks.length
-
-    if (offset > Math.floor(artworks.length / 2)) {
-      offset -= artworks.length
-    }
-
-    if (offset === 0) {
-      // Main Card In Primo Piano
-      return {
-        y: '0%',
-        scale: 1,
-        zIndex: 50,
-        opacity: 1,
-        brightness: 1,
-      }
-    } else if (offset === -1) {
-      // Prima carta che sporge SOPRA
-      return {
-        y: '-10%',
-        scale: 0.97,
-        zIndex: 40,
-        opacity: 1,
-        brightness: 0.7,
-      }
-    } else if (offset === -2) {
-      // Seconda carta che sporge SOPRA
-      return {
-        y: '-18%',
-        scale: 0.94,
-        zIndex: 30,
-        opacity: 1,
-        brightness: 0.5,
-      }
-    } else if (offset === 1) {
-      // Prima carta che sporge SOTTO
-      return {
-        y: '10%',
-        scale: 0.97,
-        zIndex: 40,
-        opacity: 1,
-        brightness: 0.7,
-      }
-    } else if (offset === 2) {
-      // Seconda carta che sporge SOTTO
-      return {
-        y: '18%',
-        scale: 0.94,
-        zIndex: 30,
-        opacity: 1,
-        brightness: 0.5,
-      }
+  const handleExpand = (artwork: MockArtwork) => {
+    if (onExpand) {
+      onExpand(artwork)
     } else {
-      // Altre carte -> Nascoste
-      return {
-        y: offset < 0 ? '-30%' : '30%',
-        scale: 0.8,
-        zIndex: 10,
-        opacity: 0,
-        brightness: 0,
-      }
+      router.push(`/artwork/${encodeURIComponent(artwork.id)}`)
     }
   }
 
   return (
     <div
       className="flex flex-col items-center justify-center w-[80vw] lg:w-[25vw] xl:w-[20vw] h-full relative cursor-ns-resize"
+      role="group"
+      aria-roledescription="carousel"
+      aria-label={`Mazzo: ${subclusterTitle}`}
       onWheel={handleWheel}
       onTouchStart={(e) => {
         touchStartY.current = e.touches[0].clientY
@@ -126,75 +67,22 @@ export const ClusterDeck = ({ subclusterTitle, artworks, onExpand, isDeckActive 
         touchStartY.current = null
       }}
     >
-      {/* Intestazione del Subcluster / Deck */}
-      <div className="text-center z-50 mb-[12vh] lg:mb-[10vh] h-[2rem] flex items-center justify-center shrink-0 pointer-events-none">
-        <AnimatePresence>
-          {isDeckActive && (
-            <motion.h3
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="font-neo text-white text-[6vw] lg:text-[1.8vw] xl:text-[1.5vw] tracking-widest uppercase drop-shadow-md leading-none"
-            >
-              {subclusterTitle}
-            </motion.h3>
-          )}
-        </AnimatePresence>
-      </div>
+      <DeckHeader title={subclusterTitle} isActive={!!isDeckActive} />
 
-      {/* Area del Mazzo */}
       <div className="relative w-[55vw] h-[70vw] md:w-[40vw] md:h-[50vw] lg:w-[20vw] lg:h-[25vw] flex items-center justify-center pointer-events-none">
         <AnimatePresence>
-          {artworks.map((artwork, i) => {
-            const style = getCardStyle(i)
-            const isActive = i === activeIndex
-
-            return (
-              <motion.div
-                key={artwork.id}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{
-                  y: style.y,
-                  scale: style.scale,
-                  zIndex: style.zIndex,
-                  opacity: style.opacity,
-                  filter: `brightness(${style.brightness})`,
-                }}
-                transition={{
-                  duration: 0.5,
-                  ease: [0.32, 0.72, 0, 1], // Curva aggressiva che si assesta morbida
-                }}
-                className={`absolute w-full h-full border-2 border-[#1A1A1A] shadow-[0_15px_30px_rgba(0,0,0,0.8)] overflow-hidden bg-[#111] pointer-events-auto ${isActive ? 'cursor-pointer hover:border-[#F45390]' : ''}`}
-                onClick={() => {
-                  if (isActive) {
-                    if (onExpand) {
-                      onExpand(artwork)
-                    } else {
-                      router.push(`/artwork/${encodeURIComponent(artwork.id)}`)
-                    }
-                  } else {
-                    // Cliccando una carta visibile non principale, si potrebbe scorrere fino ad essa
-                    // (Ma disabilitato per focus al finto scorrimento scroll wheel)
-                    setActiveIndex(i)
-                  }
-                }}
-              >
-                <img
-                  src={artwork.image}
-                  alt={artwork.title}
-                  className="w-full h-full object-cover"
-                  style={{ opacity: isActive ? 1 : 0.8 }}
-                />
-
-                {/* Piccolo overlay interno solo sulla carta attiva */}
-                {isActive && (
-                  <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/80 to-transparent">
-                    <p className="font-neo text-white text-sm uppercase">{artwork.title}</p>
-                  </div>
-                )}
-              </motion.div>
-            )
-          })}
+          {artworks.map((artwork, i) => (
+            <DeckCard
+              key={artwork.id}
+              artwork={artwork}
+              index={i}
+              activeIndex={activeIndex}
+              total={artworks.length}
+              isActive={i === activeIndex}
+              onActivate={setActiveIndex}
+              onExpand={handleExpand}
+            />
+          ))}
         </AnimatePresence>
       </div>
     </div>

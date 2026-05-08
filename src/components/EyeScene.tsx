@@ -74,8 +74,8 @@ const EyeModel = ({
 
   useEffect(() => {
     if (scene && onReady) {
-      const timer = setTimeout(onReady, 100)
-      return () => clearTimeout(timer)
+      const id = requestAnimationFrame(onReady)
+      return () => cancelAnimationFrame(id)
     }
   }, [scene, onReady])
 
@@ -198,12 +198,10 @@ const EyeModel = ({
         <Html
           center
           zIndexRange={[10, 0]}
-          className="pointer-events-none neo-skip-branding"
-          data-neo-skip="true"
+          className="pointer-events-none"
         >
           <div
-            className="w-[90vmin] h-[90vmin] md:w-[80vmin] md:h-[80vmin] max-w-[550px] max-h-[550px] animate-[spin_20s_linear_infinite] flex items-center justify-center neo-skip-branding"
-            data-neo-skip="true"
+            className="w-[90vmin] h-[90vmin] md:w-[80vmin] md:h-[80vmin] max-w-[550px] max-h-[550px] animate-[spin_20s_linear_infinite] flex items-center justify-center"
           >
             <CircularText isMobile={false} />
             <CircularText isMobile={true} />

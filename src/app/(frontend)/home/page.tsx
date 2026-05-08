@@ -3,6 +3,7 @@ import { ClusterLayout, ClusterData } from '@/components/home/ClusterLayout'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { Suspense } from 'react'
+import Image from 'next/image'
 
 import { getImageUrl } from '@/utilities/getMediaUrl'
 import { MiniMatrixLoader } from '@/components/MiniMatrixLoader'
@@ -52,11 +53,16 @@ export default async function HomePage() {
   return (
     <main className="w-full min-h-screen relative flex flex-col items-center justify-center bg-[#151515] overflow-hidden">
       {/* Background GIF - Desktop first */}
-      <img
-        src="/images/drops/bg-home.gif"
-        alt="Home Background"
-        className="absolute inset-0 w-screen h-screen object-cover z-0 opacity-80 brightness-100"
-      />
+      <div className="absolute inset-0 w-screen h-screen z-0 opacity-80 brightness-100">
+        <Image
+          src="/images/drops/bg-home.gif"
+          alt=""
+          fill
+          className="object-cover"
+          unoptimized
+          priority
+        />
+      </div>
       {mappedClusters.length >= 2 ? (
         <Suspense fallback={<MiniMatrixLoader />}>
           <ClusterLayout clusters={mappedClusters} />

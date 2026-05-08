@@ -3,6 +3,8 @@ import { fetchArtworkByNid, fetchAdjacentArtworks } from '@/app/(frontend)/home/
 import { notFound } from 'next/navigation'
 import { EyeScene } from '@/components/EyeScene'
 import { ArtworkDetailClient } from './ArtworkDetailClient'
+import { BrandedTitle } from '@/components/BrandedTitle'
+import Image from 'next/image'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,11 +26,15 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
   return (
     <main className="relative w-full h-screen overflow-hidden flex flex-col justify-between pt-[6vh] md:pt-[4vh] bg-[#151515]">
       {/* Background GIF - Desktop first */}
-      <img
-        src="/images/drops/bg-home.gif"
-        alt="Background"
-        className="absolute inset-0 w-screen h-screen object-cover z-0 opacity-40 brightness-75 scale-100 md:scale-105 pointer-events-none"
-      />
+      <div className="absolute inset-0 w-screen h-screen z-0 opacity-40 brightness-75 scale-100 md:scale-105 pointer-events-none">
+        <Image
+          src="/images/drops/bg-home.gif"
+          alt=""
+          fill
+          className="object-cover"
+          unoptimized
+        />
+      </div>
 
       {/* ── AREA TOP: Occhio e NID in alto, sfondo nero globale trasparisce ── */}
       <div className="flex flex-col items-center flex-shrink-0 z-[500] relative">
@@ -42,8 +48,8 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
             scaleMultiplier={1.3}
           />
         </div>
-        <span className="font-neo text-2xl lg:text-3xl tracking-widest font-bold leading-none text-[#768b1a] drop-shadow-[0_0_10px_rgba(118,139,26,0.6)]">
-          {displayTitle}
+        <span className="font-neo text-2xl lg:text-3xl tracking-widest font-bold leading-none text-white drop-shadow-[0_0_10px_rgba(244,83,144,0.15)] lowercase">
+          <BrandedTitle text={displayTitle} />
         </span>
       </div>
 

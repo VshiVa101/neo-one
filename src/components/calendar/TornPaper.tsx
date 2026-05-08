@@ -22,7 +22,7 @@ const tornClipPath = `polygon(
 
 export function TornPaper({ children, className = '' }: TornPaperProps) {
   return (
-    <motion.div
+    <div
       className={`relative text-black ${className}`}
       style={{ 
         clipPath: tornClipPath,
@@ -30,11 +30,8 @@ export function TornPaper({ children, className = '' }: TornPaperProps) {
         backgroundSize: 'auto',
         backgroundRepeat: 'repeat'
       }}
-      initial={{ scaleX: 0 }}
-      animate={{ scaleX: 1 }}
-      transition={{ type: 'spring', stiffness: 50, damping: 20 }}
     >
       <div className="relative z-10">{children}</div>
-    </motion.div>
+    </div>
   )
 }

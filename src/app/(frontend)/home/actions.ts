@@ -69,8 +69,6 @@ export async function fetchArtworkByNid(nid: string) {
   const decodedNid = decodeURIComponent(nid)
   const cleanNid = decodedNid.trim()
 
-  console.log(`[Neo-One] Requesting artwork (decoded): "${cleanNid}"`)
-
   // 1. Try by NID (preferred)
   let { docs } = await payload.find({
     collection: 'artworks',
@@ -95,17 +93,14 @@ export async function fetchArtworkByNid(nid: string) {
       docs = idDocs
     } catch (e) {
       // ID lookup might fail if queryId format is invalid for the DB
-      console.warn(`[Neo-One] ID lookup failed for "${cleanNid}"`)
     }
   }
 
   if (!docs || docs.length === 0) {
-    console.error(`[Neo-One] Artwork NOT FOUND: "${cleanNid}"`)
     return null
   }
 
   const art = docs[0]
-  console.log(`[Neo-One] Found artwork: ${art.nid} (ID: ${art.id})`)
   const subcluster = art.subcluster as any
   const clusterIdRaw =
     typeof subcluster === 'object' && subcluster?.cluster
@@ -198,6 +193,14 @@ export async function fetchCartSettings() {
   return settings
 }
 
+export async function fetchCalendarSettings() {
+  const payload = await getPayload({ config: configPromise })
+  const settings = await payload.findGlobal({
+    slug: 'calendar-settings',
+  })
+  return settings
+}
+
 export async function submitCart(data: { name: string; email: string; message: string; items: any[] }) {
   const payload = await getPayload({ config: configPromise })
 
@@ -218,7 +221,6 @@ export async function submitCart(data: { name: string; email: string; message: s
 
     return { success: true, id: submission.id }
   } catch (error) {
-    console.error('Submission error:', error)
     return { success: false, error: 'Errore durante l\'invio. Riprova più tardi.' }
   }
 }

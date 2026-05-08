@@ -114,6 +114,21 @@
       0 0 0 1px rgba(0, 0, 0, 0.7),
       0 0 18px rgba(0, 0, 0, 0.9);
   }
+
+  .neo-logo-mask {
+    -webkit-mask-image: url('/images/ui/logo-neoone-blackmetal-bianco.png');
+    -webkit-mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-image: url('/images/ui/logo-neoone-blackmetal-bianco.png');
+    mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    mask-position: center;
+  }
+
+  .ui-icon-scale {
+    transform: scale(1.5);
+  }
 }
 
 :root {
@@ -240,7 +255,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground min-h-[100vh] flex flex-col uppercase;
+    @apply bg-background text-foreground min-h-[100vh] flex flex-col;
   }
 
   /* Default Typography Sizes (Readable & Impactful) */
@@ -248,22 +263,6 @@
   h2 { font-size: clamp(1.8rem, 5vw, 2.8rem) !important; line-height: 1.2; margin-bottom: 0.5em; }
   h3 { font-size: clamp(1.4rem, 4vw, 2rem) !important; line-height: 1.3; }
   p { font-size: 1.15rem !important; line-height: 1.6; opacity: 0.9; }
-
-  /* Absolute Branded Typography Enforcement */
-  *:not(.neo-skip-branding):not(.neo-skip-branding *):not([class^="neo-"]) {
-    text-transform: lowercase !important;
-    color: white !important;
-  }
-
-  /* Exception for Hero / Technical elements - FORCED ACID GREEN & UPPERCASE */
-  [data-neo-skip] text,
-  [data-neo-skip] span,
-  .neo-skip-branding text,
-  .neo-skip-branding span {
-    text-transform: uppercase !important;
-    color: #809829 !important;
-    fill: #809829 !important;
-  }
 
   .neo-O {
     color: #F45390 !important;

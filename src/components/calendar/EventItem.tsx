@@ -22,7 +22,7 @@ export function EventItem({ event, onClick, index }: EventItemProps) {
       whileTap={{ scale: 0.95 }}
     >
       <div className="mb-1 text-center">
-        <span className="block font-neo text-[11px] md:text-sm text-[#39ff14] tracking-wide transition-colors duration-300">
+        <span className="block font-neo text-[11px] md:text-sm text-white tracking-wide transition-colors duration-300">
           {event.date}
         </span>
       </div>

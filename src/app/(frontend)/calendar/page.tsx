@@ -52,10 +52,18 @@ export default async function CalendarPage() {
     }
   })
 
+  const socialLinks = (settings.socialLinks || []).map((link: any) => ({
+    id: link.id,
+    url: link.url,
+    label: link.label,
+    icon: getImageUrl(link.icon, ''),
+  }))
+
   return (
     <CalendarClient 
       initialEvents={events} 
       quote={settings.calendarCTA}
+      socialLinks={socialLinks}
     />
   )
 }

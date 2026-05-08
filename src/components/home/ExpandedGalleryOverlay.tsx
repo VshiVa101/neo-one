@@ -2,8 +2,10 @@
 
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MockArtwork } from './ClusterDeck'
+import { MockArtwork } from './deckCardStyle'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import { BrandedTitle } from '@/components/BrandedTitle'
 
 interface ExpandedGalleryOverlayProps {
   isOpen: boolean
@@ -61,16 +63,18 @@ export const ExpandedGalleryOverlay = ({
                       router.push(`/artwork/${encodeURIComponent(artwork.id)}${queryString ? '?' + queryString : ''}`)
                     }}
                   >
-                    <img
+                    <Image
                       src={artwork.image}
                       alt={artwork.title}
-                      className="w-full h-full object-cover grayscale brightness-110 contrast-125 sm:grayscale sm:brightness-110 sm:contrast-125 group-hover:grayscale-0 group-hover:brightness-100 group-hover:contrast-100 transition-all duration-700 max-sm:grayscale-0 max-sm:brightness-100 max-sm:contrast-100"
+                      fill
+                      className="object-cover grayscale brightness-110 contrast-125 sm:grayscale sm:brightness-110 sm:contrast-125 group-hover:grayscale-0 group-hover:brightness-100 group-hover:contrast-100 transition-all duration-700 max-sm:grayscale-0 max-sm:brightness-100 max-sm:contrast-100"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                     />
 
                     {/* Overlay Testo Sempre Visibile In Basso */}
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent flex flex-col justify-end p-4 lg:p-6 transition-all duration-300">
-                      <p className="font-neo text-white text-base lg:text-lg tracking-widest uppercase mb-1 drop-shadow-md">
-                        {artwork.title}
+                      <p className="font-neo text-white text-base lg:text-lg tracking-widest mb-1 drop-shadow-md">
+                        <BrandedTitle text={artwork.title} />
                       </p>
                       <div className="h-0.5 w-8 lg:w-12 bg-[#809829] shadow-[0_0_10px_#809829] group-hover:w-full transition-all duration-500" />
                     </div>
@@ -102,7 +106,7 @@ export const ExpandedGalleryOverlay = ({
                 }}
                 className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#B3828B] rounded-full cursor-pointer transition-colors duration-300"
               >
-                <img src="/images/ui/esccc.webp" className="w-[62%] h-[62%] object-contain" style={{ transform: 'scale(1.5)' }} />
+                <Image src="/images/ui/esccc.webp" alt="ESC" width={64} height={64} className="w-[62%] h-[62%] object-contain" style={{ transform: 'scale(1.5)' }} unoptimized />
               </motion.button>
             </div>
           </div>

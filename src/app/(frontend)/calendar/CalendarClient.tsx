@@ -19,34 +19,100 @@ import { ShoppingCart, Home } from 'lucide-react'
 interface CalendarClientProps {
   initialEvents: NeoEvent[]
   quote?: string
+  socialLinks?: Array<{
+    id: string
+    icon: string
+    url: string
+    label: string
+  }>
 }
 
-export default function CalendarClient({ initialEvents, quote }: CalendarClientProps) {
+export default function CalendarClient({ initialEvents, quote, socialLinks }: CalendarClientProps) {
   const [activeEvent, setActiveEvent] = useState<NeoEvent | null>(null)
   const [isContactOpen, setIsContactOpen] = useState(false)
   const [cartHovered, setCartHovered] = useState(false)
   const [homeHovered, setHomeHovered] = useState(false)
+  
+  // Extract unique sorted years from events
+  const availableYears = useMemo(() => {
+    const years = Array.from(new Set(initialEvents.map(e => parseInt(e.year))))
+    return years.sort((a, b) => a - b)
+  }, [initialEvents])
+
+  // Default to current actual year if it exists in data, otherwise the most recent available
+  const initialYear = useMemo(() => {
+    const now = new Date().getFullYear()
+    if (availableYears.includes(now)) return now
+    return availableYears.length > 0 ? availableYears[availableYears.length - 1] : now
+  }, [availableYears])
+
+  const [currentYear, setCurrentYear] = useState(initialYear)
+  const [direction, setDirection] = useState(0)
+  
   const { isCartOpen, setIsCartOpen, count } = useCart()
   const router = useRouter()
 
   const eventsByMonth = useMemo(() => {
     const grouped: Record<string, NeoEvent[]> = {}
-    
-    // Sort events by date
-    const sorted = [...initialEvents].sort((a, b) => {
+    const filtered = initialEvents.filter(e => parseInt(e.year) === currentYear)
+    const sorted = [...filtered].sort((a, b) => {
       const dateA = new Date(`${a.month} ${a.date}, ${a.year}`).getTime()
       const dateB = new Date(`${b.month} ${b.date}, ${b.year}`).getTime()
       return dateA - dateB
     })
-
     for (const event of sorted) {
-      if (!grouped[event.month]) {
-        grouped[event.month] = []
-      }
+      if (!grouped[event.month]) grouped[event.month] = []
       grouped[event.month].push(event)
     }
     return grouped
-  }, [initialEvents])
+  }, [initialEvents, currentYear])
+
+  const changeYear = (move: 'next' | 'prev') => {
+    const currentIndex = availableYears.indexOf(currentYear)
+    let nextIndex = currentIndex
+    
+    if (move === 'next' && currentIndex < availableYears.length - 1) {
+      nextIndex = currentIndex + 1
+    } else if (move === 'prev' && currentIndex > 0) {
+      nextIndex = currentIndex - 1
+    }
+
+    if (nextIndex !== currentIndex) {
+      setDirection(move === 'next' ? 1 : -1)
+      setCurrentYear(availableYears[nextIndex])
+    }
+  }
+
+  const variants = {
+    initial: (direction: number) => ({
+      y: direction > 0 ? 1200 : -1200, // direction 1 (next) -> from bottom, direction 0/-1 -> from top
+      opacity: 1,
+      rotate: 0
+    }),
+    animate: {
+      y: 0,
+      opacity: 1,
+      rotate: 0,
+      transition: {
+        type: 'spring',
+        stiffness: 15,
+        damping: 12,
+        delay: 0.1
+      }
+    },
+    exit: (direction: number) => ({
+      y: direction > 0 ? -1200 : 1200, // direction 1 (next) -> exits top
+      opacity: 1,
+      rotate: 0,
+      transition: {
+        duration: 1.0
+      }
+    })
+  }
+
+  // Navigation Helpers
+  const canGoNext = availableYears.indexOf(currentYear) < availableYears.length - 1
+  const canGoPrev = availableYears.indexOf(currentYear) > 0
 
   return (
     <main className="w-full min-h-screen relative bg-black overflow-hidden">
@@ -84,60 +150,120 @@ export default function CalendarClient({ initialEvents, quote }: CalendarClientP
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 pt-[18vh] md:pt-[28vh] pb-32">
-        {/* Dynamic Quote */}
-        <motion.p
-          className="text-center font-neo text-white/70 text-sm md:text-base tracking-widest lowercase mb-12"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-        >
-          <BrandedTitle text={quote || "vieni a molestarmi dal vivo"} />
-        </motion.p>
-
-        {/* Torn Paper Calendar */}
-        <TornPaper className="px-4 py-8 md:px-8 md:py-12">
-          {/* Calendar Header */}
-          <div className="text-center mb-10">
-            <h2 className="font-neo text-black text-2xl md:text-4xl tracking-widest">
-              <BrandedTitle text="Calendario" />
-            </h2>
-            <div className="mt-2 w-16 h-[2px] bg-black/30 mx-auto" />
-          </div>
-
-          {/* Months */}
-          <div className="flex flex-col gap-4">
-            {Object.entries(eventsByMonth).map(([month, events], monthIndex) => (
-              <div key={month} className="space-y-2">
-                <h3 className="font-neo text-black/60 text-base md:text-lg tracking-widest ml-2">
-                  {month}
-                </h3>
-                <motion.div
-                  className="p-3 md:p-5 shadow-lg"
-                  style={{ 
-                    backgroundImage: `url(/images/textures/row-${(monthIndex % 3) + 1}.webp)`,
-                    backgroundSize: '100% 100%',
-                    backgroundPosition: 'center',
-                  }}
-                  initial={{ opacity: 0, y: 20 }}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 pt-[18vh] md:pt-[28vh] pb-32 min-h-screen flex flex-col items-center">
+        
+        {/* Navigation Wrapper for AnimatePresence */}
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div
+            key={currentYear}
+            custom={direction}
+            variants={variants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="w-full"
+          >
+            <TornPaper className="px-4 py-8 md:px-8 md:py-12">
+              {/* Calendar Header */}
+              <div className="text-center mb-10 pt-12 md:pt-20">
+                <motion.p
+                  className="font-neo text-white text-xs md:text-sm tracking-widest lowercase mb-4 opacity-70"
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 + monthIndex * 0.15 }}
+                  transition={{ duration: 0.8, delay: 0.5 }}
                 >
-                  <div className="flex gap-3 overflow-x-auto pt-4 -mt-4 pb-2 custom-scrollbar">
-                    {events.map((event, eventIndex) => (
-                      <EventItem
-                        key={event.id}
-                        event={event}
-                        index={eventIndex}
-                        onClick={() => setActiveEvent(event)}
-                      />
-                    ))}
-                  </div>
-                </motion.div>
+                  <BrandedTitle text={quote || "vieni a molestarmi dal vivo"} />
+                </motion.p>
+
+                <div className="flex flex-col items-center justify-center gap-0 mb-6">
+                  {/* Top Arrow -> Next available year */}
+                  <motion.button
+                    whileHover={canGoNext ? { scale: 1.2, y: -5 } : {}}
+                    whileTap={canGoNext ? { scale: 0.9 } : {}}
+                    onClick={() => changeYear('next')}
+                    className="flex items-center justify-center focus:outline-none disabled:opacity-0 disabled:cursor-default"
+                    disabled={!canGoNext}
+                    style={{ transition: 'opacity 0.3s' }}
+                  >
+                    <Image 
+                      src="/images/ui/direction-arrow-green.webp" 
+                      alt="Prossimo Anno" 
+                      width={50} 
+                      height={50} 
+                      className="-rotate-90 drop-shadow-[0_0_10px_rgba(57,255,20,0.5)]"
+                      unoptimized
+                    />
+                  </motion.button>
+                  
+                  <h2 className="font-neo text-white text-3xl md:text-5xl tracking-[0.3em] leading-none flex items-center justify-center pt-4 pb-1">
+                    <BrandedTitle text={currentYear.toString()} />
+                  </h2>
+
+                  {/* Bottom Arrow -> Previous available year */}
+                  <motion.button
+                    whileHover={canGoPrev ? { scale: 1.2, y: 5 } : {}}
+                    whileTap={canGoPrev ? { scale: 0.9 } : {}}
+                    onClick={() => changeYear('prev')}
+                    className="flex items-center justify-center focus:outline-none disabled:opacity-0 disabled:cursor-default"
+                    disabled={!canGoPrev}
+                    style={{ transition: 'opacity 0.3s' }}
+                  >
+                    <Image 
+                      src="/images/ui/direction-arrow-green.webp" 
+                      alt="Anno Precedente" 
+                      width={50} 
+                      height={50} 
+                      className="rotate-90 drop-shadow-[0_0_10px_rgba(57,255,20,0.5)]"
+                      unoptimized
+                    />
+                  </motion.button>
+                </div>
+                <div className="mt-2 w-16 h-[2px] bg-black/30 mx-auto" />
               </div>
-            ))}
-          </div>
-        </TornPaper>
+
+              {/* Months */}
+              <div className="flex flex-col gap-4">
+                {Object.keys(eventsByMonth).length > 0 ? (
+                  Object.entries(eventsByMonth).map(([month, events], monthIndex) => (
+                    <div key={month} className="space-y-2">
+                      <h3 className="font-neo text-white text-base md:text-lg tracking-widest ml-8 lowercase">
+                        <BrandedTitle text={month} />
+                      </h3>
+                      <motion.div
+                        className="p-3 md:p-5 shadow-lg"
+                        style={{ 
+                          backgroundImage: `url(/images/textures/row-${(monthIndex % 3) + 1}.webp)`,
+                          backgroundSize: '100% 100%',
+                          backgroundPosition: 'center',
+                        }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.3 + monthIndex * 0.15 }}
+                      >
+                        <div className="flex gap-3 overflow-x-auto pt-4 -mt-4 pb-2 custom-scrollbar">
+                          {events.map((event, eventIndex) => (
+                            <EventItem
+                              key={event.id}
+                              event={event}
+                              index={eventIndex}
+                              onClick={() => setActiveEvent(event)}
+                            />
+                          ))}
+                        </div>
+                      </motion.div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-20 text-center">
+                    <p className="font-neo text-white/30 text-sm tracking-widest lowercase">
+                      <BrandedTitle text="nessun evento programmato per quest'anno" />
+                    </p>
+                  </div>
+                )}
+              </div>
+            </TornPaper>
+          </motion.div>
+        </AnimatePresence>
 
         {/* Bottom Spacer */}
         <div className="h-16" />
@@ -177,7 +303,6 @@ export default function CalendarClient({ initialEvents, quote }: CalendarClientP
         <motion.button
           animate={{
             scale: cartHovered ? 1.5 : 1,
-            backgroundColor: cartHovered ? '#F45390' : '#B3828B',
           }}
           transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
           whileTap={{ scale: 0.9 }}
@@ -186,6 +311,7 @@ export default function CalendarClient({ initialEvents, quote }: CalendarClientP
           onClick={() => setIsCartOpen(true)}
           className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300 relative"
           style={{
+            backgroundColor: cartHovered ? '#F45390' : '#B3828B',
             boxShadow: cartHovered
               ? '0 0 30px rgba(244, 83, 144, 0.8), 0 0 60px rgba(244, 83, 144, 0.3)'
               : '0 0 10px rgba(0,0,0,0.3)',
@@ -193,11 +319,20 @@ export default function CalendarClient({ initialEvents, quote }: CalendarClientP
           }}
           title="Vai alla Cassa"
         >
-          <ShoppingCart 
-            size={24} 
-            className={cartHovered ? 'text-black' : 'text-[#F45390]'} 
-            strokeWidth={2.5}
-            style={{ transform: 'scale(1.2)' }}
+          <Image
+            src={
+              cartHovered
+                ? '/images/drops/carrellorosa_optimized.webp'
+                : count > 0
+                  ? '/images/drops/carrelloverde_optimized.webp'
+                  : '/images/drops/carrello_optimized.webp'
+            }
+            alt="Carrello"
+            width={64}
+            height={64}
+            className="w-full h-full object-contain"
+            style={{ transform: 'scale(1.5)' }}
+            unoptimized
           />
           <span className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-[#809829] rounded-full font-neo text-[8px] md:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)]">
             {count}
@@ -222,7 +357,7 @@ export default function CalendarClient({ initialEvents, quote }: CalendarClientP
       />
 
       {/* Social Linktree Bar */}
-      <SocialBar />
+      <SocialBar socialLinks={socialLinks} />
     </main>
   )
 }
