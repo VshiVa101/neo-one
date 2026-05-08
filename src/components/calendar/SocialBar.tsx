@@ -42,16 +42,14 @@ export function SocialBar({ socialLinks }: SocialBarProps) {
                 className="relative group flex-shrink-0"
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ 
-                  scale: { delay: 0.9 + i * 0.1 },
-                  opacity: { delay: 0.9 + i * 0.1 }
-                }}
                 whileHover={{ 
                   x: 8, 
                   scale: 1.2,
                   filter: 'brightness(1.3)',
                 }}
                 transition={{ 
+                  scale: { delay: 0.9 + i * 0.1 },
+                  opacity: { delay: 0.9 + i * 0.1 },
                   type: 'spring', 
                   stiffness: 400, 
                   damping: 10 
