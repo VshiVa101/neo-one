@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { EyeScene } from '@/components/EyeScene'
+import { BrandedTitle } from '@/components/BrandedTitle'
 import { TornPaper } from '@/components/calendar/TornPaper'
 import { EventItem } from '@/components/calendar/EventItem'
 import { EventDetail } from '@/components/calendar/EventDetail'
@@ -86,20 +87,20 @@ export default function CalendarClient({ initialEvents, quote }: CalendarClientP
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 pt-[18vh] md:pt-[28vh] pb-32">
         {/* Dynamic Quote */}
         <motion.p
-          className="text-center font-neo text-[#39ff14] text-sm md:text-base tracking-widest uppercase mb-12"
+          className="text-center font-neo text-white/70 text-sm md:text-base tracking-widest lowercase mb-12"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
         >
-          {quote || "Vieni a molestarmi dal vivo"}
+          <BrandedTitle text={quote || "vieni a molestarmi dal vivo"} />
         </motion.p>
 
         {/* Torn Paper Calendar */}
         <TornPaper className="px-4 py-8 md:px-8 md:py-12">
           {/* Calendar Header */}
           <div className="text-center mb-10">
-            <h2 className="font-neo text-black text-2xl md:text-4xl tracking-widest uppercase">
-              CALENDARIO
+            <h2 className="font-neo text-black text-2xl md:text-4xl tracking-widest">
+              <BrandedTitle text="Calendario" />
             </h2>
             <div className="mt-2 w-16 h-[2px] bg-black/30 mx-auto" />
           </div>
@@ -108,7 +109,7 @@ export default function CalendarClient({ initialEvents, quote }: CalendarClientP
           <div className="flex flex-col gap-4">
             {Object.entries(eventsByMonth).map(([month, events], monthIndex) => (
               <div key={month} className="space-y-2">
-                <h3 className="font-neo text-[#39ff14] text-base md:text-lg tracking-widest uppercase ml-2">
+                <h3 className="font-neo text-black/60 text-base md:text-lg tracking-widest ml-2">
                   {month}
                 </h3>
                 <motion.div
@@ -176,6 +177,7 @@ export default function CalendarClient({ initialEvents, quote }: CalendarClientP
         <motion.button
           animate={{
             scale: cartHovered ? 1.5 : 1,
+            backgroundColor: cartHovered ? '#F45390' : '#B3828B',
           }}
           transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
           whileTap={{ scale: 0.9 }}
@@ -184,7 +186,6 @@ export default function CalendarClient({ initialEvents, quote }: CalendarClientP
           onClick={() => setIsCartOpen(true)}
           className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300 relative"
           style={{
-            backgroundColor: cartHovered ? '#F45390' : '#B3828B',
             boxShadow: cartHovered
               ? '0 0 30px rgba(244, 83, 144, 0.8), 0 0 60px rgba(244, 83, 144, 0.3)'
               : '0 0 10px rgba(0,0,0,0.3)',
@@ -192,17 +193,11 @@ export default function CalendarClient({ initialEvents, quote }: CalendarClientP
           }}
           title="Vai alla Cassa"
         >
-          <img
-            src={
-              cartHovered
-                ? '/images/drops/carrellorosa_optimized.webp'
-                : count > 0
-                  ? '/images/drops/carrelloverde_optimized.webp'
-                  : '/images/drops/carrello_optimized.webp'
-            }
-            alt="Carrello"
-            className="w-full h-full object-contain"
-            style={{ transform: 'scale(1.5)' }}
+          <ShoppingCart 
+            size={24} 
+            className={cartHovered ? 'text-black' : 'text-[#F45390]'} 
+            strokeWidth={2.5}
+            style={{ transform: 'scale(1.2)' }}
           />
           <span className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-[#809829] rounded-full font-neo text-[8px] md:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)]">
             {count}
