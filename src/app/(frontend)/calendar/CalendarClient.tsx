@@ -94,7 +94,7 @@ export default function CalendarClient({ initialEvents, quote, socialLinks }: Ca
       opacity: 1,
       rotate: 0,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 15,
         damping: 12,
         delay: 0.1
@@ -150,7 +150,7 @@ export default function CalendarClient({ initialEvents, quote, socialLinks }: Ca
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 pt-[18vh] md:pt-[28vh] pb-32 min-h-screen flex flex-col items-center">
+      <div className="relative z-10 w-full max-w-3xl mx-auto px-4 pt-[18vh] md:pt-[28vh] pb-32 min-h-screen flex flex-col items-center">
         
         {/* Navigation Wrapper for AnimatePresence */}
         <AnimatePresence mode="wait" custom={direction}>

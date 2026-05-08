@@ -42,8 +42,20 @@ export function SocialBar({ socialLinks }: SocialBarProps) {
                 className="relative group flex-shrink-0"
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.9 + i * 0.1 }}
-                whileHover={{ x: 5, scale: 1.1 }}
+                transition={{ 
+                  scale: { delay: 0.9 + i * 0.1 },
+                  opacity: { delay: 0.9 + i * 0.1 }
+                }}
+                whileHover={{ 
+                  x: 8, 
+                  scale: 1.2,
+                  filter: 'brightness(1.3)',
+                }}
+                transition={{ 
+                  type: 'spring', 
+                  stiffness: 400, 
+                  damping: 10 
+                }}
                 onPointerDown={(e) => e.stopPropagation()}
               >
                 <div className="w-[3.3rem] h-[3.3rem] md:w-[4.4rem] md:h-[4.4rem] relative">
