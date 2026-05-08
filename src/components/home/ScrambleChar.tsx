@@ -48,6 +48,8 @@ interface ScrambleCharProps {
   scrambleInterval?: number
 }
 
+let globalAudioCtx: AudioContext | null = null
+
 export const ScrambleChar = ({
   target,
   isScrambling,
@@ -55,15 +57,16 @@ export const ScrambleChar = ({
   scrambleInterval = 100,
 }: ScrambleCharProps) => {
   const [display, setDisplay] = useState(target)
-  const audioContextRef = useRef<AudioContext | null>(null)
 
   const playTick = () => {
     try {
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+      if (!globalAudioCtx) {
+        globalAudioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
       }
-      const ctx = audioContextRef.current
-      if (ctx.state === 'suspended') ctx.resume()
+      const ctx = globalAudioCtx
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {})
+      }
 
       const oscillator = ctx.createOscillator()
       const gainNode = ctx.createGain()
