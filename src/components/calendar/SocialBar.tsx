@@ -51,7 +51,7 @@ export function SocialBar({ socialLinks }: SocialBarProps) {
                 // Prevent drag from triggering click if moved significantly
                 onPointerDown={(e) => e.stopPropagation()}
               >
-                <div className="w-12 h-12 md:w-16 md:h-16 relative">
+                <div className="w-[3.3rem] h-[3.3rem] md:w-[4.4rem] md:h-[4.4rem] relative">
                   <Image
                     src={link.icon}
                     alt={link.label}
