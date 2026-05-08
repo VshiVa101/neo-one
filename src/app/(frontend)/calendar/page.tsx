@@ -43,7 +43,9 @@ export default async function CalendarPage() {
       details: {
         headline: doc.title,
         description: doc.description,
-        images: (doc.detailImages || []).map((imgObj: any) => getImageUrl(imgObj.image)),
+        images: (doc.detailImages || []).map((imgObj: any) => 
+          getImageUrl(imgObj.image, '/images/ui/pre-orderverde.webp')
+        ),
         stickers: [],
         comicBubble: doc.eventCTA || settings.defaultEventCTA || '',
       },

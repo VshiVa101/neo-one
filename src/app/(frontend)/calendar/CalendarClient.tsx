@@ -148,6 +148,7 @@ export default function CalendarClient({ initialEvents, quote }: CalendarClientP
         <motion.button
           animate={{
             scale: homeHovered ? 1.5 : 1,
+            backgroundColor: homeHovered ? '#F45390' : '#B3828B',
           }}
           transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
           whileTap={{ scale: 0.9 }}
@@ -156,7 +157,6 @@ export default function CalendarClient({ initialEvents, quote }: CalendarClientP
           onClick={() => router.push('/home')}
           className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
           style={{
-            backgroundColor: homeHovered ? '#F45390' : '#B3828B',
             boxShadow: homeHovered
               ? '0 0 30px rgba(244, 83, 144, 0.8), 0 0 60px rgba(244, 83, 144, 0.3)'
               : '0 0 10px rgba(0,0,0,0.3)',
@@ -166,7 +166,7 @@ export default function CalendarClient({ initialEvents, quote }: CalendarClientP
         >
           <Home 
             size={24} 
-            className="text-black" 
+            className={homeHovered ? 'text-black' : 'text-[#F45390]'} 
             strokeWidth={2.5}
             style={{ transform: 'scale(1.2)' }}
           />
