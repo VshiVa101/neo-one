@@ -20,21 +20,17 @@ export function SocialBar({ socialLinks }: SocialBarProps) {
 
   return (
     <motion.div
-      className="fixed bottom-4 left-0 right-0 z-[400] flex justify-center pointer-events-none"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      className="fixed left-6 top-1/2 -translate-y-1/2 z-[400] flex flex-col pointer-events-none"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1], delay: 0.8 }}
     >
       <div 
         ref={containerRef}
-        className="w-full max-w-2xl px-12 overflow-hidden pointer-events-auto cursor-grab active:cursor-grabbing"
+        className="flex flex-col items-center pointer-events-auto"
       >
         <motion.div 
-          className="flex items-center justify-center gap-6 md:gap-8 py-2 w-max mx-auto"
-          drag="x"
-          dragConstraints={containerRef}
-          dragElastic={0.2}
-          dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+          className="flex flex-col items-center gap-6 md:gap-7 py-4"
         >
           {socialLinks.map((link, i: number) => {
             return (
@@ -47,8 +43,7 @@ export function SocialBar({ socialLinks }: SocialBarProps) {
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.9 + i * 0.1 }}
-                whileHover={{ y: -5, scale: 1.1 }}
-                // Prevent drag from triggering click if moved significantly
+                whileHover={{ x: 5, scale: 1.1 }}
                 onPointerDown={(e) => e.stopPropagation()}
               >
                 <div className="w-[3.3rem] h-[3.3rem] md:w-[4.4rem] md:h-[4.4rem] relative">
