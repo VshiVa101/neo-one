@@ -2,8 +2,8 @@
 
 **File:** `docs/NEO_ALIGNMENT.md`
 **Purpose:** single operational handoff document for future models/agents working on Neo-One.
-**Last updated:** 2026-05-07
-**Current release context:** v1.2.1
+**Last updated:** 2026-05-12
+**Current release context:** v1.2.2
 
 ---
 
@@ -454,7 +454,7 @@ Current completed fix:
 
 Current next product focus from roadmap:
 
-- P2 Calendar & Linktree page (da wireframe `hi-frames/`)
+- P2 Calendar & Linktree page (da wireframe `hi-frames/`) ✅ COMPLETATO — grab-to-scroll, SocialBar, eventi mensili
 - P3 Mobile Polish
 - P4 Audio Experience
 

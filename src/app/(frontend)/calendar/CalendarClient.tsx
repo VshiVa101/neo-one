@@ -15,6 +15,7 @@ import { SocialBar } from '@/components/calendar/SocialBar'
 import type { NeoEvent } from '@/data/calendar-mock'
 import { useCart } from '@/contexts/CartContext'
 import { ShoppingCart, Home } from 'lucide-react'
+import { useRef } from 'react'
 
 interface CalendarClientProps {
   initialEvents: NeoEvent[]
@@ -25,6 +26,45 @@ interface CalendarClientProps {
     url: string
     label: string
   }>
+}
+
+const MonthRow = ({ events, month, monthIndex, setActiveEvent }: { events: NeoEvent[], month: string, monthIndex: number, setActiveEvent: (e: NeoEvent) => void }) => {
+  const containerRef = useRef<HTMLDivElement>(null)
+  
+  return (
+    <div key={month} className="space-y-2">
+      <h3 className="font-neo text-white text-base md:text-lg tracking-widest ml-8 lowercase">
+        <BrandedTitle text={month} />
+      </h3>
+      <motion.div
+        ref={containerRef}
+        className="p-3 md:p-5 shadow-lg overflow-hidden relative"
+        style={{ 
+          backgroundImage: `url(/images/textures/row-${(monthIndex % 3) + 1}.webp)`,
+          backgroundSize: '100% 100%',
+          backgroundPosition: 'center',
+        }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 + monthIndex * 0.15 }}
+      >
+        <motion.div 
+          drag="x"
+          dragConstraints={containerRef}
+          className="flex gap-3 pt-4 -mt-4 pb-2 w-max cursor-grab active:cursor-grabbing px-4"
+        >
+          {events.map((event, eventIndex) => (
+            <EventItem
+              key={event.id}
+              event={event}
+              index={eventIndex}
+              onClick={() => setActiveEvent(event)}
+            />
+          ))}
+        </motion.div>
+      </motion.div>
+    </div>
+  )
 }
 
 export default function CalendarClient({ initialEvents, quote, socialLinks }: CalendarClientProps) {
@@ -225,33 +265,13 @@ export default function CalendarClient({ initialEvents, quote, socialLinks }: Ca
               <div className="flex flex-col gap-4">
                 {Object.keys(eventsByMonth).length > 0 ? (
                   Object.entries(eventsByMonth).map(([month, events], monthIndex) => (
-                    <div key={month} className="space-y-2">
-                      <h3 className="font-neo text-white text-base md:text-lg tracking-widest ml-8 lowercase">
-                        <BrandedTitle text={month} />
-                      </h3>
-                      <motion.div
-                        className="p-3 md:p-5 shadow-lg"
-                        style={{ 
-                          backgroundImage: `url(/images/textures/row-${(monthIndex % 3) + 1}.webp)`,
-                          backgroundSize: '100% 100%',
-                          backgroundPosition: 'center',
-                        }}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.3 + monthIndex * 0.15 }}
-                      >
-                        <div className="flex gap-3 overflow-x-auto pt-4 -mt-4 pb-2 custom-scrollbar">
-                          {events.map((event, eventIndex) => (
-                            <EventItem
-                              key={event.id}
-                              event={event}
-                              index={eventIndex}
-                              onClick={() => setActiveEvent(event)}
-                            />
-                          ))}
-                        </div>
-                      </motion.div>
-                    </div>
+                    <MonthRow 
+                      key={month}
+                      month={month}
+                      events={events}
+                      monthIndex={monthIndex}
+                      setActiveEvent={setActiveEvent}
+                    />
                   ))
                 ) : (
                   <div className="py-20 text-center">

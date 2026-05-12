@@ -1,8 +1,8 @@
-﻿# ðŸš€ Neo-One Vercel Deployment Checklist
+# ðŸš€ Neo-One Vercel Deployment Checklist
 
-**Release:** v1.2.1
-**Status:** Deployed
-**Date:** May 7, 2026
+**Release:** v1.2.2
+**Status:** In Progress
+**Date:** May 12, 2026
 **GitHub Repo:** https://github.com/VshiVa101/neo-one.git
 
 ---

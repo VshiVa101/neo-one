@@ -1,5 +1,12 @@
 # Neo-One Art Hub
 
+## Release v1.2.2 (2026-05-12)
+
+- **Calendar grab-to-scroll**: SocialBar footer now uses framer-motion `drag="x"` for horizontal drag-scrolling. Icons themselves act as drag handles — no more ghost-image interference on desktop.
+- **Grab vs Click**: Long-press grab no longer triggers accidental link navigation. A `hasDragged` ref tracks framer-motion drag state and suppresses the click event when a drag occurred.
+- **Desktop & mobile aligned**: Touch (mobile) already worked via framer-motion's pointer events; desktop is now fully aligned with the same grab-to-scroll UX.
+- **MonthRow scrolling**: Calendar event rows also use `drag="x"` with `cursor-grab`/`active:cursor-grabbing`, replacing native horizontal scroll for a consistent grab interaction.
+
 ## Release v1.1.3 (2026-04-30)
 
 - Fixed desktop cart behavior: wheel scrolling now works inside cart overlay and no longer gets blocked by home layout wheel interception.

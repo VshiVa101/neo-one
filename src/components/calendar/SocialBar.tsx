@@ -15,38 +15,37 @@ interface SocialBarProps {
 
 export function SocialBar({ socialLinks }: SocialBarProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const hasDragged = useRef(false)
   
   if (!socialLinks || socialLinks.length === 0) return null
 
   return (
     <motion.div
-      className="fixed left-6 top-1/2 -translate-y-1/2 z-[400] flex flex-col pointer-events-none"
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[400] w-full max-w-[95vw] pointer-events-none overflow-hidden"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1], delay: 0.8 }}
     >
       <div 
         ref={containerRef}
-        className="flex flex-col items-center pointer-events-auto"
+        className="w-full flex justify-center pointer-events-auto"
       >
         <motion.div 
-          className="flex flex-col items-center gap-6 md:gap-7 py-4"
+          drag="x"
+          dragConstraints={containerRef}
+          onDragStart={() => { hasDragged.current = true }}
+          onDragEnd={() => {
+            setTimeout(() => { hasDragged.current = false }, 0)
+          }}
+          className="flex items-center gap-6 md:gap-8 py-4 px-10 w-max cursor-grab active:cursor-grabbing select-none"
         >
           {socialLinks.map((link, i: number) => {
             return (
-              <motion.a
+              <motion.div
                 key={link.id}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative group flex-shrink-0"
+                className="relative group flex-shrink-0 cursor-grab active:cursor-grabbing select-none"
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
-                whileHover={{ 
-                  x: 8, 
-                  scale: 1.2,
-                  filter: 'brightness(1.3)',
-                }}
                 transition={{ 
                   scale: { delay: 0.9 + i * 0.1 },
                   opacity: { delay: 0.9 + i * 0.1 },
@@ -54,18 +53,36 @@ export function SocialBar({ socialLinks }: SocialBarProps) {
                   stiffness: 400, 
                   damping: 10 
                 }}
-                onPointerDown={(e) => e.stopPropagation()}
               >
-                <div className="w-[3.3rem] h-[3.3rem] md:w-[4.4rem] md:h-[4.4rem] relative">
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  draggable={false}
+                  onDragStart={(e) => e.preventDefault()}
+                  onClick={(e) => {
+                    if (hasDragged.current) {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      hasDragged.current = false
+                    }
+                  }}
+                  style={{ WebkitUserDrag: 'none' } as React.CSSProperties}
+                  className="block w-[3rem] h-[3rem] md:w-[4rem] md:h-[4rem] relative
+                    transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+                    group-hover:-translate-y-2 group-hover:scale-110 group-hover:brightness-125
+                    drop-shadow-[0_0_15px_rgba(0,0,0,0.4)] select-none"
+                >
                   <Image
                     src={link.icon}
                     alt={link.label}
                     fill
-                    className="object-contain transition-all duration-300 drop-shadow-[0_0_15px_rgba(0,0,0,0.4)]"
+                    draggable={false}
+                    className="object-contain"
                     unoptimized
                   />
-                </div>
-              </motion.a>
+                </a>
+              </motion.div>
             )
           })}
         </motion.div>

@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+
+## [1.2.2] - 2026-05-12
+
+### 🖱️ CALENDAR GRAB-TO-SCROLL & SOCIALBAR REFACTOR
+
+- **SocialBar horizontal repositioning**: Relocated from left sidebar to fixed bottom center. Now uses framer-motion `drag="x"` for horizontal grab-to-scroll across the entire footer area, including directly on social icons.
+- **Grab vs Click disambiguation**: Added `hasDragged` ref with `onDragStart`/`onDragEnd` lifecycle. On drag, the `<a>` `onClick` gate calls `preventDefault()`, preventing accidental link navigation after long-press grab.
+- **Native drag suppression**: Suppressed browser ghost-image drag on desktop via `draggable={false}`, `-webkit-user-drag: none`, `onDragStart` `preventDefault()` on `<a>` and `<Image>` elements. Added `select-none` throughout to prevent text selection.
+- **Hover refactor**: Moved icon hover effects from framer-motion `whileHover` (which blocked parent drag gesture propagation) to pure CSS `group-hover:` with cubic-bezier spring-like transitions.
+- **CalendarClient.tsx MonthRow**: Extracted inline `MonthRow` component. Month event lists now use `drag="x"` with `cursor-grab`/`active:cursor-grabbing` instead of native `overflow-x-auto`.
+
 ## [1.2.1] - 2026-05-07
 
 ### 🧹 STABILIZZAZIONE WORKFLOW & ALLINEAMENTO METADATI

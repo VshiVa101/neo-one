@@ -1,6 +1,6 @@
 {
   "name": "neo-one",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Website template for Payload",
   "license": "MIT",
   "type": "module",
@@ -104,3 +104,4 @@
     ]
   }
 }
+

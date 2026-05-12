@@ -11,7 +11,7 @@ This document outlines the strategy for transforming the current placeholder `/c
 *   **Torn Paper Container**: The central UI element is a white "torn paper" block that holds the calendar data. This creates a high-contrast, analog-meets-digital vibe.
 *   **Calendar Logic**: Organized by months (GENNAIO, FEBBRAIO). Each month contains a horizontal row of events.
 *   **Event Items**: Minimalist thumbnails with dates hovering above. Some items have "PRE-ORDER" tags.
-*   **Social Linktree**: A fixed bottom bar with stylized, vibrant social icons.
+*   **Social Linktree**: A fixed bottom bar with stylized, vibrant social icons, draggable via framer-motion `drag="x"` for horizontal grab-to-scroll.
 *   **Floating Actions**: Circular buttons on the right for "Share" and "Cart".
 
 ### Event Detail Overlay
@@ -48,7 +48,7 @@ graph TD
 *   `src/components/calendar/EventItem.tsx`: Individual event card with hover effects.
 *   `src/components/calendar/EventDetail.tsx`: The modal content for event specifics.
 *   `src/components/calendar/ContactForm.tsx`: The contact form modal content.
-*   `src/components/calendar/SocialBar.tsx`: The linktree social bar.
+*   `src/components/calendar/SocialBar.tsx`: The linktree social bar with framer-motion `drag="x"` and `hasDragged` ref for click/drag disambiguation.
 *   `src/app/api/contact/route.ts`: API handler for the form (Resend integration).
 
 ---
@@ -101,8 +101,13 @@ export interface SocialLink {
 
 ### Phase 4: Social Linktree & Polish
 1.  **Social Bar**: Implement the fixed bottom bar with icons from `public/images/ui`.
-2.  **Floating UI**: Add the Share and Cart buttons with "Eye" motifs.
-3.  **Animations**: Apply global entrance animations (CRT flicker, typewriter for quotes).
+2.  **Drag-to-Scroll**: Add framer-motion `drag="x"` on the social icons container with `dragConstraints` bounded to parent ref for horizontal grab-to-scroll.
+3.  **Grab vs Click disambiguation**: Use a `hasDragged` ref � `onDragStart` sets it, the `<a>` `onClick` gate calls `preventDefault()` if a drag occurred, preventing accidental navigation after long-press grab.
+4.  **Native drag suppression**: Suppress browser ghost-image drag on desktop via `draggable={false}`, `-webkit-user-drag: none`, and `onDragStart` `preventDefault()` on `<a>` and `<Image>` elements. `select-none` prevents text selection during drag.
+5.  **Hover effects**: Moved from framer-motion&apos;s `whileHover` (which blocked parent drag gesture propagation) to pure CSS `group-hover:` utilities with spring-like cubic-bezier transitions.
+6.  **Floating UI**: Add the Share and Cart buttons with &quot;Eye&quot; motifs.
+7.  **Animations**: Apply global entrance animations (CRT flicker, typewriter for quotes).
+8.  **MonthRow drag**: CalendarClient event rows also use `drag="x"` with `cursor-grab`/`active:cursor-grabbing` for horizontal event list scroll.
 
 ---
 
@@ -112,6 +117,10 @@ export interface SocialLink {
 *   **Torn Paper**: `initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ type: "spring", stiffness: 50 }}`
 *   **Event Items**: `whileHover={{ y: -5, scale: 1.05 }} transition={{ type: "spring", stiffness: 300 }}`
 *   **Modals**: `initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.1 }}`
+*   **SocialBar entrance**: `initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1], delay: 0.8 }}`
+*   **SocialBar hover (icon lift)**: CSS `group-hover:-translate-y-2 group-hover:scale-110 group-hover:brightness-125` with `transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]`
+*   **SocialBar drag**: framer-motion `drag="x"` with `dragConstraints` bounded to parent ref. `cursor-grab` / `active:cursor-grabbing` for pointer feedback.
+*   **MonthRow drag**: Same `drag="x"` + `cursor-grab` pattern applied to CalendarClient month event rows.
 
 ---
 
@@ -119,3 +128,6 @@ export interface SocialLink {
 *   **NO DB**: All data must reside in the mock file.
 *   **NO Payload Config**: Use standard Next.js route handlers for the form.
 *   **Design First**: Prioritize the high-fidelity aesthetic over perfect functionality for the P2 stage.
+
+
+
