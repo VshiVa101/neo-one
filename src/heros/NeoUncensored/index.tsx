@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState, Suspense, lazy } from 'react'
 import type { Page } from '@/payload-types'
-import { useAudio } from '@/contexts/AudioContext'
 
 // Lazy load ThreeEye to avoid SSR issues
 const ThreeEye = lazy(() => import('@/components/ThreeEye'))
@@ -140,7 +139,6 @@ const PixelExplosionLayer: React.FC<{
 
 export const NeoUncensoredHero: React.FC<HeroProps> = () => {
   const reducedMotion = usePrefersReducedMotion()
-  const { startBackgroundMusic } = useAudio()
 
   const EXPLOSION_MS = 980
 
@@ -153,8 +151,6 @@ export const NeoUncensoredHero: React.FC<HeroProps> = () => {
   const [explosionOrigin, setExplosionOrigin] = useState({ x: 0, y: 0 })
   const [explosionActive, setExplosionActive] = useState(false)
   const eyeContainerRef = useRef<HTMLDivElement>(null)
-
-  const musicStartedRef = useRef(false)
 
   // Audio per la reazione a catena
   const triggerChainExplosion = () => {
@@ -195,13 +191,6 @@ export const NeoUncensoredHero: React.FC<HeroProps> = () => {
       setShowHome(true)
     }, EXPLOSION_MS)
   }
-
-  useEffect(() => {
-    if (showHome && !musicStartedRef.current) {
-      musicStartedRef.current = true
-      startBackgroundMusic()
-    }
-  }, [showHome, startBackgroundMusic])
 
   const ringText = "qui dio non c'è , tua madre non vuole e tuo padre è gia dentro"
 

@@ -359,6 +359,7 @@ export default function CalendarClient({ initialEvents, quote, socialLinks }: Ca
         {activeEvent && (
           <EventDetail
             event={activeEvent}
+            quote={quote}
             onClose={() => setActiveEvent(null)}
           />
         )}

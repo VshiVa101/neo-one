@@ -5,6 +5,8 @@ import { useRouter, usePathname } from 'next/navigation'
 import { MatrixGateway } from '@/components/MatrixGateway'
 import { EyeScene } from '@/components/EyeScene'
 import { useTransition } from '@/contexts/TransitionContext'
+import { useAudio } from '@/contexts/AudioContext'
+import { useCrtStaticNoise } from '@/hooks/useCrtStaticNoise'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MiniMatrixLoader } from '@/components/MiniMatrixLoader'
 
@@ -12,11 +14,13 @@ export default function HeroClient() {
   const router = useRouter()
   const pathname = usePathname()
   const { isTransitioning } = useTransition()
+  const { primeBackgroundMusic } = useAudio()
   const [shouldRender, setShouldRender] = useState(false)
   const [isEyeReady, setIsEyeReady] = useState(false)
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [isFading, setIsFading] = useState(false)
   const [isTouchDevice, setIsTouchDevice] = useState(false)
+  const crtNoise = useCrtStaticNoise()
 
   const handleUnlock = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -31,6 +35,9 @@ export default function HeroClient() {
       .play()
       .then(() => silentAudio.pause())
       .catch(() => {})
+
+    primeBackgroundMusic()
+    crtNoise.start()
 
     setIsFading(true)
     setTimeout(() => {

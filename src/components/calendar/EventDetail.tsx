@@ -8,10 +8,11 @@ import { BrandedTitle } from '@/components/BrandedTitle'
 
 interface EventDetailProps {
   event: NeoEvent
+  quote?: string
   onClose: () => void
 }
 
-export function EventDetail({ event, onClose }: EventDetailProps) {
+export function EventDetail({ event, quote, onClose }: EventDetailProps) {
   return (
     <motion.div
       className="fixed inset-0 z-[600] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 md:p-8"
@@ -50,7 +51,7 @@ export function EventDetail({ event, onClose }: EventDetailProps) {
             transition={{ duration: 0.4, delay: 0.2 }}
           >
             <div className="text-white font-neo text-[9px] md:text-[10px] tracking-[0.3em] uppercase text-center leading-relaxed">
-              <BrandedTitle text="supporta l'arte underground. o aimeno il mio affitto." />
+              <BrandedTitle text={event.details.comicBubble || quote || ''} />
             </div>
           </motion.div>
         </div>
