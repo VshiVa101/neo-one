@@ -18,6 +18,8 @@ import { getServerSideURL } from '@/utilities/getURL'
 import { TransitionProvider } from '@/contexts/TransitionContext'
 import { TransitionOverlay } from '@/components/TransitionOverlay'
 import { CartProvider } from '@/contexts/CartContext'
+import { AudioProvider } from '@/contexts/AudioContext'
+import { AudioBackground } from '@/components/AudioBackground'
 
 const mergedFontNeo = localFont({
   src: '../../../public/fonts/MergedFontNEO.otf', // adjust relative path from app/(frontend) to public/fonts/ if needed, or use full path. Actually next/font/local resolves relative to the file.
@@ -74,22 +76,25 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           }}
         />
         <AppProviders>
-          <CartProvider>
-            <TransitionProvider>
-              <AdminBar
-                adminBarProps={{
-                  preview: isEnabled,
-                }}
-              />
-              
+          <AudioProvider>
+            <CartProvider>
+              <TransitionProvider>
+                <AdminBar
+                  adminBarProps={{
+                    preview: isEnabled,
+                  }}
+                />
+                
 
-              <TransitionOverlay />
-              
-              {/* Main Content Area */}
-              {children}
-              
-            </TransitionProvider>
-          </CartProvider>
+                <TransitionOverlay />
+                
+                {/* Main Content Area */}
+                {children}
+                
+                <AudioBackground />
+              </TransitionProvider>
+            </CartProvider>
+          </AudioProvider>
         </AppProviders>
       </body>
     </html>

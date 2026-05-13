@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { EyeScene } from '@/components/EyeScene'
+import { StateBasedNavButton } from '@/components/StateBasedNavButton'
 import { BrandedTitle } from '@/components/BrandedTitle'
 import { TornPaper } from '@/components/calendar/TornPaper'
 import { EventItem } from '@/components/calendar/EventItem'
@@ -14,7 +15,7 @@ import { ContactForm } from '@/components/calendar/ContactForm'
 import { SocialBar } from '@/components/calendar/SocialBar'
 import type { NeoEvent } from '@/data/calendar-mock'
 import { useCart } from '@/contexts/CartContext'
-import { ShoppingCart, Home } from 'lucide-react'
+import { ShoppingCart } from 'lucide-react'
 import { useRef } from 'react'
 
 interface CalendarClientProps {
@@ -71,7 +72,6 @@ export default function CalendarClient({ initialEvents, quote, socialLinks }: Ca
   const [activeEvent, setActiveEvent] = useState<NeoEvent | null>(null)
   const [isContactOpen, setIsContactOpen] = useState(false)
   const [cartHovered, setCartHovered] = useState(false)
-  const [homeHovered, setHomeHovered] = useState(false)
   
   // Extract unique sorted years from events
   const availableYears = useMemo(() => {
@@ -98,7 +98,7 @@ export default function CalendarClient({ initialEvents, quote, socialLinks }: Ca
     const sorted = [...filtered].sort((a, b) => {
       const dateA = new Date(`${a.month} ${a.date}, ${a.year}`).getTime()
       const dateB = new Date(`${b.month} ${b.date}, ${b.year}`).getTime()
-      return dateA - dateB
+      return dateB - dateA
     })
     for (const event of sorted) {
       if (!grouped[event.month]) grouped[event.month] = []
@@ -225,14 +225,20 @@ export default function CalendarClient({ initialEvents, quote, socialLinks }: Ca
                     disabled={!canGoNext}
                     style={{ transition: 'opacity 0.3s' }}
                   >
-                    <Image 
-                      src="/images/ui/direction-arrow-green.webp" 
-                      alt="Prossimo Anno" 
-                      width={50} 
-                      height={50} 
-                      className="-rotate-90 drop-shadow-[0_0_10px_rgba(57,255,20,0.5)]"
-                      unoptimized
-                    />
+                    <motion.div
+                      whileHover={{ filter: 'drop-shadow(0 0 25px rgba(57,255,20,0.9))' }}
+                      whileTap={{ filter: 'drop-shadow(0 0 15px rgba(57,255,20,0.7))' }}
+                      style={{ filter: 'drop-shadow(0 0 10px rgba(57,255,20,0.5))' }}
+                    >
+                      <Image 
+                        src="/images/ui/direction-arrow-green.webp" 
+                        alt="Prossimo Anno" 
+                        width={50} 
+                        height={50} 
+                        className="-rotate-90"
+                        unoptimized
+                      />
+                    </motion.div>
                   </motion.button>
                   
                   <h2 className="font-neo text-white text-3xl md:text-5xl tracking-[0.3em] leading-none flex items-center justify-center pt-4 pb-1">
@@ -248,14 +254,20 @@ export default function CalendarClient({ initialEvents, quote, socialLinks }: Ca
                     disabled={!canGoPrev}
                     style={{ transition: 'opacity 0.3s' }}
                   >
-                    <Image 
-                      src="/images/ui/direction-arrow-green.webp" 
-                      alt="Anno Precedente" 
-                      width={50} 
-                      height={50} 
-                      className="rotate-90 drop-shadow-[0_0_10px_rgba(57,255,20,0.5)]"
-                      unoptimized
-                    />
+                    <motion.div
+                      whileHover={{ filter: 'drop-shadow(0 0 25px rgba(57,255,20,0.9))' }}
+                      whileTap={{ filter: 'drop-shadow(0 0 15px rgba(57,255,20,0.7))' }}
+                      style={{ filter: 'drop-shadow(0 0 10px rgba(57,255,20,0.5))' }}
+                    >
+                      <Image 
+                        src="/images/ui/direction-arrow-green.webp" 
+                        alt="Anno Precedente" 
+                        width={50} 
+                        height={50} 
+                        className="rotate-90"
+                        unoptimized
+                      />
+                    </motion.div>
                   </motion.button>
                 </div>
                 <div className="mt-2 w-16 h-[2px] bg-black/30 mx-auto" />
@@ -292,32 +304,14 @@ export default function CalendarClient({ initialEvents, quote, socialLinks }: Ca
       {/* Floating Actions: Home + Cart (matching Home style) */}
       <div className="fixed bottom-[80px] right-6 md:bottom-[100px] md:right-10 z-[400] flex flex-col items-center gap-3">
         {/* Home Button */}
-        <motion.button
-          animate={{
-            scale: homeHovered ? 1.5 : 1,
-            backgroundColor: homeHovered ? '#F45390' : '#B3828B',
-          }}
-          transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-          whileTap={{ scale: 0.9 }}
-          onMouseEnter={() => setHomeHovered(true)}
-          onMouseLeave={() => setHomeHovered(false)}
+        <StateBasedNavButton
+          defaultIcon="/images/ui/web_5.webp"
+          hoverIcon="/images/ui/web_3.webp"
+          activeIcon="/images/ui/web_4.webp"
           onClick={() => router.push('/home')}
-          className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
-          style={{
-            boxShadow: homeHovered
-              ? '0 0 30px rgba(244, 83, 144, 0.8), 0 0 60px rgba(244, 83, 144, 0.3)'
-              : '0 0 10px rgba(0,0,0,0.3)',
-            zIndex: homeHovered ? 401 : undefined,
-          }}
           title="Home"
-        >
-          <Home 
-            size={24} 
-            className={homeHovered ? 'text-black' : 'text-[#F45390]'} 
-            strokeWidth={2.5}
-            style={{ transform: 'scale(1.2)' }}
-          />
-        </motion.button>
+          alt="Torna alla home"
+        />
 
         {/* Cart Button */}
         <motion.button

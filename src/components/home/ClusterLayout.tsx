@@ -10,6 +10,7 @@ import { ExpandedGalleryOverlay } from '@/components/home/ExpandedGalleryOverlay
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useTransition } from '@/contexts/TransitionContext'
 import { useCart } from '@/contexts/CartContext'
+import { StateBasedNavButton } from '@/components/StateBasedNavButton'
 import { ClusterMainStage } from './ClusterMainStage'
 import { ClusterNavFooter } from './ClusterNavFooter'
 import { ExpandedClusterModal } from './ExpandedClusterModal'
@@ -60,7 +61,6 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
   const router = useRouter()
   const [cartHovered, setCartHovered] = useState(false)
-  const [infoHovered, setInfoHovered] = useState(false)
   const [isHoveringFooter, setIsHoveringFooter] = useState(false)
   const [expandedClusterId, setExpandedClusterId] = useState<number | string | null>(null)
   const [cachedSubclusters, setCachedSubclusters] = useState<Record<string, SubclusterData[]>>({})
@@ -266,33 +266,14 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       {/* ── BOTTOM-RIGHT BUTTONS ── */}
       <div className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[400] pointer-events-auto flex flex-col items-center gap-3">
         {!expandedClusterId && expandedDeckIndex === null && (
-          <motion.button
-            animate={{ scale: infoHovered ? 1.5 : 1 }}
-            transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-            whileTap={{ scale: 0.9 }}
-            onMouseEnter={() => setInfoHovered(true)}
-            onMouseLeave={() => setInfoHovered(false)}
+          <StateBasedNavButton
+            defaultIcon="/images/ui/web_2.webp"
+            hoverIcon="/images/ui/web_6.webp"
+            activeIcon="/images/ui/web_7.webp"
             onClick={() => router.push('/calendar')}
-            className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300"
-            style={{
-              backgroundColor: infoHovered ? '#F45390' : '#B3828B',
-              boxShadow: infoHovered
-                ? '0 0 30px rgba(244, 83, 144, 0.8), 0 0 60px rgba(244, 83, 144, 0.3)'
-                : '0 0 10px rgba(0,0,0,0.3)',
-              zIndex: infoHovered ? 401 : undefined,
-            }}
             title="Calendario"
-          >
-            <Image
-              src="/images/drops/inforosa.webp"
-              alt="Info"
-              width={64}
-              height={64}
-              className="w-full h-full object-contain"
-              style={{ transform: 'scale(1.5)' }}
-              unoptimized
-            />
-          </motion.button>
+            alt="Vai al calendario"
+          />
         )}
 
         <motion.button

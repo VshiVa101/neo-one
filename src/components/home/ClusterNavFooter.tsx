@@ -29,7 +29,7 @@ export const ClusterNavFooter = ({
     <div className="fixed bottom-6 md:bottom-10 left-0 w-full flex items-center px-[5vw] gap-6 z-20 pointer-events-none">
       <div
         ref={footerRef}
-        className="flex-1 h-[14vh] md:h-[16vh] overflow-hidden select-none home-footer-container pointer-events-auto"
+        className="flex-1 h-[20vh] md:h-[22vh] select-none home-footer-container pointer-events-auto overflow-visible"
         onMouseEnter={() => onHoverChange(true)}
         onMouseLeave={() => onHoverChange(false)}
       >
@@ -51,7 +51,7 @@ export const ClusterNavFooter = ({
                 whileHover={{ scale: 1.1, rotate: 3, y: -10, opacity: 1 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
                 onClick={() => onSelectCluster(i)}
-                className="w-[12vh] h-[12vh] md:w-[15vh] md:h-[15vh] flex-shrink-0 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-[#111] cursor-pointer border border-gray-700/30 relative"
+                className="will-change-transform w-[12vh] h-[12vh] md:w-[15vh] md:h-[15vh] flex-shrink-0 shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-[#111] cursor-pointer border border-gray-700/30 relative"
               >
                 <Image
                   src={cluster.image}

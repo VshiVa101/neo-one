@@ -11,18 +11,6 @@ interface EventDetailProps {
   onClose: () => void
 }
 
-// Jagged "burst" clip path for the pink bubble
-const burstClipPath = `polygon(
-  0% 15%, 12% 2%, 25% 18%, 38% 0%, 50% 20%, 62% 0%, 75% 18%, 88% 2%, 100% 15%,
-  92% 35%, 100% 50%, 92% 65%, 100% 85%, 85% 100%, 70% 90%, 50% 100%, 30% 90%, 15% 100%, 0% 85%,
-  8% 65%, 0% 50%, 8% 35%
-)`
-
-// Taped/torn effect for the black banner
-const tornBannerClipPath = `polygon(
-  1% 5%, 99% 0%, 98% 95%, 2% 100%
-)`
-
 export function EventDetail({ event, onClose }: EventDetailProps) {
   return (
     <motion.div
@@ -33,7 +21,7 @@ export function EventDetail({ event, onClose }: EventDetailProps) {
       onClick={onClose}
     >
       <motion.div
-        className="relative w-full max-w-5xl aspect-video md:aspect-[16/10] bg-[#1a1a1a] rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col"
+        className="relative w-full h-full bg-[#1a1a1a] rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col"
         initial={{ scale: 0.9, opacity: 0, y: 50 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 1.1, opacity: 0, y: -50 }}
@@ -67,92 +55,73 @@ export function EventDetail({ event, onClose }: EventDetailProps) {
           </motion.div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="relative flex-1 grid grid-cols-1 md:grid-cols-2 gap-8 p-8 md:p-12 pt-40 md:pt-48 overflow-y-auto scrollbar-hide">
+        {/* Main Content Area */}
+        <div className="relative flex-1 flex flex-col overflow-y-auto scrollbar-hide p-8 md:p-12 pt-40 md:pt-48">
           
-          {/* Left Side: Product/Main Image */}
-          <motion.div 
-            className="relative flex items-center justify-center"
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
+          {/* Headline */}
+          <motion.h2
+            className="font-neo text-white text-2xl md:text-4xl tracking-widest lowercase mb-8 md:mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <div className="relative w-full aspect-square max-w-[400px] group">
-               {/* Decorative jagged frame back */}
-               <div className="absolute inset-0 bg-[#fc5896] rotate-3 scale-105 opacity-20 blur-sm group-hover:rotate-6 transition-transform duration-500" />
-               
-               <Image
-                 src={event.thumbnail}
-                 alt={event.details.headline}
-                 fill
-                 className="object-cover z-10 border-4 border-black/50"
-                 sizes="(max-width: 768px) 100vw, 50vw"
-               />
-               
-               {/* Label Overlay */}
-                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-20 bg-white text-black px-4 py-1 font-neo text-xs tracking-tighter uppercase whitespace-nowrap rotate-[-2deg] shadow-lg">
-                   <BrandedTitle text="stampa a mano!" />
-                </div>
-            </div>
-          </motion.div>
+            <BrandedTitle text={event.details.headline} />
+          </motion.h2>
 
-          {/* Right Side: Collage elements */}
-          <div className="relative flex flex-col items-center justify-center gap-12">
+          {/* Image Row: Primary always visible, Secondary to the right on desktop */}
+          <div className="flex flex-wrap md:flex-nowrap gap-6 md:gap-10 mb-8 md:mb-12">
             
-            {/* Secondary Image or Detail */}
-            {event.details.images[1] && (
-               <motion.div 
-                 className="relative w-48 h-48 md:w-64 md:h-64 rotate-6 shadow-2xl z-10"
-                 initial={{ opacity: 0, rotate: 0 }}
-                 animate={{ opacity: 1, rotate: 6 }}
-                 transition={{ delay: 0.5 }}
-               >
-                 <Image
-                   src={event.details.images[1]}
-                   alt="detail"
-                   fill
-                   className="object-cover border-8 border-white"
-                 />
-               </motion.div>
-            )}
-
-            {/* Pink Jagged Bubble */}
-            <motion.div
-              className="relative bg-[#fc5896] p-8 md:p-12 flex items-center justify-center text-center shadow-xl z-20"
-              style={{ clipPath: burstClipPath }}
-              initial={{ scale: 0, rotate: -10 }}
-              animate={{ scale: 1, rotate: -2 }}
-              transition={{ delay: 0.6, type: 'spring' }}
+            {/* Primary Image */}
+            <motion.div 
+              className="relative flex-1 min-w-0 md:basis-7/12 flex items-center justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
             >
-              <div className="text-black font-neo text-sm md:text-lg leading-tight uppercase tracking-tighter">
-                 <BrandedTitle text="e ricamata coi piedi da una suora!" />
+              <div className="relative w-full aspect-square max-w-[500px] group">
+                <div className="absolute inset-0 bg-[#fc5896] rotate-3 scale-105 opacity-20 blur-sm group-hover:rotate-6 transition-transform duration-500" />
+                <Image
+                  src={event.thumbnail}
+                  alt={event.details.headline}
+                  fill
+                  className="object-cover z-10 border-4 border-black/50"
+                  sizes="(max-width: 768px) 100vw, 55vw"
+                />
               </div>
             </motion.div>
 
-            {/* Black Taped Sticker */}
-            <motion.div
-              className="absolute -right-4 top-1/4 md:top-1/3 bg-black text-white px-8 py-3 z-30 shadow-2xl rotate-[-25deg]"
-              style={{ clipPath: tornBannerClipPath }}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.7 }}
-            >
-                <div className="font-neo text-xs md:text-sm tracking-widest whitespace-nowrap uppercase">
-                   <BrandedTitle text="Stupidi gadget in omaggio!" />
+            {/* Secondary Image (right on desktop, below on mobile) */}
+            {event.details.images[1] && (
+              <motion.div 
+                className="relative flex-1 min-w-0 md:basis-5/12 flex items-center justify-center"
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6 }}
+              >
+                <div className="relative w-full aspect-square max-w-[400px] rotate-6 shadow-2xl">
+                  <Image
+                    src={event.details.images[1]}
+                    alt="detail"
+                    fill
+                    className="object-cover border-8 border-white"
+                    sizes="(max-width: 768px) 100vw, 40vw"
+                  />
                 </div>
-            </motion.div>
+              </motion.div>
+            )}
+          </div>
 
-            {/* Event Info (Headline & Desc) */}
+          {/* Collage Elements */}
+          <div className="relative flex flex-col items-center gap-8 md:gap-12 mt-auto pt-8">
+
+            {/* Event Description */}
             <motion.div 
-              className="relative z-40 bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-xl max-w-sm"
+              className="relative z-10 bg-white/5 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-xl max-w-2xl w-full text-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
             >
-              <h2 className="font-neo text-white text-xl md:text-2xl tracking-widest lowercase mb-3">
-                <BrandedTitle text={event.details.headline} />
-              </h2>
-              <div className="font-neo text-white/70 text-xs md:text-sm leading-relaxed lowercase">
+              <div className="font-neo text-white/70 text-sm md:text-base leading-relaxed lowercase">
                 <BrandedTitle text={event.details.description} />
               </div>
             </motion.div>
@@ -160,16 +129,15 @@ export function EventDetail({ event, onClose }: EventDetailProps) {
             {/* Comic Bubble / Call to Action */}
             {event.details.comicBubble && (
               <motion.div
-                className="absolute -bottom-10 -right-4 z-50 bg-[#39ff14] text-black px-6 py-2 font-neo text-xs md:text-sm tracking-widest lowercase shadow-[0_0_20px_rgba(57,255,20,0.4)] rotate-[5deg]"
+                className="relative bg-[#39ff14] text-black px-8 py-3 font-neo text-sm md:text-base tracking-widest lowercase shadow-[0_0_20px_rgba(57,255,20,0.4)] rotate-[3deg]"
                 style={{ clipPath: 'polygon(0% 0%, 100% 0%, 100% 75%, 75% 75%, 75% 100%, 50% 75%, 0% 75%)' }}
-                initial={{ opacity: 0, scale: 0.8, x: 20 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1, type: 'spring' }}
               >
                 <BrandedTitle text={event.details.comicBubble} />
               </motion.div>
             )}
-
           </div>
         </div>
 

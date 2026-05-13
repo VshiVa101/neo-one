@@ -11,7 +11,6 @@ export interface NeoEvent {
     subheadline?: string
     description: string
     images: string[]
-    stickers: string[]
     comicBubble?: string
   }
 }
@@ -57,7 +56,6 @@ export const mockEvents: NeoEvent[] = [
         '/images/ui/web-bg.webp',
         '/images/ui/pink-zebra-bg.webp',
       ],
-      stickers: ['/images/ui/pre-orderrosa.webp'],
       comicBubble: 'Stupidi gadget in omaggio!',
     },
   },
@@ -75,7 +73,6 @@ export const mockEvents: NeoEvent[] = [
       images: [
         '/images/ui/web-bg.webp',
       ],
-      stickers: [],
       comicBubble: 'Ingresso libero — dress code: nero',
     },
   },
@@ -96,7 +93,6 @@ export const mockEvents: NeoEvent[] = [
         '/images/ui/pink-zebra-bg.webp',
         '/images/ui/web-bg.webp',
       ],
-      stickers: ['/images/ui/pre-orderrosa.webp', '/images/ui/inforosa.webp'],
       comicBubble: 'Drop limitato a 50 pezzi',
     },
   },
@@ -114,7 +110,6 @@ export const mockEvents: NeoEvent[] = [
       images: [
         '/images/ui/web-bg.webp',
       ],
-      stickers: [],
     },
   },
   {
@@ -133,7 +128,6 @@ export const mockEvents: NeoEvent[] = [
       images: [
         '/images/ui/pink-zebra-bg.webp',
       ],
-      stickers: ['/images/ui/pre-orderrosa.webp'],
       comicBubble: 'Chi sarà il mystery guest?',
     },
   },
@@ -152,7 +146,6 @@ export const mockEvents: NeoEvent[] = [
         '/images/ui/web-bg.webp',
         '/images/ui/pink-zebra-bg.webp',
       ],
-      stickers: ['/images/ui/inforosa.webp'],
       comicBubble: 'Vieni a molestarmi dal vivo',
     },
   },

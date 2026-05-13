@@ -1,9 +1,11 @@
 {
   "profile": "openai",
   "env": {
-    "OPENAI_BASE_URL": "https://api.groq.com/openai/v1",
-    "OPENAI_MODEL": "llama-3.3-70b-versatile",
-    "OPENAI_API_FORMAT": "chat_completions"
+    "OPENAI_BASE_URL": "https://api.deepseek.com/v1",
+    "OPENAI_MODEL": "deepseek-v4-flash",
+    "OPENAI_API_FORMAT": "chat_completions",
+    "OPENAI_AUTH_HEADER": "sk-b3c003b838f548a381296b07c36e339d",
+    "OPENAI_AUTH_SCHEME": "raw"
   },
-  "createdAt": "2026-05-01T19:53:21.736Z"
+  "createdAt": "2026-05-12T15:19:02.811Z"
 }

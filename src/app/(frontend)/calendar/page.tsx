@@ -17,7 +17,7 @@ export default async function CalendarPage() {
   // Fetch Events (Signals)
   const { docs: eventDocs } = await payload.find({
     collection: 'signals',
-    sort: 'eventDate',
+    sort: '-eventDate',
     limit: 100,
   })
 
@@ -46,7 +46,6 @@ export default async function CalendarPage() {
         images: (doc.detailImages || []).map((imgObj: any) => 
           getImageUrl(imgObj.image, '/images/ui/pre-orderverde.webp')
         ),
-        stickers: [],
         comicBubble: doc.eventCTA || settings.defaultEventCTA || '',
       },
     }
