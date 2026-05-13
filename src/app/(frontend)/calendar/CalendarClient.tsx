@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -16,10 +16,10 @@ import { SocialBar } from '@/components/calendar/SocialBar'
 import type { NeoEvent } from '@/data/calendar-mock'
 import { useCart } from '@/contexts/CartContext'
 import { ShoppingCart } from 'lucide-react'
-import { useRef } from 'react'
 
 interface CalendarClientProps {
   initialEvents: NeoEvent[]
+  initialEventId?: string
   quote?: string
   socialLinks?: Array<{
     id: string
@@ -68,7 +68,7 @@ const MonthRow = ({ events, month, monthIndex, setActiveEvent }: { events: NeoEv
   )
 }
 
-export default function CalendarClient({ initialEvents, quote, socialLinks }: CalendarClientProps) {
+export default function CalendarClient({ initialEvents, initialEventId, quote, socialLinks }: CalendarClientProps) {
   const [activeEvent, setActiveEvent] = useState<NeoEvent | null>(null)
   const [isContactOpen, setIsContactOpen] = useState(false)
   const [cartHovered, setCartHovered] = useState(false)
@@ -91,6 +91,23 @@ export default function CalendarClient({ initialEvents, quote, socialLinks }: Ca
   
   const { isCartOpen, setIsCartOpen, count } = useCart()
   const router = useRouter()
+
+  // Auto-open evento da initialEventId (passato dal server via ?event=)
+  useEffect(() => {
+    if (initialEventId) {
+      const match = initialEvents.find(e => e.id === initialEventId)
+      if (match) setActiveEvent(match)
+    }
+  }, [initialEventId, initialEvents])
+
+  // Sincronizza l'URL quando l'evento si apre/chiude
+  useEffect(() => {
+    if (activeEvent) {
+      router.replace(`/calendar?event=${activeEvent.id}`, { scroll: false })
+    } else if (initialEventId) {
+      router.replace('/calendar', { scroll: false })
+    }
+  }, [activeEvent])
 
   const eventsByMonth = useMemo(() => {
     const grouped: Record<string, NeoEvent[]> = {}

@@ -1,10 +1,12 @@
 'use client'
 
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import type { NeoEvent } from '@/data/calendar-mock'
 import { EyeScene } from '@/components/EyeScene'
 import { BrandedTitle } from '@/components/BrandedTitle'
+import { useCart } from '@/contexts/CartContext'
 
 interface EventDetailProps {
   event: NeoEvent
@@ -13,6 +15,39 @@ interface EventDetailProps {
 }
 
 export function EventDetail({ event, quote, onClose }: EventDetailProps) {
+  const { addToCart, count, setIsCartOpen } = useCart()
+  const [purchaseHovered, setPurchaseHovered] = useState(false)
+  const [cartHovered, setCartHovered] = useState(false)
+  const [linkHovered, setLinkHovered] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
+  const [addedToCart, setAddedToCart] = useState(false)
+
+  const handlePurchase = () => {
+    addToCart({
+      nid: event.id,
+      title: event.details.headline,
+      image: event.thumbnail,
+    })
+    setAddedToCart(true)
+    setTimeout(() => setAddedToCart(false), 1500)
+  }
+
+  const handleCopyLink = async () => {
+    const url = `${window.location.origin}/calendar?event=${event.id}`
+    try {
+      await navigator.clipboard.writeText(url)
+    } catch {
+      const textArea = document.createElement('textarea')
+      textArea.value = url
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+    }
+    setLinkCopied(true)
+    setTimeout(() => setLinkCopied(false), 1500)
+  }
+
   return (
     <motion.div
       className="fixed inset-0 z-[600] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 md:p-8"
@@ -61,16 +96,6 @@ export function EventDetail({ event, quote, onClose }: EventDetailProps) {
             </div>
           </motion.div>
           
-          {/* Headline */}
-          <motion.h3
-            className="font-neo text-white text-[9px] md:text-[10px] tracking-[0.3em] lowercase mb-8 md:mb-12 text-center w-full"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <BrandedTitle text={event.details.headline} />
-          </motion.h3>
-
           {/* Image Row: Primary always visible, Secondary to the right on desktop */}
           <div className="flex flex-wrap md:flex-nowrap gap-6 md:gap-10 mb-8 md:mb-12">
             
@@ -114,46 +139,118 @@ export function EventDetail({ event, quote, onClose }: EventDetailProps) {
             )}
           </div>
 
-          {/* Collage Elements */}
-          <div className="relative flex flex-col items-center gap-8 md:gap-12 mt-auto pt-8">
+          {/* Headline */}
+          <motion.h3
+            className="font-neo text-white text-[9px] md:text-[10px] tracking-[0.3em] lowercase mb-8 md:mb-12 text-center w-full"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+          >
+            <BrandedTitle text={event.details.headline} />
+          </motion.h3>
 
-            {/* Event Description */}
-            <motion.div 
-              className="relative z-10 bg-white/5 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-xl max-w-2xl w-full text-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-            >
-              <div className="font-neo text-white/70 text-sm md:text-base leading-relaxed lowercase">
-                <BrandedTitle text={event.details.description} />
-              </div>
-            </motion.div>
+          {/* Event Description */}
+          <motion.div 
+            className="relative z-10 self-center p-7 md:p-10 max-w-2xl w-full text-center mb-20 md:mb-24"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            style={{
+              backgroundImage: "url('/images/ui/bb.webp')",
+              backgroundSize: '100% 100%',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+          >
+            <div className="font-neo text-white/70 text-sm md:text-base leading-relaxed lowercase">
+              <BrandedTitle text={event.details.description} />
+            </div>
+          </motion.div>
 
-            {/* Comic Bubble / Call to Action */}
-            {event.details.comicBubble && (
-              <motion.div
-                className="relative bg-[#39ff14] text-black px-8 py-3 font-neo text-sm md:text-base tracking-widest lowercase shadow-[0_0_20px_rgba(57,255,20,0.4)] rotate-[3deg]"
-                style={{ clipPath: 'polygon(0% 0%, 100% 0%, 100% 75%, 75% 75%, 75% 100%, 50% 75%, 0% 75%)' }}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1, type: 'spring' }}
-              >
-                <BrandedTitle text={event.details.comicBubble} />
-              </motion.div>
-            )}
-          </div>
         </div>
 
-        {/* Close Button — fixed at bottom center of card */}
-        <button
-          onClick={onClose}
-          className="absolute bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 w-12 h-12 md:w-16 md:h-16 rounded-full bg-black border-2 border-[#fc5896] flex items-center justify-center text-[#fc5896] hover:bg-[#fc5896] hover:text-black transition-all duration-300 shadow-lg z-50"
-        >
-          <div className="relative w-6 h-6 md:w-8 md:h-8">
-            <span className="absolute top-1/2 left-0 w-full h-0.5 bg-current rotate-45" />
-            <span className="absolute top-1/2 left-0 w-full h-0.5 bg-current -rotate-45" />
-          </div>
-        </button>
+        {/* Bottom Buttons — ESC + Purchase centered at bottom of card */}
+        <div className="absolute bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-4 z-50">
+          {/* ESC Button */}
+          <motion.button
+            whileHover={{ scale: 1.1, rotate: 90, backgroundColor: '#F45390' }}
+            whileTap={{ scale: 0.9 }}
+            onClick={onClose}
+            className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#B3828B] rounded-full cursor-pointer transition-colors duration-300"
+          >
+            <Image src="/images/ui/esccc.webp" alt="ESC" width={64} height={64} className="w-[62%] h-[62%] object-contain" style={{ transform: 'scale(1.5)' }} unoptimized />
+          </motion.button>
+
+          {/* Copy Link Button */}
+          <motion.button
+            onMouseEnter={() => setLinkHovered(true)}
+            onMouseLeave={() => setLinkHovered(false)}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={handleCopyLink}
+            className="neo-interface-btn relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#B3828B] rounded-full cursor-pointer transition-colors duration-300"
+            style={{ backgroundColor: linkCopied ? '#809829' : linkHovered ? '#F45390' : '#B3828B' }}
+          >
+            <Image
+              src={linkHovered || linkCopied ? '/images/ui/condividiverde.webp' : '/images/ui/condivcidi.webp'}
+              alt="Copia link"
+              width={64}
+              height={64}
+              className="w-[62%] h-[62%] object-contain"
+              style={{ transform: 'scale(1.5)' }}
+              unoptimized
+            />
+            {linkCopied && (
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-neo text-[8px] md:text-[10px] text-[#809829] tracking-widest lowercase">
+                link copiato
+              </span>
+            )}
+          </motion.button>
+
+          {/* Purchase / Pre-Order Button */}
+          <motion.button
+            onClick={handlePurchase}
+            onMouseEnter={() => setPurchaseHovered(true)}
+            onMouseLeave={() => setPurchaseHovered(false)}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#B3828B] rounded-full cursor-pointer transition-colors duration-300"
+            style={{ backgroundColor: addedToCart ? '#809829' : purchaseHovered ? '#F45390' : '#B3828B' }}
+          >
+            <Image src="/images/ui/euros.webp" alt="Acquista" width={64} height={64} className="w-[72%] h-[72%] object-contain transition-all duration-300" style={{ transform: 'scale(1.5)' }} unoptimized />
+          </motion.button>
+
+          {/* Cart Button */}
+          <motion.button
+            onMouseEnter={() => setCartHovered(true)}
+            onMouseLeave={() => setCartHovered(false)}
+            whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsCartOpen(true)}
+            className="neo-interface-btn relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#B3828B] rounded-full cursor-pointer transition-colors duration-300"
+          >
+            <Image
+              src={
+                cartHovered
+                  ? '/images/drops/carrellorosa_optimized.webp'
+                  : count > 0
+                    ? '/images/ui/carrelloverde.webp'
+                    : '/images/ui/carrello.webp'
+              }
+              alt="Carrello"
+              width={64}
+              height={64}
+              className="w-[62%] h-[62%] object-contain relative z-10"
+              style={{ transform: 'scale(1.5)' }}
+              unoptimized
+            />
+            {count > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-[#809829] rounded-full font-neo text-[8px] md:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)]">
+                {count}
+              </span>
+            )}
+          </motion.button>
+        </div>
         
         {/* Overlay subtle grain */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay bg-[url('/images/textures/grain.png')]" />

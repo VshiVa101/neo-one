@@ -11,7 +11,12 @@ const monthNames = [
   'LUGLIO', 'AGOSTO', 'SETTEMBRE', 'OTTOBRE', 'NOVEMBRE', 'DICEMBRE'
 ]
 
-export default async function CalendarPage() {
+export default async function CalendarPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ event?: string }>
+}) {
+  const { event: initialEventId } = await searchParams
   const payload = await getPayload({ config: configPromise })
 
   // Fetch Events (Signals)
@@ -63,6 +68,7 @@ export default async function CalendarPage() {
       initialEvents={events} 
       quote={settings.calendarCTA}
       socialLinks={socialLinks}
+      initialEventId={initialEventId}
     />
   )
 }
