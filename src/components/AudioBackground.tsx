@@ -1,26 +1,13 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
 import { useAudio } from '@/contexts/AudioContext'
 
 const VOLUME_ICON_URL = 'https://res.cloudinary.com/dhk3bdk5q/image/upload/v1778683869/ui/volume-icon.webp'
 
 export const AudioBackground = () => {
-  const { isMuted, isPlaying, toggleMute, unmuteMusic } = useAudio()
-  const pathname = usePathname()
-  const unmutedRef = useRef(false)
-
-  useEffect(() => {
-    if (pathname === '/home' && isPlaying && !unmutedRef.current) {
-      unmutedRef.current = true
-      const timer = setTimeout(() => {
-        unmuteMusic()
-      }, 800)
-      return () => clearTimeout(timer)
-    }
-  }, [pathname, isPlaying, unmuteMusic])
+  const { isMuted, isPlaying, toggleMute } = useAudio()
 
   if (!isPlaying) return null
 

@@ -1,13 +1,16 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useTransition } from '@/contexts/TransitionContext'
+import { useAudio } from '@/contexts/AudioContext'
 import Image from 'next/image'
 
 export const TransitionOverlay = () => {
     const { isTransitioning, onTransitionComplete } = useTransition()
+    const { unmuteMusic } = useAudio()
     const [isVisible, setIsVisible] = useState(false)
     const [renderGifs, setRenderGifs] = useState(false)
+    const musicUnmutedRef = useRef(false)
 
     useEffect(() => {
         if (isTransitioning) {
@@ -32,9 +35,13 @@ export const TransitionOverlay = () => {
                 setIsVisible(false)
             }, 2000)
 
-            // Dopo la dissolvenza (es. 1s), rimuovi le gif dal DOM e segnala completamento
+            // Dopo la dissolvenza (es. 1s), rimuovi le gif dal DOM, avvia musica e segnala completamento
             const endTimer = setTimeout(() => {
                 setRenderGifs(false)
+                if (!musicUnmutedRef.current) {
+                    musicUnmutedRef.current = true
+                    unmuteMusic()
+                }
                 onTransitionComplete()
             }, 3000)
 

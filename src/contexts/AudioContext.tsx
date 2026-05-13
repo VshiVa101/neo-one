@@ -25,26 +25,33 @@ export const AudioProvider = ({ children }: { children: React.ReactNode }) => {
   const [isMuted, setIsMuted] = useState(true)
   const [isPlaying, setIsPlaying] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const primedRef = useRef(false)
 
   const primeBackgroundMusic = useCallback(() => {
-    if (audioRef.current) return
+    if (primedRef.current) return
 
     const audio = new Audio(BG_MUSIC_URL)
     audio.loop = true
     audio.volume = 0
 
     audio.play().then(() => {
-      setIsPlaying(true)
+      audio.pause()
+      audio.currentTime = 0
     }).catch(() => {})
 
     audioRef.current = audio
+    primedRef.current = true
   }, [])
 
   const unmuteMusic = useCallback(() => {
     if (!audioRef.current) return
+
+    audioRef.current.currentTime = 0
     audioRef.current.volume = DEFAULT_VOLUME
+    audioRef.current.play().catch(() => {})
     setIsMuted(false)
-  }, [])
+    if (!isPlaying) setIsPlaying(true)
+  }, [isPlaying])
 
   const toggleMute = useCallback(() => {
     if (!audioRef.current) return
