@@ -8,7 +8,7 @@ next-env.d.ts
 .vercel
 
 # Payload default media upload directory
-public/media/
+public/media/*
 
 public/robots.txt
 public/sitemap*.xml
@@ -17,6 +17,9 @@ public/sitemap*.xml
 !public/media/explosion-arcade.mp3
 !public/media/dash.mp3
 !public/media/return.mp3
+!public/media/banana.mp3
+!public/media/fruscio-satanico.mp3
+!public/media/click-sounds/
 
 
 # Playwright
