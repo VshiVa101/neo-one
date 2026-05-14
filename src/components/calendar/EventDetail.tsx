@@ -151,19 +151,19 @@ export function EventDetail({ event, quote, onClose }: EventDetailProps) {
 
           {/* Event Description */}
           <motion.div 
-            className="relative z-10 self-center p-7 md:p-10 max-w-2xl w-full text-center mb-20 md:mb-24"
+            className="relative z-10 self-center px-12 py-10 md:px-28 md:py-14 max-w-4xl w-full text-center mb-20 md:mb-24"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
             style={{
-              backgroundImage: "url('/images/ui/bb.webp')",
+              backgroundImage: "url('/images/ui/bbjdhsgfshdjyg.png')",
               backgroundSize: '100% 100%',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
             }}
           >
-            <div className="font-neo text-white/70 text-sm md:text-base leading-relaxed lowercase">
-              <BrandedTitle text={event.details.description} />
+            <div className="font-neo text-black text-sm md:text-base leading-relaxed lowercase">
+              <BrandedTitle text={event.details.description} disableColor={true} />
             </div>
           </motion.div>
 

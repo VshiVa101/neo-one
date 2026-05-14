@@ -20,6 +20,7 @@ import { TransitionOverlay } from '@/components/TransitionOverlay'
 import { CartProvider } from '@/contexts/CartContext'
 import { AudioProvider } from '@/contexts/AudioContext'
 import { AudioBackground } from '@/components/AudioBackground'
+import { ClickSoundListener } from '@/components/ClickSoundListener'
 
 const mergedFontNeo = localFont({
   src: '../../../public/fonts/MergedFontNEO.otf', // adjust relative path from app/(frontend) to public/fonts/ if needed, or use full path. Actually next/font/local resolves relative to the file.
@@ -92,6 +93,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 {children}
                 
                 <AudioBackground />
+                <ClickSoundListener />
               </TransitionProvider>
             </CartProvider>
           </AudioProvider>

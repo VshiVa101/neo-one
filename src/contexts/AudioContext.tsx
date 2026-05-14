@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useRef, useState, useCallback, useEffect } from 'react'
 
-const BG_MUSIC_URL = 'https://res.cloudinary.com/dhk3bdk5q/video/upload/v1778683868/audio/background-music.mp3'
+const BG_MUSIC_URL = '/media/banana.mp3'
 const DEFAULT_VOLUME = 0.5
 const LS_ACTIVATED = 'neo-audio-activated'
 const LS_MUTED = 'neo-audio-muted'
@@ -13,6 +13,9 @@ interface AudioContextType {
   toggleMute: () => void
   primeBackgroundMusic: () => void
   unmuteMusic: () => void
+  fadeOutAndPause: () => void
+  restartFromStart: () => void
+  stopMusicImmediately: () => void
 }
 
 const AudioContext = createContext<AudioContextType | null>(null)
@@ -28,6 +31,7 @@ export const AudioProvider = ({ children }: { children: React.ReactNode }) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const primedRef = useRef(false)
+  const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Restore persisted state on mount
   // Replica il flusso primeBackgroundMusic + unmuteMusic per far ripartire
@@ -48,7 +52,7 @@ export const AudioProvider = ({ children }: { children: React.ReactNode }) => {
       primedRef.current = true
 
       const startPlayback = () => {
-        if (!muted) {
+        if (!muted && typeof window !== 'undefined' && window.location.pathname !== '/') {
           audio.volume = DEFAULT_VOLUME
           audio.currentTime = 0
           audio.play().catch(() => {})
@@ -118,8 +122,110 @@ export const AudioProvider = ({ children }: { children: React.ReactNode }) => {
     } catch {}
   }, [isMuted])
 
+  const fadeOutAndPause = useCallback(() => {
+    if (!audioRef.current) return
+
+    if (fadeIntervalRef.current) {
+      clearInterval(fadeIntervalRef.current)
+      fadeIntervalRef.current = null
+    }
+
+    const audio = audioRef.current
+    const startVolume = audio.volume
+    const steps = 30
+    const duration = 1000
+    const stepTime = duration / steps
+    const volumeStep = startVolume / steps
+    let currentStep = 0
+
+    fadeIntervalRef.current = setInterval(() => {
+      currentStep++
+      const newVolume = Math.max(0, startVolume - volumeStep * currentStep)
+      audio.volume = newVolume
+
+      if (currentStep >= steps || newVolume <= 0) {
+        if (fadeIntervalRef.current) {
+          clearInterval(fadeIntervalRef.current)
+          fadeIntervalRef.current = null
+        }
+        audio.volume = 0
+        audio.pause()
+        setIsPlaying(false)
+        setIsMuted(true)
+        try {
+          localStorage.setItem(LS_MUTED, 'true')
+        } catch {}
+      }
+    }, stepTime)
+  }, [])
+
+  const restartFromStart = useCallback(() => {
+    if (fadeIntervalRef.current) {
+      clearInterval(fadeIntervalRef.current)
+      fadeIntervalRef.current = null
+    }
+
+    if (!audioRef.current) {
+      const audio = new Audio(BG_MUSIC_URL)
+      audio.loop = true
+      audio.volume = 0
+      audioRef.current = audio
+      primedRef.current = true
+    }
+
+    const audio = audioRef.current!
+    audio.currentTime = 0
+    audio.volume = 0
+    audio.play().catch(() => {})
+
+    const steps = 30
+    const duration = 1000
+    const stepTime = duration / steps
+    const volumeStep = DEFAULT_VOLUME / steps
+    let currentStep = 0
+
+    fadeIntervalRef.current = setInterval(() => {
+      currentStep++
+      const newVolume = Math.min(DEFAULT_VOLUME, volumeStep * currentStep)
+      audio.volume = newVolume
+
+      if (currentStep >= steps || newVolume >= DEFAULT_VOLUME) {
+        if (fadeIntervalRef.current) {
+          clearInterval(fadeIntervalRef.current)
+          fadeIntervalRef.current = null
+        }
+        audio.volume = DEFAULT_VOLUME
+      }
+    }, stepTime)
+
+    setIsMuted(false)
+    setIsPlaying(true)
+    try {
+      localStorage.setItem(LS_ACTIVATED, 'true')
+      localStorage.setItem(LS_MUTED, 'false')
+    } catch {}
+  }, [])
+
+  const stopMusicImmediately = useCallback(() => {
+    if (fadeIntervalRef.current) {
+      clearInterval(fadeIntervalRef.current)
+      fadeIntervalRef.current = null
+    }
+
+    if (!audioRef.current) return
+
+    audioRef.current.volume = 0
+    audioRef.current.pause()
+    audioRef.current.currentTime = 0
+    setIsPlaying(false)
+    setIsMuted(true)
+    try {
+      localStorage.setItem(LS_MUTED, 'true')
+    } catch {}
+  }, [])
+
   return (
-    <AudioContext.Provider value={{ isMuted, isPlaying, toggleMute, primeBackgroundMusic, unmuteMusic }}>
+    <AudioContext.Provider value={{ isMuted, isPlaying, toggleMute, primeBackgroundMusic, unmuteMusic, fadeOutAndPause, restartFromStart, stopMusicImmediately }}>
       {children}
     </AudioContext.Provider>
   )

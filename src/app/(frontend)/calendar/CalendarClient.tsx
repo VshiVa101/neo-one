@@ -238,10 +238,14 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
                     whileHover={canGoNext ? { scale: 1.2, y: -5 } : {}}
                     whileTap={canGoNext ? { scale: 0.9 } : {}}
                     onClick={() => changeYear('next')}
-                    className="flex items-center justify-center focus:outline-none disabled:opacity-0 disabled:cursor-default"
+                    className="flex items-center justify-center focus:outline-none disabled:opacity-0 disabled:cursor-default group relative"
                     disabled={!canGoNext}
                     style={{ transition: 'opacity 0.3s' }}
                   >
+                    {/* Decorative Dots */}
+                    <div className="absolute -left-6 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#809829] shadow-[0_0_10px_rgba(128,152,41,0.6)] opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute -right-6 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#809829] shadow-[0_0_10px_rgba(128,152,41,0.6)] opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
+                    
                     <motion.div
                       whileHover={{ filter: 'drop-shadow(0 0 25px rgba(57,255,20,0.9))' }}
                       whileTap={{ filter: 'drop-shadow(0 0 15px rgba(57,255,20,0.7))' }}
@@ -267,10 +271,14 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
                     whileHover={canGoPrev ? { scale: 1.2, y: 5 } : {}}
                     whileTap={canGoPrev ? { scale: 0.9 } : {}}
                     onClick={() => changeYear('prev')}
-                    className="flex items-center justify-center focus:outline-none disabled:opacity-0 disabled:cursor-default"
+                    className="flex items-center justify-center focus:outline-none disabled:opacity-0 disabled:cursor-default group relative"
                     disabled={!canGoPrev}
                     style={{ transition: 'opacity 0.3s' }}
                   >
+                    {/* Decorative Dots */}
+                    <div className="absolute -left-6 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#809829] shadow-[0_0_10px_rgba(128,152,41,0.6)] opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute -right-6 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#809829] shadow-[0_0_10px_rgba(128,152,41,0.6)] opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
+                    
                     <motion.div
                       whileHover={{ filter: 'drop-shadow(0 0 25px rgba(57,255,20,0.9))' }}
                       whileTap={{ filter: 'drop-shadow(0 0 15px rgba(57,255,20,0.7))' }}

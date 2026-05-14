@@ -2,8 +2,8 @@
 
 **File:** `docs/NEO_ALIGNMENT.md`
 **Purpose:** single operational handoff document for future models/agents working on Neo-One.
-**Last updated:** 2026-05-12
-**Current release context:** v1.2.2
+**Last updated:** 2026-05-14
+**Current release context:** v1.3.0
 
 ---
 
@@ -439,23 +439,23 @@ Avoid:
 
 ---
 
-## 11. Current handoff snapshot — v1.2.1
+## 11. Current handoff snapshot — v1.3.0
 
 Current completed fix:
 
-- `EyeScene` desktop tracking restored.
-- Mobile touch tracking restored.
-- Touch target holds briefly, then returns to idle.
-- Living eye animations preserved.
-- Tracking and animations separated into transform layers.
-- GLB cloned per instance.
-- Non-Hero eye click navigation restored by default.
-- Hero remains locked through explicit `isUnlocked` prop until Matrix gateway unlock.
+- `EyeScene` desktop and mobile tracking optimized with transform layering.
+- GLB cloned per instance to avoid Object3D contention.
+- Calendar page fully implemented with horizontal grab-to-scroll.
+- SocialBar moved to bottom-center with drag navigation.
+- Restricted explosion entrance animation to Hero -> Home transition only.
+- Audio refactor: removed banana noise from CRT, implemented `banana.mp3` as global background music.
+- EventDetail styled with custom irregular background and high-contrast black text.
+- Cloudinary URL resolution fixed via centralized utility.
 
 Current next product focus from roadmap:
 
-- P2 Calendar & Linktree page (da wireframe `hi-frames/`) ✅ COMPLETATO — grab-to-scroll, SocialBar, eventi mensili
 - P3 Mobile Polish
-- P4 Audio Experience
+- P4 Audio Experience Improvements
+- P5 Checkout / E-commerce finalization
 
 Do not start the next roadmap item unless the user asks to proceed.

@@ -1,12 +1,17 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { useCart } from '@/contexts/CartContext'
 import { BrandedTitle } from '@/components/BrandedTitle'
 import { useNavigationHistory } from '@/hooks/useNavigationHistory'
+import { useAudio } from '@/contexts/AudioContext'
+import { startCrtNoise, stopCrtNoise, isCrtNoisePlaying } from '@/utilities/crtNoiseManager'
+
+let rumoreSessionActive = false
+let restartTimeout: ReturnType<typeof setTimeout> | null = null
 
 interface ArtworkDetailClientProps {
   nid: string
@@ -48,6 +53,7 @@ export const ArtworkDetailClient = ({
   const router = useRouter()
   const { goBackToGallery } = useNavigationHistory()
   const { addToCart, count, setIsCartOpen } = useCart()
+  const { fadeOutAndPause, restartFromStart } = useAudio()
 
   const [isZoomOpen, setIsZoomOpen] = useState(false)
   const [zoomScale, setZoomScale] = useState(1)
@@ -139,6 +145,32 @@ export const ArtworkDetailClient = ({
       document.body.style.overflow = 'unset'
     }
   }, [isZoomOpen])
+
+  useEffect(() => {
+    if (!isRumoreCluster) return
+
+    rumoreSessionActive = true
+    if (restartTimeout) {
+      clearTimeout(restartTimeout)
+      restartTimeout = null
+    }
+
+    if (!isCrtNoisePlaying()) {
+      startCrtNoise()
+    }
+    fadeOutAndPause()
+
+    return () => {
+      rumoreSessionActive = false
+      restartTimeout = setTimeout(() => {
+        if (!rumoreSessionActive) {
+          stopCrtNoise()
+          restartFromStart()
+        }
+        restartTimeout = null
+      }, 400)
+    }
+  }, [isRumoreCluster, clusterSlug, fadeOutAndPause, restartFromStart])
 
   // Gestione tasto ESC fisico
   React.useEffect(() => {

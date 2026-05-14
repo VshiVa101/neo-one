@@ -24,6 +24,7 @@ interface EyeModelProps {
   isUnlocked?: boolean
   scaleMultiplier?: number
   onClick?: () => void
+  disableTransitionOverlay?: boolean
 }
 
 // Carichiamo la versione ottimizzata con supporto Draco
@@ -42,6 +43,7 @@ const EyeModel = ({
   isUnlocked = true,
   scaleMultiplier = 1,
   onClick,
+  disableTransitionOverlay = true,
 }: EyeModelProps) => {
   const eyeRef = useRef<THREE.Group>(null)
   const animationRef = useRef<THREE.Group>(null)
@@ -156,10 +158,15 @@ const EyeModel = ({
 
     if (hovered) setHovered(false)
     setIsIgnoringPointer(true)
-    triggerTransition()
-    setTimeout(() => {
+    
+    if (disableTransitionOverlay) {
       router.push(targetRoute)
-    }, 1500)
+    } else {
+      triggerTransition()
+      setTimeout(() => {
+        router.push(targetRoute)
+      }, 1500)
+    }
   }
 
   return (
@@ -309,6 +316,7 @@ interface EyeSceneProps {
   isUnlocked?: boolean
   scaleMultiplier?: number
   onClick?: () => void
+  disableTransitionOverlay?: boolean
 }
 
 export const EyeScene = ({
@@ -320,6 +328,7 @@ export const EyeScene = ({
   isUnlocked = true,
   scaleMultiplier = 1,
   onClick,
+  disableTransitionOverlay = true,
 }: EyeSceneProps) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const globalMouse = useRef<EyePointerState>({
@@ -434,6 +443,7 @@ export const EyeScene = ({
             isUnlocked={isUnlocked}
             scaleMultiplier={scaleMultiplier}
             onClick={onClick}
+            disableTransitionOverlay={disableTransitionOverlay}
           />
         </Suspense>
       </Canvas>

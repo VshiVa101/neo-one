@@ -24,25 +24,63 @@ export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | 
 }
 
 /**
- * Helper function per estrarre l'URL in modo sicuro (Cloudinary focus)
+ * Costruisce l'URL Cloudinary full-resolution da un media document.
+ *
+ * Il plugin Cloudinary salva nel DB:
+ *   - url: PATH LOCALE (es. "/api/media/file/edna-1.webp") — NON un URL Cloudinary
+ *   - thumbnailURL: URL Cloudinary 300x300 croppato
+ *   - cloudinaryPublicId: la chiave per ricostruire l'URL full-res
+ *
+ * Priorità:
+ * 1. cloudinaryPublicId + base da thumbnailURL → URL Cloudinary full-res (MIGLIORE)
+ * 2. thumbnailURL → strip crop transforms → full-res
+ * 3. url se assoluto (http) → usalo direttamente
+ * 4. url/filename locale → fallback
  */
 export const getImageUrl = (media: any, defaultUrl: string) => {
-  let imageUrl = defaultUrl
-  if (media && typeof media === 'object') {
-    if (media.thumbnailURL && typeof media.thumbnailURL === 'string') {
-      imageUrl = media.thumbnailURL.replace(/\/upload\/[^\/]+\//, '/upload/f_auto,q_auto/')
-    } else if (media.url) {
-      imageUrl = media.url
-      if (!imageUrl.startsWith('/') && !imageUrl.startsWith('http')) {
-        if (!imageUrl.includes('api/media')) {
-          imageUrl = '/api/media/file/' + imageUrl
-        } else {
-          imageUrl = '/' + imageUrl
-        }
+  if (!media || typeof media !== 'object') return defaultUrl
+
+  const isAudioOrVideo =
+    media.mimeType?.startsWith('audio/') || media.mimeType?.startsWith('video/')
+
+  // 1. BEST: costruisci URL full-res da cloudinaryPublicId
+  if (media.cloudinaryPublicId && media.thumbnailURL) {
+    // Estrai base: "https://res.cloudinary.com/{cloud}/{type}/upload/"
+    const baseMatch = media.thumbnailURL.match(
+      /^(https:\/\/res\.cloudinary\.com\/[^/]+\/[^/]+\/upload\/)/,
+    )
+    if (baseMatch) {
+      const base = baseMatch[1]
+      // Audio/video: niente trasformazioni immagine
+      if (isAudioOrVideo) {
+        return `${base}${media.cloudinaryPublicId}`
       }
-    } else if (media.filename) {
-      imageUrl = '/api/media/file/' + media.filename
+      // Immagini: solo ottimizzazione formato/qualità, ZERO crop
+      return `${base}f_auto,q_auto/${media.cloudinaryPublicId}`
     }
   }
-  return imageUrl
+
+  // 2. thumbnailURL Cloudinary → strip crop per full-res
+  if (media.thumbnailURL?.includes('cloudinary.com')) {
+    if (isAudioOrVideo) {
+      return media.thumbnailURL.replace(/\/upload\/[^/]+\//, '/upload/')
+    }
+    return media.thumbnailURL.replace(/\/upload\/[^/]+\//, '/upload/f_auto,q_auto/')
+  }
+
+  // 3. URL assoluto (raro ma possibile in futuro)
+  if (media.url?.startsWith('http')) return media.url
+
+  // 4. Fallback locale (path relativo)
+  if (media.url) {
+    if (!media.url.startsWith('/') && !media.url.startsWith('http')) {
+      return media.url.includes('api/media') ? '/' + media.url : '/api/media/file/' + media.url
+    }
+    return media.url
+  }
+
+  // 5. Filename come ultima risorsa
+  if (media.filename) return '/api/media/file/' + media.filename
+
+  return defaultUrl
 }

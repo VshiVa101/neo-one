@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 
 
+## [1.3.0] - 2026-05-14
+
+### 🗓️ CALENDAR, AUDIO & NAVIGATION POLISH
+
+- **Calendar Implementation**: Fully functional `/calendar` page with monthly events, horizontal grab-to-scroll, and social bar repositioned to bottom-center.
+- **Audio Experience**: Restricted "explosion" entrance animation to Hero-to-Home transitions only. Removed "banana" audio from CRT noise manager; replaced site background music with `banana.mp3`.
+- **Visual Refinement**: Updated `EventDetail` with new asset `bbjdhsgfshdjyg.png` and forced black text/branding for readability.
+- **Bugfixes & Stability**: Resolved memory leak in `useAuth.ts` via `useCallback`, fixed Cloudinary image resolution utility (`getImageUrl`), and restored Expanded Cluster view layout/branding.
+
 ## [1.2.2] - 2026-05-12
 
 ### 🖱️ CALENDAR GRAB-TO-SCROLL & SOCIALBAR REFACTOR

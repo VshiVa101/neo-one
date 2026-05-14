@@ -10,7 +10,8 @@ interface MatrixGatewayProps {
   isFading: boolean
 }
 
-const EXIT_SEQUENCE = [6, 0, 4, 1]
+const FINAL_INDICES = [2, 3, 5] // O - N
+const EXIT_SEQUENCE = [6, 0, 4, 1] // E, N, O, E
 
 export function MatrixGateway({ onClick, isFading }: MatrixGatewayProps) {
   const [stage, setStage] = useState<'initial' | 'slow' | 'fast' | 'shrinking' | 'final'>('initial')
@@ -19,6 +20,7 @@ export function MatrixGateway({ onClick, isFading }: MatrixGatewayProps) {
   const [scrambleInterval, setScrambleInterval] = useState(600)
   const [showTouch, setShowTouch] = useState(false)
   const lettersRef = useRef<HTMLDivElement | null>(null)
+  const exitIntervalRef = useRef<NodeJS.Timeout | null>(null)
   
   useEffect(() => {
     // Stage 1: Start slowly with just 2 random letters scrambling
@@ -44,11 +46,13 @@ export function MatrixGateway({ onClick, isFading }: MatrixGatewayProps) {
     const shrinkTimer = setTimeout(() => {
       setStage('shrinking')
       let currentExitIndex = 0
-      const exitInterval = setInterval(() => {
+      
+      exitIntervalRef.current = setInterval(() => {
         if (currentExitIndex >= EXIT_SEQUENCE.length) {
-          clearInterval(exitInterval)
+          if (exitIntervalRef.current) clearInterval(exitIntervalRef.current)
           setStage('final')
           setScramblingIndices(new Set()) // Stop all scrambling
+          setVisibleIndices(new Set(FINAL_INDICES)) // Force only O-N to be visible
           setScrambleInterval(100)
           setTimeout(() => setShowTouch(true), 600)
           return
@@ -70,6 +74,7 @@ export function MatrixGateway({ onClick, isFading }: MatrixGatewayProps) {
       clearTimeout(mediumTimer)
       clearTimeout(fastTimer)
       clearTimeout(shrinkTimer)
+      if (exitIntervalRef.current) clearInterval(exitIntervalRef.current)
     }
   }, [])
 

@@ -75,7 +75,7 @@ export default buildConfig({
         apiSecret: process.env.CLOUDINARY_API_SECRET || '',
       },
       folder: 'uploads',
-      clientUploads: false,
+      clientUploads: true,
       useFilename: true,
     }),
     // project-defined plugins (forms, seo, redirects, search...)

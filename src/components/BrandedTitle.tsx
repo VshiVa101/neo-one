@@ -5,6 +5,7 @@ import { normalizeNeoString } from '@/utilities/normalizeNeoText'
 
 interface BrandedTitleProps {
   text: string
+  disableColor?: boolean
 }
 
 /**
@@ -12,7 +13,7 @@ interface BrandedTitleProps {
  * Funziona in sinergia con NeoBrandingObserver, ma applica la trasformazione immediatamente
  * per evitare flickering e garantire la coerenza visiva nei titoli.
  */
-export const BrandedTitle = ({ text }: { text: string }) => {
+export const BrandedTitle = ({ text, disableColor = false }: BrandedTitleProps) => {
   if (!text) return null
 
   // Sostituzione preventiva caratteri accentati per il font Neo
@@ -31,7 +32,7 @@ export const BrandedTitle = ({ text }: { text: string }) => {
           return (
             <span 
               key={i} 
-              className={`neo-${char}`} 
+              className={disableColor ? undefined : `neo-${char}`} 
               data-neo-processed="true"
               style={{ 
                 fontWeight: 'bold',

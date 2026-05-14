@@ -6,7 +6,7 @@ import { MatrixGateway } from '@/components/MatrixGateway'
 import { EyeScene } from '@/components/EyeScene'
 import { useTransition } from '@/contexts/TransitionContext'
 import { useAudio } from '@/contexts/AudioContext'
-import { useCrtStaticNoise } from '@/hooks/useCrtStaticNoise'
+import { startCrtNoise, stopCrtNoise } from '@/utilities/crtNoiseManager'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MiniMatrixLoader } from '@/components/MiniMatrixLoader'
 
@@ -14,13 +14,12 @@ export default function HeroClient() {
   const router = useRouter()
   const pathname = usePathname()
   const { isTransitioning } = useTransition()
-  const { primeBackgroundMusic } = useAudio()
+  const { primeBackgroundMusic, stopMusicImmediately } = useAudio()
   const [shouldRender, setShouldRender] = useState(false)
   const [isEyeReady, setIsEyeReady] = useState(false)
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [isFading, setIsFading] = useState(false)
   const [isTouchDevice, setIsTouchDevice] = useState(false)
-  const crtNoise = useCrtStaticNoise()
 
   const handleUnlock = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -37,7 +36,7 @@ export default function HeroClient() {
       .catch(() => {})
 
     primeBackgroundMusic()
-    crtNoise.start()
+    startCrtNoise()
 
     setIsFading(true)
     setTimeout(() => {
@@ -47,6 +46,13 @@ export default function HeroClient() {
 
   useEffect(() => {
     setShouldRender(true)
+    stopMusicImmediately()
+  }, [stopMusicImmediately])
+
+  useEffect(() => {
+    return () => {
+      stopCrtNoise()
+    }
   }, [])
 
   useEffect(() => {
@@ -78,6 +84,7 @@ export default function HeroClient() {
         initial={{ opacity: 1 }}
         animate={{ opacity: isTransitioning ? 0 : 1 }}
         transition={{ duration: 1.5, ease: 'easeInOut' }}
+        data-hero="true"
         className="fixed inset-0 w-full h-screen relative bg-black overflow-hidden flex flex-col items-center justify-center m-0 p-0 text-white z-50 transition-opacity"
       >
         {/* Background GIF - Appare solo quando l'occhio è pronto */}
@@ -106,6 +113,7 @@ export default function HeroClient() {
             isUnlocked={isUnlocked}
             globalTracking={true}
             scaleMultiplier={isTouchDevice ? 1.6 : 1}
+            disableTransitionOverlay={false}
           />
         </div>
 

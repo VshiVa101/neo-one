@@ -3,13 +3,16 @@
 import React, { useRef } from 'react'
 import Image from 'next/image'
 import { useAudio } from '@/contexts/AudioContext'
+import { usePathname } from 'next/navigation'
 
 const VOLUME_ICON_URL = 'https://res.cloudinary.com/dhk3bdk5q/image/upload/v1778683869/ui/volume-icon.webp'
 
 export const AudioBackground = () => {
   const { isMuted, isPlaying, toggleMute } = useAudio()
+  const pathname = usePathname()
 
-  if (!isPlaying) return null
+  // L'icona del volume non deve apparire nella landing splash (/)
+  if (!isPlaying || pathname === '/') return null
 
   return (
     <button
