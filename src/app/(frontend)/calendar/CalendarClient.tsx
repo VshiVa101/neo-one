@@ -31,7 +31,7 @@ interface CalendarClientProps {
 
 const MonthRow = ({ events, month, monthIndex, setActiveEvent }: { events: NeoEvent[], month: string, monthIndex: number, setActiveEvent: (e: NeoEvent) => void }) => {
   const containerRef = useRef<HTMLDivElement>(null)
-  
+
   return (
     <div key={month} className="space-y-2">
       <h3 className="font-neo text-white text-base md:text-lg tracking-widest ml-8 lowercase">
@@ -39,11 +39,13 @@ const MonthRow = ({ events, month, monthIndex, setActiveEvent }: { events: NeoEv
       </h3>
       <motion.div
         ref={containerRef}
-        className="p-3 md:p-5 shadow-lg overflow-hidden relative"
+        className="p-5 md:p-8 shadow-lg overflow-hidden relative"
         style={{ 
           backgroundImage: `url(/images/textures/row-${(monthIndex % 3) + 1}.webp)`,
           backgroundSize: '100% 100%',
           backgroundPosition: 'center',
+          WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
+          maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
         }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -52,14 +54,15 @@ const MonthRow = ({ events, month, monthIndex, setActiveEvent }: { events: NeoEv
         <motion.div 
           drag="x"
           dragConstraints={containerRef}
-          className="flex gap-3 pt-4 -mt-4 pb-2 w-max cursor-grab active:cursor-grabbing px-4"
+          dragElastic={0.1}
+          className="flex gap-3 pt-4 -mt-4 pb-2 w-max cursor-grab active:cursor-grabbing pl-12 md:pl-20 pr-8"
         >
           {events.map((event, eventIndex) => (
             <EventItem
               key={event.id}
               event={event}
               index={eventIndex}
-              onClick={() => setActiveEvent(event)}
+              onTap={() => setActiveEvent(event)}
             />
           ))}
         </motion.div>
@@ -222,17 +225,19 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
           >
             <TornPaper className="px-4 py-8 md:px-8 md:py-12">
               {/* Calendar Header */}
-              <div className="text-center mb-10 pt-12 md:pt-20">
-                <motion.p
-                  className="font-neo text-white text-xs md:text-sm tracking-widest lowercase mb-4 opacity-70"
+              <div className="text-center mb-4 pt-8 md:pt-14">
+                <motion.div
+                  className="max-w-xs md:max-w-md mx-auto mb-3"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.5 }}
                 >
-                  <BrandedTitle text={quote || "vieni a molestarmi dal vivo"} />
-                </motion.p>
+                  <p className="font-neo text-white text-base md:text-xl tracking-widest lowercase opacity-80 leading-relaxed">
+                    <BrandedTitle text={quote || "vieni a molestarmi dal vivo"} />
+                  </p>
+                </motion.div>
 
-                <div className="flex flex-col items-center justify-center gap-0 mb-6">
+                <div className="flex flex-col items-center justify-center gap-0 mb-2">
                   {/* Top Arrow -> Next available year */}
                   <motion.button
                     whileHover={canGoNext ? { scale: 1.2, y: -5 } : {}}
@@ -243,26 +248,26 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
                     style={{ transition: 'opacity 0.3s' }}
                   >
                     {/* Decorative Dots */}
-                    <div className="absolute -left-6 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#809829] shadow-[0_0_10px_rgba(128,152,41,0.6)] opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute -right-6 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#809829] shadow-[0_0_10px_rgba(128,152,41,0.6)] opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute -left-6 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#9AB830] shadow-[0_0_16px_rgba(154,184,48,0.8),0_0_30px_rgba(154,184,48,0.3)] opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute -right-6 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#9AB830] shadow-[0_0_16px_rgba(154,184,48,0.8),0_0_30px_rgba(154,184,48,0.3)] opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
                     
                     <motion.div
-                      whileHover={{ filter: 'drop-shadow(0 0 25px rgba(57,255,20,0.9))' }}
-                      whileTap={{ filter: 'drop-shadow(0 0 15px rgba(57,255,20,0.7))' }}
-                      style={{ filter: 'drop-shadow(0 0 10px rgba(57,255,20,0.5))' }}
+                      whileHover={{ filter: 'drop-shadow(0 0 35px rgba(57,255,20,1)) brightness(1.3)' }}
+                      whileTap={{ filter: 'drop-shadow(0 0 20px rgba(57,255,20,0.8)) brightness(1.1)' }}
+                      style={{ filter: 'drop-shadow(0 0 20px rgba(57,255,20,0.7)) brightness(1.1)' }}
                     >
                       <Image 
                         src="/images/ui/direction-arrow-green.webp" 
                         alt="Prossimo Anno" 
-                        width={50} 
-                        height={50} 
+                        width={75} 
+                        height={75} 
                         className="-rotate-90"
                         unoptimized
                       />
                     </motion.div>
                   </motion.button>
                   
-                  <h2 className="font-neo text-white text-3xl md:text-5xl tracking-[0.3em] leading-none flex items-center justify-center pt-4 pb-1">
+                  <h2 className="font-neo text-white text-3xl md:text-5xl tracking-[0.3em] leading-none flex items-center justify-center pt-2 pb-1">
                     <BrandedTitle text={currentYear.toString()} />
                   </h2>
 
@@ -276,26 +281,26 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
                     style={{ transition: 'opacity 0.3s' }}
                   >
                     {/* Decorative Dots */}
-                    <div className="absolute -left-6 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#809829] shadow-[0_0_10px_rgba(128,152,41,0.6)] opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute -right-6 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#809829] shadow-[0_0_10px_rgba(128,152,41,0.6)] opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute -left-6 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#9AB830] shadow-[0_0_16px_rgba(154,184,48,0.8),0_0_30px_rgba(154,184,48,0.3)] opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute -right-6 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#9AB830] shadow-[0_0_16px_rgba(154,184,48,0.8),0_0_30px_rgba(154,184,48,0.3)] opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
                     
                     <motion.div
-                      whileHover={{ filter: 'drop-shadow(0 0 25px rgba(57,255,20,0.9))' }}
-                      whileTap={{ filter: 'drop-shadow(0 0 15px rgba(57,255,20,0.7))' }}
-                      style={{ filter: 'drop-shadow(0 0 10px rgba(57,255,20,0.5))' }}
+                      whileHover={{ filter: 'drop-shadow(0 0 35px rgba(57,255,20,1)) brightness(1.3)' }}
+                      whileTap={{ filter: 'drop-shadow(0 0 20px rgba(57,255,20,0.8)) brightness(1.1)' }}
+                      style={{ filter: 'drop-shadow(0 0 20px rgba(57,255,20,0.7)) brightness(1.1)' }}
                     >
                       <Image 
                         src="/images/ui/direction-arrow-green.webp" 
                         alt="Anno Precedente" 
-                        width={50} 
-                        height={50} 
+                        width={75} 
+                        height={75} 
                         className="rotate-90"
                         unoptimized
                       />
                     </motion.div>
                   </motion.button>
                 </div>
-                <div className="mt-2 w-16 h-[2px] bg-black/30 mx-auto" />
+                <div className="mt-1 w-16 h-[2px] bg-black/30 mx-auto" />
               </div>
 
               {/* Months */}

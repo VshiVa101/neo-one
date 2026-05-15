@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 
 
+## [1.3.1] - 2026-05-15
+
+### 📝 TEXT WRAPPING & UI REFINEMENT
+
+- **Global Text Wrapping**: Implemented a site-wide CSS solution to prevent word-breaking on window resize/zoom, excluding `.hero` sections. Uses `overflow-wrap: anywhere`, `word-break: keep-all`, and `hyphens: none`.
+- **Layout Integrity**: Forced `overflow-x: hidden` on `html` and `body` to prevent unintended horizontal scrolling.
+- **Calendar UX**: Refined grab-to-scroll interactions and alignment for the social bar and calendar event items.
+
 ## [1.3.0] - 2026-05-14
 
 ### 🗓️ CALENDAR, AUDIO & NAVIGATION POLISH

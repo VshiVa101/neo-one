@@ -2,8 +2,8 @@
 
 **File:** `docs/NEO_ALIGNMENT.md`
 **Purpose:** single operational handoff document for future models/agents working on Neo-One.
-**Last updated:** 2026-05-14
-**Current release context:** v1.3.0
+**Last updated:** 2026-05-15
+**Current release context:** v1.3.1
 
 ---
 
@@ -451,6 +451,7 @@ Current completed fix:
 - Audio refactor: removed banana noise from CRT, implemented `banana.mp3` as global background music.
 - EventDetail styled with custom irregular background and high-contrast black text.
 - Cloudinary URL resolution fixed via centralized utility.
+- **v1.3.1 Fix**: Global text wrapping strategy implemented to prevent word-breaking on resize, with `overflow-x: hidden` on root to prevent horizontal scroll.
 
 Current next product focus from roadmap:
 

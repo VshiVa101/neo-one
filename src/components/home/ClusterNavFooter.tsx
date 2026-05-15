@@ -14,6 +14,7 @@ interface ClusterNavFooterProps {
   footerRef: React.RefObject<HTMLDivElement | null>
   footerX: MotionValue<number>
   onHoverChange: (hovering: boolean) => void
+  children?: React.ReactNode
 }
 
 export const ClusterNavFooter = ({
@@ -24,12 +25,13 @@ export const ClusterNavFooter = ({
   footerRef,
   footerX,
   onHoverChange,
+  children,
 }: ClusterNavFooterProps) => {
   return (
-    <div className="fixed bottom-6 md:bottom-10 left-0 w-full flex items-center px-[5vw] gap-6 z-20 pointer-events-none">
+    <div className="fixed bottom-6 md:bottom-10 left-0 w-full flex items-center px-[5vw] gap-6 z-[400] pointer-events-none">
       <div
         ref={footerRef}
-        className="flex-1 h-[20vh] md:h-[22vh] select-none home-footer-container pointer-events-auto overflow-visible"
+        className="flex-1 h-[20vh] md:h-[22vh] select-none home-footer-container pointer-events-auto overflow-visible relative z-0"
         onMouseEnter={() => onHoverChange(true)}
         onMouseLeave={() => onHoverChange(false)}
       >
@@ -64,6 +66,9 @@ export const ClusterNavFooter = ({
             )
           })}
         </motion.div>
+      </div>
+      <div className="relative z-10">
+        {children}
       </div>
     </div>
   )

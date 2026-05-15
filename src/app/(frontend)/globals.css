@@ -254,8 +254,19 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html, body {
+    overflow-x: hidden;
+  }
+
   body {
     @apply bg-background text-foreground min-h-[100vh] flex flex-col;
+  }
+
+  /* Gestione globale del wrapping del testo (escluso .hero) */
+  body *:not(.hero):not(.hero *) {
+    overflow-wrap: anywhere;
+    word-break: keep-all;
+    hyphens: none;
   }
 
   /* Default Typography Sizes (Readable & Impactful) */

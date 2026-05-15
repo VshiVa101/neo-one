@@ -67,11 +67,11 @@ export function SocialBar({ socialLinks }: SocialBarProps) {
                       hasDragged.current = false
                     }
                   }}
-                  style={{ WebkitUserDrag: 'none' } as React.CSSProperties}
+                  style={{ WebkitUserDrag: 'none', filter: 'none' } as React.CSSProperties}
                   className="block w-[3rem] h-[3rem] md:w-[4rem] md:h-[4rem] relative
                     transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
                     group-hover:-translate-y-2 group-hover:scale-110 group-hover:brightness-125
-                    drop-shadow-[0_0_15px_rgba(0,0,0,0.4)] select-none"
+                    select-none"
                 >
                   <Image
                     src={link.icon}
@@ -80,6 +80,8 @@ export function SocialBar({ socialLinks }: SocialBarProps) {
                     draggable={false}
                     className="object-contain"
                     unoptimized
+                    sizes="4rem"
+                    quality={100}
                   />
                 </a>
               </motion.div>

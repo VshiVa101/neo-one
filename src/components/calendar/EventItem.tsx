@@ -6,15 +6,18 @@ import type { NeoEvent } from '@/data/calendar-mock'
 
 interface EventItemProps {
   event: NeoEvent
-  onClick: () => void
+  onTap: () => void
   index: number
 }
 
-export function EventItem({ event, onClick, index }: EventItemProps) {
+export function EventItem({ event, onTap, index }: EventItemProps) {
   return (
     <motion.button
-      className="group relative flex-shrink-0 w-[54px] md:w-[75px] cursor-pointer"
-      onClick={onClick}
+      type="button"
+      draggable={false}
+      onDragStart={(e) => e.preventDefault()}
+      className="group relative flex-shrink-0 w-[51px] md:w-[71px] cursor-grab active:cursor-grabbing -mt-2 focus:outline-none"
+      onTap={onTap}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: [0.32, 0.72, 0, 1] }}
@@ -32,8 +35,9 @@ export function EventItem({ event, onClick, index }: EventItemProps) {
           src={event.thumbnail}
           alt={event.details.headline}
           fill
+          draggable={false}
           className="object-cover"
-          sizes="(max-width: 768px) 54px, 75px"
+          sizes="(max-width: 768px) 51px, 71px"
         />
       </div>
     </motion.button>

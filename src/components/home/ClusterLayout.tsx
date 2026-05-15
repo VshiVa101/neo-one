@@ -252,7 +252,8 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         onClusterClick={setExpandedClusterId}
       />
 
-      {/* ── FOOTER ── */}
+      {/* ── FOOTER & BUTTONS (Aligned on same axis) — visibile solo in home, non in expanded/gallery ── */}
+      {!expandedClusterId && expandedDeckIndex === null && (
       <ClusterNavFooter
         clusters={clusters}
         selectedLeft={navState.left}
@@ -261,11 +262,8 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         footerRef={footerRef}
         footerX={footerX}
         onHoverChange={setIsHoveringFooter}
-      />
-
-      {/* ── BOTTOM-RIGHT BUTTONS ── */}
-      <div className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[400] pointer-events-auto flex flex-col items-center gap-3">
-        {!expandedClusterId && expandedDeckIndex === null && (
+      >
+        <div className="pointer-events-auto flex flex-col items-center justify-center gap-3 h-[20vh] md:h-[22vh]">
           <StateBasedNavButton
             defaultIcon="/images/ui/web_2.webp"
             hoverIcon="/images/ui/web_6.webp"
@@ -274,45 +272,46 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
             title="Calendario"
             alt="Vai al calendario"
           />
-        )}
 
-        <motion.button
-          animate={{ scale: cartHovered ? 1.5 : 1 }}
-          transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-          whileTap={{ scale: 0.9 }}
-          onMouseEnter={() => setCartHovered(true)}
-          onMouseLeave={() => setCartHovered(false)}
-          onClick={() => setIsCartOpen(true)}
-          className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300 relative"
-          style={{
-            backgroundColor: cartHovered ? '#F45390' : '#B3828B',
-            boxShadow: cartHovered
-              ? '0 0 30px rgba(244, 83, 144, 0.8), 0 0 60px rgba(244, 83, 144, 0.3)'
-              : '0 0 10px rgba(0,0,0,0.3)',
-            zIndex: cartHovered ? 401 : undefined,
-          }}
-          title="Vai alla Cassa"
-        >
-          <Image
-            src={
-              cartHovered
-                ? '/images/drops/carrellorosa_optimized.webp'
-                : count > 0
-                  ? '/images/drops/carrelloverde_optimized.webp'
-                  : '/images/drops/carrello_optimized.webp'
-            }
-            alt="Carrello"
-            width={64}
-            height={64}
-            className="w-full h-full object-contain"
-            style={{ transform: 'scale(1.5)' }}
-            unoptimized
-          />
-          <span className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-[#809829] rounded-full font-neo text-[8px] md:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)]">
-            {count}
-          </span>
-        </motion.button>
-      </div>
+          <motion.button
+            animate={{ scale: cartHovered ? 1.5 : 1 }}
+            transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+            whileTap={{ scale: 0.9 }}
+            onMouseEnter={() => setCartHovered(true)}
+            onMouseLeave={() => setCartHovered(false)}
+            onClick={() => setIsCartOpen(true)}
+            className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300 relative"
+            style={{
+              backgroundColor: cartHovered ? '#F45390' : '#B3828B',
+              boxShadow: cartHovered
+                ? '0 0 30px rgba(244, 83, 144, 0.8), 0 0 60px rgba(244, 83, 144, 0.3)'
+                : '0 0 10px rgba(0,0,0,0.3)',
+              zIndex: cartHovered ? 401 : undefined,
+            }}
+            title="Vai alla Cassa"
+          >
+            <Image
+              src={
+                cartHovered
+                  ? '/images/drops/carrellorosa_optimized.webp'
+                  : count > 0
+                    ? '/images/drops/carrelloverde_optimized.webp'
+                    : '/images/drops/carrello_optimized.webp'
+              }
+              alt="Carrello"
+              width={64}
+              height={64}
+              className="w-full h-full object-contain"
+              style={{ transform: 'scale(1.5)' }}
+              unoptimized
+            />
+            <span className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-[#809829] rounded-full font-neo text-[8px] md:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)]">
+              {count}
+            </span>
+          </motion.button>
+        </div>
+      </ClusterNavFooter>
+      )}
 
       {/* ── EXPANDED CLUSTER MODAL ── */}
       <ExpandedClusterModal
