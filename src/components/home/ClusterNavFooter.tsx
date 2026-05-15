@@ -67,7 +67,7 @@ export const ClusterNavFooter = ({
           })}
         </motion.div>
       </div>
-      <div className="relative z-10">
+      <div className="relative z-10 pointer-events-auto">
         {children}
       </div>
     </div>

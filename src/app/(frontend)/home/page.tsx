@@ -51,7 +51,7 @@ export default async function HomePage() {
   })
 
   return (
-    <main className="w-full min-h-screen relative flex flex-col items-center justify-center bg-[#151515] overflow-hidden">
+    <main className="w-full min-h-screen relative flex flex-col items-center justify-center bg-[#151515]">
       {/* Background GIF - Desktop first */}
       <div className="absolute inset-0 w-screen h-screen z-0 opacity-80 brightness-100">
         <Image
