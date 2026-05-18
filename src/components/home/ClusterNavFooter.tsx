@@ -31,7 +31,7 @@ export const ClusterNavFooter = ({
     <div className="fixed bottom-6 md:bottom-10 left-0 w-full flex items-center px-[5vw] gap-6 z-[400] pointer-events-none">
       <div
         ref={footerRef}
-        className="flex-1 h-[20vh] md:h-[22vh] select-none home-footer-container pointer-events-auto overflow-visible relative z-0"
+        className="flex-1 min-w-0 h-[20vh] md:h-[22vh] select-none home-footer-container pointer-events-auto overflow-visible relative z-0"
         onMouseEnter={() => onHoverChange(true)}
         onMouseLeave={() => onHoverChange(false)}
       >
