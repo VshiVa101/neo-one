@@ -211,7 +211,7 @@ export const NeoUncensoredHero: React.FC<HeroProps> = () => {
         <style jsx global>{`
           @font-face {
             font-family: 'MergedFontNEO';
-            src: url('/neo-assets/hero/fonts/MergedFontNEO.otf') format('opentype');
+            src: url('/fonts/MergedFontNEO.otf') format('opentype');
             font-weight: normal;
             font-style: normal;
           }
