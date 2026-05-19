@@ -184,7 +184,7 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
           backgroundSize: '100% 100vh',
           backgroundRepeat: 'repeat-y',
         }}
-        animate={{ backgroundPosition: ['0px 0px', '0px 100vh'] }}
+        animate={{ backgroundPosition: ['0px 0px', '0px -100vh'] }}
         transition={{ 
           duration: 20, 
           repeat: Infinity, 
