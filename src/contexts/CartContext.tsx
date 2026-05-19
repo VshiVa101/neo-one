@@ -97,6 +97,49 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     )
   }
 
+  const play8BitExplosion = () => {
+    try {
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext
+      if (!AudioContext) return
+      const audioCtx = new AudioContext()
+      const duration = 1.2
+      const bufferSize = audioCtx.sampleRate * duration
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate)
+      const data = buffer.getChannelData(0)
+      
+      let lastVal = 0
+      for (let i = 0; i < bufferSize; i++) {
+        // Create 8-bit crunch by holding values (lower sample rate effect)
+        if (i % 25 === 0) {
+          const decay = Math.exp(-i / (audioCtx.sampleRate * 0.3))
+          lastVal = (Math.random() * 2 - 1) * decay
+        }
+        // Quantize amplitude for bitcrush effect
+        data[i] = Math.round(lastVal * 8) / 8
+      }
+      
+      const noiseNode = audioCtx.createBufferSource()
+      noiseNode.buffer = buffer
+      
+      const filter = audioCtx.createBiquadFilter()
+      filter.type = 'lowpass'
+      filter.frequency.setValueAtTime(1500, audioCtx.currentTime)
+      filter.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + duration)
+      
+      const gainNode = audioCtx.createGain()
+      gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration)
+
+      noiseNode.connect(filter)
+      filter.connect(gainNode)
+      gainNode.connect(audioCtx.destination)
+      
+      noiseNode.start()
+    } catch (e) {
+      console.error('Audio synthesis failed', e)
+    }
+  }
+
   const handleSubmit = async () => {
     if (!isEmailValid || !(items.length > 0 || message) || isSubmitting) return
 
@@ -112,6 +155,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       if (res.success) {
         setIsSubmitting(false)
         setIsDissolving(true)
+        play8BitExplosion()
         setTimeout(() => {
           setItems([])
           setName('')
