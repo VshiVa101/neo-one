@@ -181,17 +181,12 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
         className="fixed inset-0 z-0 pointer-events-none"
         style={{ 
           backgroundImage: "url('/images/bg/bg-scroll.gif')",
-          backgroundSize: 'auto',
-          backgroundRepeat: 'repeat',
-          width: '300%',
-          height: '300%',
-          left: '-100%',
-          top: '-100%',
-          rotate: 90,
+          backgroundSize: '100% 100vh',
+          backgroundRepeat: 'repeat-y',
         }}
-        animate={{ backgroundPosition: ['0px 0px', '0px 1000px'] }}
+        animate={{ backgroundPosition: ['0px 0px', '0px 100vh'] }}
         transition={{ 
-          duration: 60, 
+          duration: 20, 
           repeat: Infinity, 
           ease: "linear" 
         }}
