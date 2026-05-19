@@ -130,6 +130,30 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
+  const [explodeScale, setExplodeScale] = useState(0)
+
+  useEffect(() => {
+    if (isDissolving) {
+      let start = performance.now()
+      let req: number
+      const animate = (time: number) => {
+        const elapsed = time - start
+        const progress = Math.min(elapsed / 1200, 1)
+        // easeIn function for a sudden explosion at the end
+        const ease = progress === 0 ? 0 : Math.pow(2, 10 * progress - 10)
+        setExplodeScale(ease * 1000)
+        
+        if (progress < 1) {
+          req = requestAnimationFrame(animate)
+        }
+      }
+      req = requestAnimationFrame(animate)
+      return () => cancelAnimationFrame(req)
+    } else {
+      setExplodeScale(0)
+    }
+  }, [isDissolving])
+
   const [submitHovered, setSubmitHovered] = useState(false)
 
   const isActive = items.length > 0 || message.length > 0
@@ -148,6 +172,40 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       }}
     >
       {children}
+
+      {/* SVG Filter for Pixel Explosion */}
+      <svg width="0" height="0" className="absolute pointer-events-none">
+        <defs>
+          <filter id="pixel-explosion" x="-100%" y="-100%" width="300%" height="300%">
+            {/* Generate blocky noise for pixelation */}
+            <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="1" result="noise" />
+            <feComponentTransfer in="noise" result="pixelatedNoise">
+              <feFuncR type="discrete" tableValues="0 0.25 0.5 0.75 1" />
+              <feFuncG type="discrete" tableValues="0 0.25 0.5 0.75 1" />
+            </feComponentTransfer>
+            {/* Displace the cart graphic using the noise */}
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="pixelatedNoise"
+              xChannelSelector="R"
+              yChannelSelector="G"
+              scale={explodeScale}
+              result="displaced"
+            />
+            {/* Brighten to Neo-One colors and fade out alpha as it explodes */}
+            <feColorMatrix
+              in="displaced"
+              type="matrix"
+              values={`
+                1 0 0 0 ${explodeScale / 1000}
+                0 1 0 0 ${explodeScale / 2000}
+                0 0 1 0 0
+                0 0 0 ${1 - explodeScale / 1000} 0
+              `}
+            />
+          </filter>
+        </defs>
+      </svg>
 
       <AnimatePresence>
         {isCartOpen && (
@@ -169,7 +227,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
             <div className="absolute inset-0 overflow-y-auto custom-scrollbar">
               <div className="w-full min-h-full flex flex-col items-center p-6 md:p-12 lg:p-20">
-                <div className={`w-full max-w-4xl flex flex-col gap-8 lg:gap-12 py-12 ${isDissolving ? 'cart-dissolving' : ''}`}>
+                <motion.div 
+                  className={`w-full max-w-4xl flex flex-col gap-8 lg:gap-12 py-12`}
+                  style={{ filter: isDissolving ? 'url(#pixel-explosion)' : 'none' }}
+                  animate={isDissolving ? { scale: 1.05 } : { scale: 1 }}
+                  transition={{ duration: 1.2, ease: "easeIn" }}
+                >
               {/* Cart Items Area */}
               <div className="flex flex-col gap-6">
                 <div className="flex items-center justify-between">
@@ -367,7 +430,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                   </div>
                 </div>
               </div>
-            </div>
+                </motion.div>
               </div>
             </div>
           </motion.div>
