@@ -177,18 +177,17 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
   return (
     <main className="w-full min-h-screen relative bg-black overflow-hidden">
       {/* Absolute Backgrounds */}
-      <motion.div 
-        className="fixed inset-0 z-0 pointer-events-none"
+      <div 
+        className="fixed z-0 pointer-events-none"
         style={{ 
           backgroundImage: "url('/images/bg/bg-scroll.gif')",
-          backgroundSize: '100% 100vh',
-          backgroundRepeat: 'repeat-y',
-        }}
-        animate={{ backgroundPosition: ['0px 0px', '0px -100vh'] }}
-        transition={{ 
-          duration: 20, 
-          repeat: Infinity, 
-          ease: "linear" 
+          backgroundSize: '100% 100%',
+          backgroundRepeat: 'no-repeat',
+          width: '100vh',
+          height: '100vw',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%) rotate(90deg)',
         }}
       />
       
