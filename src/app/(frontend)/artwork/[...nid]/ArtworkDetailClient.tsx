@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
@@ -69,6 +69,52 @@ export const ArtworkDetailClient = ({
   const [isPreviewPlaying, setIsPreviewPlaying] = useState(false)
   const touchStartX = React.useRef<number | null>(null)
   const previewAudioRef = React.useRef<HTMLAudioElement | null>(null)
+
+  // ── Pinch-to-zoom refs ──
+  const pinchStartDist = useRef<number | null>(null)
+  const pinchStartScale = useRef<number>(1)
+
+  // ── Double-tap detection ──
+  const lastTapTime = useRef<number>(0)
+
+  const getFingerDistance = (touches: React.TouchList) => {
+    const dx = touches[0].clientX - touches[1].clientX
+    const dy = touches[0].clientY - touches[1].clientY
+    return Math.sqrt(dx * dx + dy * dy)
+  }
+
+  const handleZoomTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      e.preventDefault()
+      pinchStartDist.current = getFingerDistance(e.touches)
+      pinchStartScale.current = zoomScale
+    }
+  }, [zoomScale])
+
+  const handleZoomTouchMove = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 2 && pinchStartDist.current !== null) {
+      e.preventDefault()
+      const currentDist = getFingerDistance(e.touches)
+      const ratio = currentDist / pinchStartDist.current
+      setZoomScale(Math.min(Math.max(1, pinchStartScale.current * ratio), 5))
+    }
+  }, [])
+
+  const handleZoomTouchEnd = useCallback(() => {
+    pinchStartDist.current = null
+  }, [])
+
+  const handleDoubleTap = useCallback((e: React.TouchEvent) => {
+    // Only act on single-finger taps (not pinch end)
+    if (e.touches.length > 0) return
+    const now = Date.now()
+    const timeDelta = now - lastTapTime.current
+    lastTapTime.current = now
+    if (timeDelta < 300 && timeDelta > 0) {
+      e.preventDefault()
+      setZoomScale((prev) => (prev > 1 ? 1 : 2.5))
+    }
+  }, [])
 
   const isRumoreCluster = clusterSlug?.toLowerCase() === 'rumore'
 
@@ -208,6 +254,12 @@ export const ArtworkDetailClient = ({
             className="fixed inset-0 z-[2000] bg-black cursor-grab active:cursor-grabbing flex items-center justify-center overflow-hidden touch-none"
             onClick={() => setIsZoomOpen(false)}
             onWheel={handleWheel}
+            onTouchStart={handleZoomTouchStart}
+            onTouchMove={handleZoomTouchMove}
+            onTouchEnd={(e) => {
+              handleZoomTouchEnd()
+              handleDoubleTap(e)
+            }}
           >
             <motion.img
               src={image}
@@ -220,6 +272,27 @@ export const ArtworkDetailClient = ({
               className="max-w-[95vw] max-h-[95vh] object-contain transition-transform duration-75 ease-linear pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
             />
+
+            {/* ── ESC Button (Mobile & Desktop) ── */}
+            <motion.button
+              whileHover={{ scale: 1.1, rotate: 90, backgroundColor: '#F45390' }}
+              whileTap={{ scale: 0.9 }}
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsZoomOpen(false)
+              }}
+              className="neo-interface-btn fixed bottom-6 left-6 md:bottom-10 md:left-10 z-[2100] w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#B3828B] rounded-full cursor-pointer transition-colors duration-300"
+            >
+              <Image
+                src="/images/ui/esccc.webp"
+                alt="ESC"
+                width={64}
+                height={64}
+                className="w-[62%] h-[62%] object-contain"
+                style={{ transform: 'scale(1.5)' }}
+                unoptimized
+              />
+            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>

@@ -47,6 +47,7 @@ export const ExpandedClusterModal = ({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
           className="fixed inset-0 z-[150] bg-black/80 flex flex-col justify-center overflow-hidden"
+          style={{ touchAction: 'none' }}
           onClick={onClose}
           onTouchStart={(e) => {
             touchStartX.current = e.touches[0].clientX

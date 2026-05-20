@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 
 
+## [1.3.2] - 2026-05-20
+
+### 📱 MOBILE PORTABILITY & INTERACTION REFINEMENT
+
+- **Pinch-to-Zoom & Double-Tap**: Implemented full two-finger pinch gesture tracking and a double-tap shortcut toggle (1x ↔ 2.5x) in the artwork detail view on mobile/touch screens.
+- **ESC Exit Button**: Added a dedicated, highly visible floating close/ESC button matching the design system within the fullscreen zoom modal.
+- **Pull-to-Refresh & Scroll Bounce Prevention**: Resolved Chrome and Safari's native refresh gestures blocking deck scrolling inside `ExpandedClusterModal` using a non-intrusive combination of global W3C CSS `overscroll-behavior-y: none` and localized `touch-action: none` / `e.preventDefault()`.
+
 ## [1.3.1] - 2026-05-15
 
 ### 📝 TEXT WRAPPING & UI REFINEMENT

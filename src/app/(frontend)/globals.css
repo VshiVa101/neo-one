@@ -260,6 +260,7 @@
 
   body {
     @apply bg-background text-foreground min-h-[100vh] flex flex-col;
+    overscroll-behavior-y: none;
   }
 
   /* Gestione globale del wrapping del testo (escluso .hero) */

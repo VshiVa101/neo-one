@@ -49,12 +49,17 @@ export const ClusterDeck = ({
   return (
     <div
       className="flex flex-col items-center justify-center w-[80vw] lg:w-[25vw] xl:w-[20vw] h-full relative cursor-ns-resize"
+      style={{ touchAction: 'none' }}
       role="group"
       aria-roledescription="carousel"
       aria-label={`Mazzo: ${subclusterTitle}`}
       onWheel={handleWheel}
       onTouchStart={(e) => {
         touchStartY.current = e.touches[0].clientY
+      }}
+      onTouchMove={(e) => {
+        // Prevent browser pull-to-refresh / scroll bounce
+        e.preventDefault()
       }}
       onTouchEnd={(e) => {
         if (touchStartY.current === null) return
