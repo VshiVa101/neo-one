@@ -224,7 +224,13 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   return (
     <div className="w-full h-screen relative z-10">
       {/* ── OCCHIO TOP CENTER ── */}
-      <div className="fixed top-[2vh] md:top-[4vh] left-1/2 -translate-x-1/2 w-[12vh] h-[12vh] md:w-[28vh] md:h-[28vh] z-[500] transition-all duration-500">
+      <div 
+        className={`fixed left-1/2 -translate-x-1/2 z-[500] transition-all duration-500 ${
+          expandedClusterId 
+            ? 'top-[1vh] md:top-[2vh] w-[8vh] h-[8vh] md:w-[15vh] md:h-[15vh] opacity-70 hover:opacity-100'
+            : 'top-[2vh] md:top-[4vh] w-[12vh] h-[12vh] md:w-[28vh] md:h-[28vh]'
+        }`}
+      >
         {shouldRenderBackgroundEye ? (
           <EyeScene
             targetRoute="/calendar"
