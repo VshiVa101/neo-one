@@ -48,7 +48,7 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
             scaleMultiplier={1.3}
           />
         </div>
-        <span className="font-neo text-2xl lg:text-3xl tracking-widest font-bold leading-none text-white drop-shadow-[0_0_10px_rgba(244,83,144,0.15)] lowercase">
+        <span className="font-neo text-2xl lg:text-3xl tracking-widest font-bold leading-none text-white drop-shadow-[0_0_10px_rgba(244,83,144,0.15)] uppercase">
           <BrandedTitle text={displayTitle} />
         </span>
       </div>

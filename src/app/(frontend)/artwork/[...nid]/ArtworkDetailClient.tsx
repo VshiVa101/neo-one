@@ -435,7 +435,7 @@ export const ArtworkDetailClient = ({
                 className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-[#111] rounded-lg border border-white/10"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
-                <h2 className="font-neo text-white text-3xl lg:text-5xl tracking-[0.2em] mb-4 lowercase branded-title">
+                <h2 className="font-neo text-white text-3xl lg:text-5xl tracking-[0.2em] mb-4 uppercase branded-title">
                   <BrandedTitle text="Dettagli" />
                 </h2>
                 <p className="font-neo text-white text-xl lg:text-2xl tracking-widest lowercase mb-2">
@@ -448,7 +448,7 @@ export const ArtworkDetailClient = ({
                   {dimensions} — {year}
                 </p>
 
-                <h2 className="font-neo text-white text-2xl lg:text-4xl tracking-[0.2em] mb-2 lowercase branded-title">
+                <h2 className="font-neo text-white text-2xl lg:text-4xl tracking-[0.2em] mb-2 uppercase branded-title">
                   <BrandedTitle text="Disponibilità" />
                 </h2>
                 <p className="font-neo text-white text-base lg:text-xl tracking-widest lowercase mb-1">

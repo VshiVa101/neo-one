@@ -66,7 +66,7 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-8">
-              <h2 className="font-neo text-white text-xl md:text-2xl tracking-widest lowercase">
+              <h2 className="font-neo text-white text-xl md:text-2xl tracking-widest uppercase">
                 <BrandedTitle text="Contact" />
               </h2>
               <button

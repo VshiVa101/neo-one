@@ -91,7 +91,7 @@ export function EventDetail({ event, quote, onClose }: EventDetailProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
           >
-            <div className="text-white font-neo text-2xl md:text-4xl tracking-widest lowercase text-center leading-relaxed">
+            <div className="text-white font-neo text-2xl md:text-4xl tracking-widest uppercase text-center leading-relaxed">
               <BrandedTitle text={event.details.comicBubble || quote || ''} />
             </div>
           </motion.div>
@@ -140,14 +140,14 @@ export function EventDetail({ event, quote, onClose }: EventDetailProps) {
           </div>
 
           {/* Headline */}
-          <motion.h3
-            className="font-neo text-white text-[9px] md:text-[10px] tracking-[0.3em] lowercase mb-8 md:mb-12 text-center w-full"
+          <motion.h1
+            className="font-neo text-white text-2xl md:text-4xl lg:text-5xl tracking-[0.3em] uppercase mb-8 md:mb-12 text-center w-full"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
           >
             <BrandedTitle text={event.details.headline} />
-          </motion.h3>
+          </motion.h1>
 
           {/* Event Description */}
           <motion.div 
@@ -162,7 +162,7 @@ export function EventDetail({ event, quote, onClose }: EventDetailProps) {
               backgroundRepeat: 'no-repeat',
             }}
           >
-            <div className="font-neo text-black text-sm md:text-base leading-relaxed lowercase">
+            <div className="font-neo text-black text-sm md:text-base leading-relaxed uppercase">
               <BrandedTitle text={event.details.description} disableColor={true} />
             </div>
           </motion.div>

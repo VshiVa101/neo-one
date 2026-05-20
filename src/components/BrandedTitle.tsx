@@ -43,7 +43,16 @@ export const BrandedTitle = ({ text, disableColor = false }: BrandedTitleProps) 
             </span>
           )
         }
-        return <span key={i}>{part.toLowerCase()}</span>
+        return (
+          <span 
+            key={i} 
+            style={{ 
+              textTransform: 'uppercase'
+            }}
+          >
+            {part.toUpperCase()}
+          </span>
+        )
       })}
     </>
   )

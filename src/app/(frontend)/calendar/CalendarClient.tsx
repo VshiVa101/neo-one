@@ -34,7 +34,7 @@ const MonthRow = ({ events, month, monthIndex, setActiveEvent }: { events: NeoEv
 
   return (
     <div key={month} className="space-y-2">
-      <h3 className="font-neo text-white text-base md:text-lg tracking-widest ml-8 lowercase">
+      <h3 className="font-neo text-white text-base md:text-lg tracking-widest ml-8 uppercase">
         <BrandedTitle text={month} />
       </h3>
       <motion.div

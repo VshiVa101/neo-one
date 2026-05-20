@@ -56,7 +56,7 @@ export default async function SubclusterPage({ params: paramsPromise }: Args) {
       <div className="max-w-7xl mx-auto px-[5vw] pt-[15vh] pb-[10vh]">
         {/* Header Sottocluster */}
         <div className="mb-[8vh]">
-          <h1 className="text-[5vw] font-neo tracking-widest leading-none text-white lowercase">
+          <h1 className="text-[5vw] font-neo tracking-widest leading-none text-white uppercase">
             <BrandedTitle text={subcluster.title} />
           </h1>
           {subcluster.mood && (
