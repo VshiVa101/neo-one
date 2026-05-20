@@ -54,7 +54,7 @@ export const ExpandedGalleryOverlay = ({
                       scale: 1.03,
                       boxShadow: '0 0 30px rgba(118, 139, 26, 0.4)',
                     }}
-                    className="group relative aspect-square sm:aspect-auto h-auto sm:h-[450px] border border-white/10 overflow-hidden cursor-pointer bg-black"
+                    className="group relative aspect-[3/4] border border-white/10 overflow-hidden cursor-pointer bg-black"
                     onClick={() => {
                       const params = new URLSearchParams()
                       if (clusterId) params.set('cluster', String(clusterId))
@@ -67,7 +67,7 @@ export const ExpandedGalleryOverlay = ({
                       src={artwork.image}
                       alt={artwork.title}
                       fill
-                      className="object-cover grayscale brightness-110 contrast-125 sm:grayscale sm:brightness-110 sm:contrast-125 group-hover:grayscale-0 group-hover:brightness-100 group-hover:contrast-100 transition-all duration-700 max-sm:grayscale-0 max-sm:brightness-100 max-sm:contrast-100"
+                      className="object-contain p-2 grayscale brightness-110 contrast-125 sm:grayscale sm:brightness-110 sm:contrast-125 group-hover:grayscale-0 group-hover:brightness-100 group-hover:contrast-100 transition-all duration-700 max-sm:grayscale-0 max-sm:brightness-100 max-sm:contrast-100"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                     />
 
