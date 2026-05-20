@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 
+## [1.3.3] - 2026-05-20
+
+### 🗓️ CALENDAR MOBILE SCROLL FIX
+
+- **Mobile Scroll Restoration**: Removed the aggressive global `overscroll-behavior-y: none` rule on `body` from `globals.css` which was inadvertently freezing all vertical scrolling on mobile browsers (especially Safari). Pull-to-refresh is still successfully blocked where appropriate (e.g. in cluster decks and modals) via local touch event preventions.
+
 ## [1.3.2] - 2026-05-20
 
 ### 📱 MOBILE PORTABILITY & INTERACTION REFINEMENT

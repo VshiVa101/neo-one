@@ -2,8 +2,8 @@
 
 **File:** `docs/NEO_ALIGNMENT.md`
 **Purpose:** single operational handoff document for future models/agents working on Neo-One.
-**Last updated:** 2026-05-15
-**Current release context:** v1.3.1
+**Last updated:** 2026-05-20
+**Current release context:** v1.3.3
 
 ---
 
@@ -439,7 +439,7 @@ Avoid:
 
 ---
 
-## 11. Current handoff snapshot — v1.3.0
+## 11. Current handoff snapshot — v1.3.3
 
 Current completed fix:
 
@@ -452,10 +452,12 @@ Current completed fix:
 - EventDetail styled with custom irregular background and high-contrast black text.
 - Cloudinary URL resolution fixed via centralized utility.
 - **v1.3.1 Fix**: Global text wrapping strategy implemented to prevent word-breaking on resize, with `overflow-x: hidden` on root to prevent horizontal scroll.
+- **v1.3.2 Fixes**: Pinch-to-zoom (two-finger pinch tracking) and double-tap zoom (1x ↔ 2.5x toggle) implemented in the artwork detail view on mobile. Added a dedicated close/ESC floating button matching the design system within the fullscreen zoom modal. local prevention of browser pull-to-refresh / scroll bounce on cluster decks and modals.
+- **v1.3.3 Fix**: Removed the global `overscroll-behavior-y: none` rule on `body` from `globals.css` that was freezing vertical scrolling on mobile browsers (Safari). Maintained targeted pull-to-refresh blocks in modals/decks.
 
 Current next product focus from roadmap:
 
-- P3 Mobile Polish
+- P3 Mobile Polish (Complete)
 - P4 Audio Experience Improvements
 - P5 Checkout / E-commerce finalization
 
