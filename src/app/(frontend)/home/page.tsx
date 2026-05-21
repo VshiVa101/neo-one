@@ -31,7 +31,7 @@ export default async function HomePage() {
       const slug = c.slug?.toLowerCase() || ''
       const title = c.title?.toLowerCase() || ''
       if (slug === 'neon' || title === 'neon') return 100
-      if (slug.includes('bianco') || slug.includes('bn') || title.includes('bianco') || title.includes('mix')) return 90
+      if (slug === 'b-n' || slug.includes('bianco') || slug.includes('bn') || title.includes('b/n') || title.includes('bianco') || title.includes('mix')) return 90
       return 0
     }
     return getPriority(b) - getPriority(a)

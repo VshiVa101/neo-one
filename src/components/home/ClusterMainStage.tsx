@@ -80,7 +80,7 @@ const ClusterPanel = ({
           <h2 className="text-xl md:text-3xl lg:text-[2.5vw] font-neo tracking-widest drop-shadow-md leading-none branded-title">
             <BrandedTitle text={cluster.title} />
           </h2>
-          <p className="mt-1 md:mt-2 font-neo text-[11px] md:text-sm lg:text-[0.9vw] leading-relaxed tracking-wide whitespace-normal break-words text-white lowercase">
+          <p className="mt-1 md:mt-2 font-neo text-xs md:text-[15px] lg:text-[1.25vw] leading-relaxed tracking-wide whitespace-normal break-words text-white uppercase">
             {cluster.desc}
           </p>
         </motion.div>

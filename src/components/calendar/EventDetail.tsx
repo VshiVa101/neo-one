@@ -91,7 +91,7 @@ export function EventDetail({ event, quote, onClose }: EventDetailProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
           >
-            <div className="text-white font-neo text-2xl md:text-4xl tracking-widest uppercase text-center leading-relaxed">
+            <div className="text-white font-neo text-lg md:text-[27px] tracking-wide uppercase text-center leading-relaxed">
               <BrandedTitle text={event.details.comicBubble || quote || ''} />
             </div>
           </motion.div>
@@ -201,7 +201,7 @@ export function EventDetail({ event, quote, onClose }: EventDetailProps) {
               unoptimized
             />
             {linkCopied && (
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-neo text-[8px] md:text-[10px] text-[#809829] tracking-widest lowercase">
+              <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-neo text-[8px] md:text-[10px] text-[#809829] tracking-widest uppercase">
                 link copiato
               </span>
             )}
@@ -229,23 +229,29 @@ export function EventDetail({ event, quote, onClose }: EventDetailProps) {
             onClick={() => setIsCartOpen(true)}
             className="neo-interface-btn relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#B3828B] rounded-full cursor-pointer transition-colors duration-300"
           >
-            <Image
-              src={
-                cartHovered
-                  ? '/images/drops/carrellorosa_optimized.webp'
-                  : count > 0
-                    ? '/images/ui/carrelloverde.webp'
-                    : '/images/ui/carrello.webp'
-              }
-              alt="Carrello"
-              width={64}
-              height={64}
-              className="w-[62%] h-[62%] object-contain relative z-10"
-              style={{ transform: 'scale(1.5)' }}
-              unoptimized
-            />
+            <motion.div
+              animate={{ rotate: count * 360 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            >
+              <Image
+                src={
+                  cartHovered
+                    ? '/images/drops/carrellorosa_optimized.webp'
+                    : count > 0
+                      ? '/images/ui/carrelloverde.webp'
+                      : '/images/ui/carrello.webp'
+                }
+                alt="Carrello"
+                width={64}
+                height={64}
+                className="w-[62%] h-[62%] object-contain relative z-10"
+                style={{ transform: 'scale(1.5)' }}
+                unoptimized
+              />
+            </motion.div>
             {count > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-[#809829] rounded-full font-neo text-[8px] md:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)]">
+              <span className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-[#809829] rounded-full font-neo text-[8px] md:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)] z-20">
                 {count}
               </span>
             )}

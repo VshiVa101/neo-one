@@ -12,9 +12,18 @@ const SOUNDS = [
   '/media/click-sounds/734421__magicalmysticva__cute-hentai-girl-voice-orgasm-sound-effect-magicalmysticva.wav',
 ]
 
-const TRIGGER_CHANCE = 0.3
+const TRIGGER_OPTIONS = [9, 12, 18]
 
 let audioPool: HTMLAudioElement[] = []
+let unplayedIndices: number[] = []
+let lastPlayedIndex: number | null = null
+let clickCount = 0
+
+function getRandomTarget(): number {
+  return TRIGGER_OPTIONS[Math.floor(Math.random() * TRIGGER_OPTIONS.length)]
+}
+
+let nextTarget = getRandomTarget()
 
 function getPool(): HTMLAudioElement[] {
   if (audioPool.length === 0) {
@@ -31,10 +40,34 @@ export function tryPlayRandomClickSound(event: MouseEvent): void {
   const target = event.target as HTMLElement
   if (target.closest('[data-hero]')) return
 
-  if (Math.random() > TRIGGER_CHANCE) return
+  clickCount++
+  if (clickCount < nextTarget) return
+
+  // Reset count and pick new target
+  clickCount = 0
+  nextTarget = getRandomTarget()
 
   const pool = getPool()
-  const sound = pool[Math.floor(Math.random() * pool.length)]
+
+  if (unplayedIndices.length === 0) {
+    let newIndices = Array.from({ length: pool.length }, (_, i) => i)
+    // Shuffle
+    for (let i = newIndices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[newIndices[i], newIndices[j]] = [newIndices[j], newIndices[i]]
+    }
+    // Prevent immediate repetition of the very last played sound
+    if (newIndices[newIndices.length - 1] === lastPlayedIndex && newIndices.length > 1) {
+      // Swap the last element with the first element
+      ;[newIndices[newIndices.length - 1], newIndices[0]] = [newIndices[0], newIndices[newIndices.length - 1]]
+    }
+    unplayedIndices = newIndices
+  }
+
+  const indexToPlay = unplayedIndices.pop()!
+  lastPlayedIndex = indexToPlay
+
+  const sound = pool[indexToPlay]
   sound.currentTime = 0
   sound.play().catch(() => {})
 }

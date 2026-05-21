@@ -57,7 +57,7 @@ export function StateBasedNavButton({
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onClick={onClick}
-      className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2"
+      className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 cursor-pointer rounded-full flex items-center justify-center focus:outline-none overflow-hidden relative"
       style={{
         backgroundColor: state === 'hovered' || state === 'pressed' ? '#F45390' : '#B3828B',
         boxShadow:
@@ -71,10 +71,8 @@ export function StateBasedNavButton({
       <Image
         src={iconSrc[state]}
         alt={alt}
-        width={64}
-        height={64}
-        className="w-full h-full object-contain"
-        style={{ transform: 'scale(1.5)' }}
+        fill
+        className="object-contain p-1"
         unoptimized
       />
     </motion.button>

@@ -262,10 +262,10 @@
     @apply bg-background text-foreground min-h-[100vh] flex flex-col;
   }
 
-  /* Gestione globale del wrapping del testo (escluso .hero) */
-  body *:not(.hero):not(.hero *) {
-    overflow-wrap: anywhere;
-    word-break: keep-all;
+  /* Parole intere — nessuna parola spezzata su due righe (escluso hero) */
+  body *:not(.neo-uncensored-hero):not(.neo-uncensored-hero *) {
+    word-break: normal;
+    overflow-wrap: break-word;
     hyphens: none;
   }
 

@@ -2,8 +2,8 @@
 
 **File:** `docs/NEO_ALIGNMENT.md`
 **Purpose:** single operational handoff document for future models/agents working on Neo-One.
-**Last updated:** 2026-05-20
-**Current release context:** v1.3.3
+**Last updated:** 2026-05-21
+**Current release context:** v1.3.4
 
 ---
 
@@ -439,7 +439,7 @@ Avoid:
 
 ---
 
-## 11. Current handoff snapshot — v1.3.3
+## 11. Current handoff snapshot — v1.3.4
 
 Current completed fix:
 
@@ -454,6 +454,13 @@ Current completed fix:
 - **v1.3.1 Fix**: Global text wrapping strategy implemented to prevent word-breaking on resize, with `overflow-x: hidden` on root to prevent horizontal scroll.
 - **v1.3.2 Fixes**: Pinch-to-zoom (two-finger pinch tracking) and double-tap zoom (1x ↔ 2.5x toggle) implemented in the artwork detail view on mobile. Added a dedicated close/ESC floating button matching the design system within the fullscreen zoom modal. local prevention of browser pull-to-refresh / scroll bounce on cluster decks and modals.
 - **v1.3.3 Fix**: Removed the global `overscroll-behavior-y: none` rule on `body` from `globals.css` that was freezing vertical scrolling on mobile browsers (Safari). Maintained targeted pull-to-refresh blocks in modals/decks.
+- **v1.3.4 Fixes**: 
+  - Corrected home page cluster loading to always retrieve B/N cluster (`b-n` slug) on initial load alongside the Neon cluster.
+  - Enlarged cluster description font size on home main stage (to exactly half of title size) and transformed it to uppercase.
+  - Enforced site-wide uppercase typography across multiple detail/list subcomponents for increased readability (excluding the hero section `neo-uncensored-hero`).
+  - Reduced EventDetail call-to-action font size by 25% and narrowed letter spacing to prevent text clipping and wrapping issues.
+  - Implemented atomic word wrapping inside `BrandedTitle` component by encasing complete words in inline-blocks and setting `white-space: nowrap`, successfully resolving mid-word breaks across all text surfaces.
+  - Patched global word-wrap rules in `globals.css` with the correct `.neo-uncensored-hero` selector.
 
 Current next product focus from roadmap:
 

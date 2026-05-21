@@ -1,13 +1,13 @@
-# ðŸš€ Neo-One Vercel Deployment Checklist
+# 🚀 Neo-One Vercel Deployment Checklist
 
-**Release:** v1.3.3
+**Release:** v1.3.4
 **Status:** In Progress
-**Date:** May 20, 2026
+**Date:** May 21, 2026
 **GitHub Repo:** https://github.com/VshiVa101/neo-one.git
 
 ---
 
-## âœ… Pre-Deployment (COMPLETATO)
+## ✅ Pre-Deployment (COMPLETATO)
 
 - [x] Codice pushato su GitHub
 - [x] Database Neon online e configurato
@@ -120,4 +120,4 @@ pnpm exec tsx scripts/create-neo-user.ts
 
 ---
 
-Ultimo aggiornamento: 20 Maggio 2026 — Release v1.3.3, Mobile Calendar Scroll Fix.
+Ultimo aggiornamento: 21 Maggio 2026 — Release v1.3.4, Cluster Matching & Site-Wide Typography Refinements.

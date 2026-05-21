@@ -44,8 +44,10 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   )
   const initialRight = clusters.findIndex(
     (c) =>
+      c.slug?.toLowerCase() === 'b-n' ||
       c.slug?.toLowerCase().includes('bn') ||
       c.slug?.toLowerCase().includes('bianco') ||
+      c.title?.toLowerCase().includes('b/n') ||
       c.title?.toLowerCase().includes('mix'),
   )
 
@@ -227,7 +229,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       <div 
         className={`fixed left-1/2 -translate-x-1/2 z-[500] transition-all duration-500 ${
           expandedClusterId 
-            ? 'top-[1vh] md:top-[2vh] w-[8vh] h-[8vh] md:w-[15vh] md:h-[15vh] opacity-70 hover:opacity-100'
+            ? 'top-[1vh] md:top-[2vh] w-[8vh] h-[8vh] md:w-[15vh] md:h-[15vh] opacity-100'
             : 'top-[2vh] md:top-[4vh] w-[12vh] h-[12vh] md:w-[28vh] md:h-[28vh]'
         }`}
       >
@@ -269,7 +271,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         footerX={footerX}
         onHoverChange={setIsHoveringFooter}
       >
-        <div className="pointer-events-auto flex flex-col items-center justify-center gap-3 h-[20vh] md:h-[22vh]">
+        <div className="pointer-events-auto flex flex-col items-center justify-center gap-5 h-[20vh] md:h-[22vh]">
           <StateBasedNavButton
             defaultIcon="/images/ui/web_2.webp"
             hoverIcon="/images/ui/web_6.webp"
@@ -296,24 +298,32 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
             }}
             title="Vai alla Cassa"
           >
-            <Image
-              src={
-                cartHovered
-                  ? '/images/drops/carrellorosa_optimized.webp'
-                  : count > 0
-                    ? '/images/drops/carrelloverde_optimized.webp'
-                    : '/images/drops/carrello_optimized.webp'
-              }
-              alt="Carrello"
-              width={64}
-              height={64}
-              className="w-full h-full object-contain"
-              style={{ transform: 'scale(1.5)' }}
-              unoptimized
-            />
-            <span className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-[#809829] rounded-full font-neo text-[8px] md:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)]">
-              {count}
-            </span>
+            <motion.div
+              animate={{ rotate: count * 360 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            >
+              <Image
+                src={
+                  cartHovered
+                    ? '/images/drops/carrellorosa_optimized.webp'
+                    : count > 0
+                      ? '/images/drops/carrelloverde_optimized.webp'
+                      : '/images/drops/carrello_optimized.webp'
+                }
+                alt="Carrello"
+                width={64}
+                height={64}
+                className="w-[62%] h-[62%] object-contain"
+                style={{ transform: 'scale(1.5)' }}
+                unoptimized
+              />
+            </motion.div>
+            {count > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-[#809829] rounded-full font-neo text-[8px] md:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)] z-20">
+                {count}
+              </span>
+            )}
           </motion.button>
         </div>
       </ClusterNavFooter>

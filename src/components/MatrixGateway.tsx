@@ -133,7 +133,7 @@ export function MatrixGateway({ onClick, isFading }: MatrixGatewayProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
               transition={{ duration: 0.45, ease: 'easeOut' }}
-              className="text-[10px] sm:text-[12px] tracking-[1.5em] ml-[1.5em] text-white/50 font-sans pointer-events-none select-none lowercase"
+              className="text-[10px] sm:text-[12px] tracking-[1.5em] ml-[1.5em] text-white/50 font-sans pointer-events-none select-none uppercase"
             >
               <BrandedTitle text="toccami" />
             </motion.div>

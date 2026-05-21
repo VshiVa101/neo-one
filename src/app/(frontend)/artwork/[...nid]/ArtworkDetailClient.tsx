@@ -438,23 +438,23 @@ export const ArtworkDetailClient = ({
                 <h2 className="font-neo text-white text-3xl lg:text-5xl tracking-[0.2em] mb-4 uppercase branded-title">
                   <BrandedTitle text="Dettagli" />
                 </h2>
-                <p className="font-neo text-white text-xl lg:text-2xl tracking-widest lowercase mb-2">
+                <p className="font-neo text-white text-xl lg:text-2xl tracking-widest uppercase mb-2">
                   {title}
                 </p>
-                <p className="font-neo text-white text-base lg:text-xl tracking-widest lowercase mb-1">
+                <p className="font-neo text-white text-base lg:text-xl tracking-widest uppercase mb-1">
                   {method} / {support}
                 </p>
-                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest lowercase mb-6">
+                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest uppercase mb-6">
                   {dimensions} — {year}
                 </p>
 
                 <h2 className="font-neo text-white text-2xl lg:text-4xl tracking-[0.2em] mb-2 uppercase branded-title">
                   <BrandedTitle text="Disponibilità" />
                 </h2>
-                <p className="font-neo text-white text-base lg:text-xl tracking-widest lowercase mb-1">
+                <p className="font-neo text-white text-base lg:text-xl tracking-widest uppercase mb-1">
                   {isAvailable ? 'acquistabile' : 'archivio'}
                 </p>
-                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest lowercase">
+                <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest uppercase">
                   {priceInfo}
                 </p>
               </div>
@@ -559,7 +559,8 @@ export const ArtworkDetailClient = ({
                 whileHover={{ scale: 1.1, backgroundColor: '#809829' }}
                 whileTap={{ scale: 0.9 }}
                 onClick={handleAudioPreview}
-                className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
+                className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
+                style={{ backgroundColor: isPreviewPlaying ? '#809829' : '#B3828B' }}
                 title="Prova Audio"
               >
                 <Image
@@ -626,25 +627,33 @@ export const ArtworkDetailClient = ({
               onClick={() => setIsCartOpen(true)}
               className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex items-center justify-center outline-none transition-colors duration-300"
             >
-              <Image
-                src={
-                  cartHovered
-                    ? '/images/drops/carrellorosa_optimized.webp'
-                    : count > 0
-                      ? '/images/ui/carrelloverde.webp'
-                      : '/images/ui/carrello.webp'
-                }
-                alt="Carrello"
-                width={44}
-                height={44}
-                className="w-[62%] h-[62%] object-contain relative z-10"
-                style={{ transform: 'scale(1.5)' }}
-                unoptimized
-              />
+              <motion.div
+                animate={{ rotate: count * 360 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className="absolute inset-0 flex items-center justify-center pointer-events-none"
+              >
+                <Image
+                  src={
+                    cartHovered
+                      ? '/images/drops/carrellorosa_optimized.webp'
+                      : count > 0
+                        ? '/images/ui/carrelloverde.webp'
+                        : '/images/ui/carrello.webp'
+                  }
+                  alt="Carrello"
+                  width={44}
+                  height={44}
+                  className="w-[62%] h-[62%] object-contain relative z-10"
+                  style={{ transform: 'scale(1.5)' }}
+                  unoptimized
+                />
+              </motion.div>
               {/* Contatore ESTERNO */}
-              <span className="absolute -top-2 -right-2 w-[22px] h-[22px] lg:w-[24px] lg:h-[24px] flex items-center justify-center bg-[#809829] rounded-full font-neo text-[10px] lg:text-sm text-black font-bold border lg:border-2 border-black z-20 shadow-[0_0_5px_rgba(128,152,41,0.8)]">
-                {count}
-              </span>
+              {count > 0 && (
+                <span className="absolute -top-2 -right-2 w-[22px] h-[22px] lg:w-[24px] lg:h-[24px] flex items-center justify-center bg-[#809829] rounded-full font-neo text-[10px] lg:text-sm text-black font-bold border lg:border-2 border-black z-20 shadow-[0_0_5px_rgba(128,152,41,0.8)]">
+                  {count}
+                </span>
+              )}
             </motion.button>
           </div>
         </div>

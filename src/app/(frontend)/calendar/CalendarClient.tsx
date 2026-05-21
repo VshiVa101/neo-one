@@ -226,7 +226,7 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.5 }}
                 >
-                  <p className="font-neo text-white text-base md:text-xl tracking-widest lowercase opacity-80 leading-relaxed">
+                  <p className="font-neo text-white text-base md:text-xl tracking-widest uppercase opacity-80 leading-relaxed">
                     <BrandedTitle text={quote || "vieni a molestarmi dal vivo"} />
                   </p>
                 </motion.div>
@@ -311,7 +311,7 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
                   ))
                 ) : (
                   <div className="py-20 text-center">
-                    <p className="font-neo text-white/30 text-sm tracking-widest lowercase">
+                    <p className="font-neo text-white/30 text-sm tracking-widest uppercase">
                       <BrandedTitle text="nessun evento programmato per quest'anno" />
                     </p>
                   </div>
@@ -326,7 +326,7 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
       </div>
 
       {/* Floating Actions: Home + Cart (matching Home style) */}
-      <div className="fixed bottom-[80px] right-6 md:bottom-[100px] md:right-10 z-[400] flex flex-col items-center gap-3">
+      <div className="fixed bottom-[80px] right-6 md:bottom-[100px] md:right-10 z-[400] flex flex-col items-center gap-5">
         {/* Home Button */}
         <StateBasedNavButton
           defaultIcon="/images/ui/web_5.webp"
@@ -357,24 +357,32 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
           }}
           title="Vai alla Cassa"
         >
-          <Image
-            src={
-              cartHovered
-                ? '/images/drops/carrellorosa_optimized.webp'
-                : count > 0
-                  ? '/images/drops/carrelloverde_optimized.webp'
-                  : '/images/drops/carrello_optimized.webp'
-            }
-            alt="Carrello"
-            width={64}
-            height={64}
-            className="w-full h-full object-contain"
-            style={{ transform: 'scale(1.5)' }}
-            unoptimized
-          />
-          <span className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-[#809829] rounded-full font-neo text-[8px] md:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)]">
-            {count}
-          </span>
+          <motion.div
+            animate={{ rotate: count * 360 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          >
+            <Image
+              src={
+                cartHovered
+                  ? '/images/drops/carrellorosa_optimized.webp'
+                  : count > 0
+                    ? '/images/drops/carrelloverde_optimized.webp'
+                    : '/images/drops/carrello_optimized.webp'
+              }
+              alt="Carrello"
+              width={64}
+              height={64}
+              className="w-[62%] h-[62%] object-contain"
+              style={{ transform: 'scale(1.5)' }}
+              unoptimized
+            />
+          </motion.div>
+          {count > 0 && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-[#809829] rounded-full font-neo text-[8px] md:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)]">
+              {count}
+            </span>
+          )}
         </motion.button>
       </div>
 

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 
 
+## [1.3.4] - 2026-05-21
+
+### 🎨 CLUSTER MATCHING & SITE-WIDE TYPOGRAPHY REFINEMENTS
+
+- **Home Featured Clusters**: Corrected matching for the B/N cluster slug (`b-n`) to guarantee it is always loaded and displayed as the right featured cluster next to the Neon cluster.
+- **Enlarged Featured Descriptions**: Increased description font size for the featured home clusters and made them uppercase, keeping them exactly half the size of the corresponding title (`text-xs md:text-[15px] lg:text-[1.25vw]`).
+- **Site-Wide Uppercase**: Enforced uppercase styling for textual contents across major pages and subcomponents (e.g. ArtworkDetailClient, CalendarClient, EventDetail, MatrixGateway) to improve readability and structure, with the hero section (`neo-uncensored-hero`) explicitly excluded.
+- **EventDetail CTA scaling**: Scaled down the EventDetail call-to-action button by 25% and narrowed its letter-spacing to prevent screen overcrowding and improve visual balance (`text-lg md:text-[27px] tracking-wide`).
+- **BrandedTitle Word-Wrapping**: Solved mid-word wrapping anomalies by dynamically wrapping whole words inside atomic `<span>` blocks with inline-blocks and `white-space: nowrap`. This ensures whole words never break mid-word across the entire site.
+- **Global Text-Break Improvements**: Corrected the global word-wrap styles in `globals.css` using the exact `.neo-uncensored-hero` selector instead of the invalid `.hero` selector, and unified the word-break rules to prevent broken syllables.
+
 ## [1.3.3] - 2026-05-20
 
 ### 🗓️ CALENDAR MOBILE SCROLL FIX
