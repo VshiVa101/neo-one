@@ -420,14 +420,101 @@ export const ArtworkDetailClient = ({
                   touchStartX.current = null
                 }}
               >
-                <Image
-                  src={image}
-                  alt={`Opera ${nid}`}
-                  fill
-                  className="object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-transform duration-700 lg:group-hover:scale-[1.02]"
-                  sizes="(max-width: 1024px) 100vw, 60vw"
-                  priority
-                />
+                <motion.div
+                  className={`relative flex items-center justify-center overflow-hidden transition-colors duration-1000 ${
+                    isPreviewPlaying && isRumoreCluster ? 'bg-[#0a0a0a]' : 'bg-transparent'
+                  }`}
+                  initial={false}
+                  animate={{
+                    width: isPreviewPlaying && isRumoreCluster ? 'min(45vh, 65vw)' : '100%',
+                    height: isPreviewPlaying && isRumoreCluster ? 'min(45vh, 65vw)' : '100%',
+                    borderRadius: isPreviewPlaying && isRumoreCluster ? '50%' : '0%',
+                    rotate: isPreviewPlaying && isRumoreCluster ? 360 : 0,
+                    borderWidth: isPreviewPlaying && isRumoreCluster ? '4px' : '0px',
+                    borderColor: '#1a1a1a'
+                  }}
+                  transition={{
+                    width: { duration: 0.8, ease: 'easeInOut' },
+                    height: { duration: 0.8, ease: 'easeInOut' },
+                    borderRadius: { duration: 0.8, ease: 'easeInOut' },
+                    borderWidth: { duration: 0.8, ease: 'easeInOut' },
+                    rotate: isPreviewPlaying && isRumoreCluster 
+                      ? { duration: 4, repeat: Infinity, ease: 'linear', delay: 0.8 } 
+                      : { duration: 0.8, ease: 'easeOut' }
+                  }}
+                >
+                  <Image
+                    src={image}
+                    alt={`Opera ${nid}`}
+                    fill
+                    className={`drop-shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-all duration-700 object-contain ${
+                      isPreviewPlaying && isRumoreCluster ? 'scale-[0.65]' : 'lg:group-hover:scale-[1.02]'
+                    }`}
+                    sizes="(max-width: 1024px) 100vw, 60vw"
+                    priority
+                  />
+                  {/* Vinyl center hole */}
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isPreviewPlaying && isRumoreCluster ? 1 : 0 }}
+                    transition={{ duration: 0.4, delay: isPreviewPlaying && isRumoreCluster ? 0.8 : 0 }}
+                    className="absolute w-4 h-4 md:w-6 md:h-6 bg-black rounded-full border border-white/10 z-10 shadow-inner" 
+                  />
+                  {/* Vinyl reflections */}
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isPreviewPlaying && isRumoreCluster ? 1 : 0 }}
+                    transition={{ duration: 0.4, delay: isPreviewPlaying && isRumoreCluster ? 0.8 : 0 }}
+                    className="absolute inset-0 rounded-full z-0 pointer-events-none"
+                    style={{
+                      background: 'conic-gradient(from 0deg, transparent 0%, rgba(255,255,255,0.05) 15%, transparent 30%, transparent 50%, rgba(255,255,255,0.05) 65%, transparent 80%)'
+                    }}
+                  />
+                </motion.div>
+
+                {/* Braccio Meccanico Giradischi */}
+                <AnimatePresence>
+                  {isRumoreCluster && (
+                    <motion.div
+                      className="absolute top-[5%] right-[12%] lg:right-[15%] z-20 pointer-events-none origin-[24px_24px] lg:origin-[32px_32px]"
+                      initial={{ opacity: 0, rotate: -30 }}
+                      animate={{ 
+                        opacity: 1, 
+                        rotate: isPreviewPlaying ? 25 : -25 
+                      }}
+                      exit={{ opacity: 0 }}
+                      transition={{ 
+                        opacity: { duration: 0.5 },
+                        rotate: { type: 'spring', stiffness: 60, damping: 15, delay: isPreviewPlaying ? 0.8 : 0 }
+                      }}
+                    >
+                      {/* Base / Perno */}
+                      <div 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAudioPreview();
+                        }}
+                        className="absolute top-0 left-0 w-[48px] h-[48px] lg:w-[64px] lg:h-[64px] bg-gradient-to-br from-[#666] via-[#222] to-[#111] rounded-full border-2 border-[#555] shadow-2xl flex items-center justify-center z-20 pointer-events-auto cursor-pointer transition-transform hover:scale-110 active:scale-95"
+                      >
+                        <div className="w-[16px] h-[16px] lg:w-[24px] lg:h-[24px] bg-gradient-to-t from-black to-[#444] rounded-full border border-[#888] shadow-inner pointer-events-none" />
+                      </div>
+                      
+                      {/* Asta principale (Rod) */}
+                      <div className="absolute top-[21px] left-[24px] lg:top-[29px] lg:left-[32px] w-[180px] md:w-[240px] lg:w-[35vh] h-[6px] lg:h-[8px] bg-gradient-to-b from-[#e0e0e0] via-[#999] to-[#555] origin-left rounded-r-full shadow-[0_10px_20px_rgba(0,0,0,0.8)]" style={{ transform: 'rotate(110deg)' }}>
+                         {/* Contrappeso (dietro il perno) */}
+                         <div className="absolute left-[-40px] lg:left-[-50px] top-1/2 -translate-y-1/2 w-[35px] lg:w-[45px] h-[16px] lg:h-[22px] bg-gradient-to-r from-[#222] via-[#555] to-[#222] rounded-l-md border border-[#444]" />
+                         
+                         {/* Testina / Headshell */}
+                         <div className="absolute right-[-15px] top-1/2 -translate-y-1/2 w-[35px] lg:w-[45px] h-[18px] lg:h-[24px] bg-gradient-to-b from-[#333] to-[#111] rounded-sm transform rotate-[-25deg] border-b-2 border-r border-[#666] shadow-2xl flex items-center justify-end pr-1">
+                           {/* Dettaglio testina */}
+                           <div className="w-[4px] h-[8px] bg-[#809829] rounded-sm" />
+                           {/* Puntina (Stylus) che tocca il disco */}
+                           <div className="absolute bottom-[-4px] left-[10px] w-[2px] h-[6px] bg-[#ccc] shadow-[0_5px_5px_rgba(0,0,0,1)]" />
+                         </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Back: Text Data */}

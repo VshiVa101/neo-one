@@ -1,8 +1,8 @@
 # 🚀 Neo-One Vercel Deployment Checklist
 
-**Release:** v1.3.4
+**Release:** v1.3.5
 **Status:** In Progress
-**Date:** May 21, 2026
+**Date:** May 22, 2026
 **GitHub Repo:** https://github.com/VshiVa101/neo-one.git
 
 ---
@@ -120,4 +120,4 @@ pnpm exec tsx scripts/create-neo-user.ts
 
 ---
 
-Ultimo aggiornamento: 21 Maggio 2026 — Release v1.3.4, Cluster Matching & Site-Wide Typography Refinements.
+Ultimo aggiornamento: 22 Maggio 2026 — Release v1.3.5, Rumore Vinyl Animation & Interactive Tonearm.

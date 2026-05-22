@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 
 
+## [1.3.5] - 2026-05-22
+
+### 🎵 RUMORE VINYL ANIMATION & INTERACTIVE TONEARM
+
+- **Vinyl Animation**: Added a dynamic vinyl record transition when playing audio previews in the "RUMORE" cluster. The artwork details image scales down and rounds to a perfect circle with standard vinyl reflections and a dark outer edge, giving the visual impression of being printed on a real disc.
+- **Image Scale Preservation**: Ensured the artwork is fully visible inside the spinning vinyl (using `object-contain` and scaling it down to 65%) to prevent its corners and sides from being cropped.
+- **Interactive Mechanical Tonearm**: Implemented a responsive mechanical record player tonearm built entirely in pure CSS/Tailwind and Framer Motion. When the track plays, the tonearm smoothly swings into place using spring physics after a 0.8s delay, placing the needle onto the spinning record.
+- **Interactive Pivot Control**: The turntable's tonearm base pivot is now fully clickable, acting as a secondary play/pause toggle for the audio track with scale-on-hover and active micro-interactions.
+
 ## [1.3.4] - 2026-05-21
 
 ### 🎨 CLUSTER MATCHING & SITE-WIDE TYPOGRAPHY REFINEMENTS
