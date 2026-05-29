@@ -37,7 +37,7 @@ export const ExpandedGalleryOverlay = ({
           className="fixed inset-0 z-[200] bg-black/90 overflow-hidden"
         >
           {/* LAYER DI SCROLL: Contiene la griglia e l'ombra sticky */}
-          <div className="absolute inset-0 overflow-y-auto overflow-x-hidden custom-scrollbar">
+          <div className="absolute inset-0 overflow-y-auto overflow-x-hidden custom-scrollbar" style={{ touchAction: 'pan-y' }}>
             {/* HEADER SPACER (per lasciare spazio all'occhio e al titolo fixed) */}
             <div className="w-full h-[24vh] md:h-[45vh] pointer-events-none" />
 

@@ -150,21 +150,15 @@ const EyeModel = ({
   const handleClick = () => {
     if (!isUnlocked) return
     
-    // Se è fornito un onClick esterno (es. per chiudere la gallery), usiamo quello
-    if (onClick) {
-      onClick()
-      return
-    }
-
     if (hovered) setHovered(false)
     setIsIgnoringPointer(true)
     
     if (disableTransitionOverlay) {
-      router.push(targetRoute)
+      router.push('/home')
     } else {
       triggerTransition()
       setTimeout(() => {
-        router.push(targetRoute)
+        router.push('/home')
       }, 1500)
     }
   }

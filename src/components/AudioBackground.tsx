@@ -11,8 +11,13 @@ export const AudioBackground = () => {
   const { isMuted, isPlaying, toggleMute } = useAudio()
   const pathname = usePathname()
 
-  // L'icona del volume non deve apparire nella landing splash (/)
-  if (!isPlaying || pathname === '/') return null
+  // L'icona del volume non deve apparire nella landing splash (/), in /home o in /calendar
+  const isExcludedPage =
+    pathname === '/' ||
+    pathname.startsWith('/home') ||
+    pathname.startsWith('/calendar')
+
+  if (!isPlaying || isExcludedPage) return null
 
   return (
     <button

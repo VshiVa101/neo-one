@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { motion, useMotionValue } from 'framer-motion'
 import Image from 'next/image'
 import { EyeScene } from '@/components/EyeScene'
@@ -11,9 +11,11 @@ import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useTransition } from '@/contexts/TransitionContext'
 import { useCart } from '@/contexts/CartContext'
 import { StateBasedNavButton } from '@/components/StateBasedNavButton'
+import { MuteNavButton } from '@/components/MuteNavButton'
 import { ClusterMainStage } from './ClusterMainStage'
 import { ClusterNavFooter } from './ClusterNavFooter'
 import { ExpandedClusterModal } from './ExpandedClusterModal'
+import { useModalHistory } from '@/hooks/useModalHistory'
 
 export interface SubclusterData {
   id: number | string
@@ -69,6 +71,19 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   const [isLoadingExpanded, setIsLoadingExpanded] = useState(false)
   const [expandedDeckIndex, setExpandedDeckIndex] = useState<number | null>(null)
   const [activeDeckIndex, setActiveDeckIndex] = useState(0)
+
+  // Back button support: close overlays instead of navigating away
+  const closeCluster = useCallback(() => setExpandedClusterId(null), [])
+  const closeGallery = useCallback(() => {
+    setExpandedDeckIndex(null)
+    // If the cluster has only 1 subcluster, close cluster too
+    const subs = expandedClusterId ? cachedSubclusters[expandedClusterId] : null
+    if (subs && subs.length === 1) {
+      setExpandedClusterId(null)
+    }
+  }, [expandedClusterId, cachedSubclusters])
+  useModalHistory(!!expandedClusterId && expandedDeckIndex === null, closeCluster, 'cluster')
+  useModalHistory(expandedDeckIndex !== null, closeGallery, 'gallery')
 
   useEffect(() => {
     const clusterParam = searchParams.get('cluster')
@@ -271,7 +286,8 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         footerX={footerX}
         onHoverChange={setIsHoveringFooter}
       >
-        <div className="pointer-events-auto flex flex-col items-center justify-center gap-5 h-[20vh] md:h-[22vh]">
+        <div className="pointer-events-auto flex flex-col items-center justify-center gap-5">
+          <MuteNavButton />
           <StateBasedNavButton
             defaultIcon="/images/ui/web_2.webp"
             hoverIcon="/images/ui/web_6.webp"

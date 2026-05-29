@@ -13,6 +13,7 @@ import { EventItem } from '@/components/calendar/EventItem'
 import { EventDetail } from '@/components/calendar/EventDetail'
 import { ContactForm } from '@/components/calendar/ContactForm'
 import { SocialBar } from '@/components/calendar/SocialBar'
+import { CalendarSidePanel } from '@/components/calendar/CalendarSidePanel'
 import type { NeoEvent } from '@/data/calendar-mock'
 import { useCart } from '@/contexts/CartContext'
 import { ShoppingCart } from 'lucide-react'
@@ -91,6 +92,8 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
 
   const [currentYear, setCurrentYear] = useState(initialYear)
   const [direction, setDirection] = useState(0)
+  const [animatingNext, setAnimatingNext] = useState(false)
+  const [animatingPrev, setAnimatingPrev] = useState(false)
   
   const { isCartOpen, setIsCartOpen, count } = useCart()
   const router = useRouter()
@@ -143,6 +146,22 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
     }
   }
 
+  const handleNextClick = async () => {
+    if (!canGoNext || animatingNext) return
+    setAnimatingNext(true)
+    await new Promise(r => setTimeout(r, 300))
+    changeYear('next')
+    setAnimatingNext(false)
+  }
+
+  const handlePrevClick = async () => {
+    if (!canGoPrev || animatingPrev) return
+    setAnimatingPrev(true)
+    await new Promise(r => setTimeout(r, 300))
+    changeYear('prev')
+    setAnimatingPrev(false)
+  }
+
   const variants = {
     initial: (direction: number) => ({
       y: direction > 0 ? 1200 : -1200, // direction 1 (next) -> from bottom, direction 0/-1 -> from top
@@ -193,18 +212,13 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
       
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(57,255,20,0.03),transparent_70%)] z-[1]" />
 
-      {/* EyeScene Anchor */}
-      <div className="fixed top-[2vh] md:top-[4vh] left-1/2 -translate-x-1/2 w-[12vh] h-[12vh] md:w-[20vh] md:h-[20vh] z-[500]">
-        <EyeScene
-          targetRoute="/home"
-          showCircularText={false}
-          globalTracking={true}
-          scaleMultiplier={1.1}
-        />
-      </div>
+      {/* EyeScene is now rendered inside CalendarSidePanel */}
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-3xl mx-auto px-4 pt-[18vh] md:pt-[28vh] pb-32 min-h-screen flex flex-col items-center">
+      <div className="relative z-10 w-full min-h-screen flex flex-col md:grid md:grid-cols-4">
+        {/* Left 3 Columns: Calendar */}
+        <div className="w-full md:col-span-3 flex flex-col justify-start">
+          <div className="w-full max-w-3xl mx-auto md:mx-0 md:ml-auto md:mr-12 lg:mr-24 pl-4 pr-24 md:px-4 pt-[18vh] md:pt-[28vh] pb-32 flex flex-col items-center">
         
         {/* Navigation Wrapper for AnimatePresence */}
         <AnimatePresence mode="wait" custom={direction}>
@@ -226,75 +240,80 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.5 }}
                 >
-                  <p className="font-neo text-white text-base md:text-xl tracking-widest uppercase opacity-80 leading-relaxed">
+                  <p 
+                    className="font-neo text-white text-base md:text-xl tracking-widest uppercase opacity-95 leading-relaxed"
+                    style={{
+                      textShadow: '1px 1px 0px #000, -1px 1px 0px #000, 1px -1px 0px #000, -1px -1px 0px #000, 0px 1px 0px #000, 0px -1px 0px #000, 1px 0px 0px #000, -1px 0px 0px #000'
+                    }}
+                  >
                     <BrandedTitle text={quote || "vieni a molestarmi dal vivo"} />
                   </p>
                 </motion.div>
 
-                <div className="flex flex-col items-center justify-center gap-0 mb-2">
-                  {/* Top Arrow -> Next available year */}
-                  <motion.button
-                    whileHover={canGoNext ? { scale: 1.2, y: -5 } : {}}
-                    whileTap={canGoNext ? { scale: 0.9 } : {}}
-                    onClick={() => changeYear('next')}
-                    className="flex items-center justify-center focus:outline-none disabled:opacity-0 disabled:cursor-default group relative"
-                    disabled={!canGoNext}
-                    style={{ transition: 'opacity 0.3s' }}
-                  >
-                    {/* Decorative Dots */}
-                    <div className="absolute -left-6 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#9AB830] shadow-[0_0_16px_rgba(154,184,48,0.8),0_0_30px_rgba(154,184,48,0.3)] opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute -right-6 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#9AB830] shadow-[0_0_16px_rgba(154,184,48,0.8),0_0_30px_rgba(154,184,48,0.3)] opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
-                    
-                    <motion.div
-                      whileHover={{ filter: 'drop-shadow(0 0 35px rgba(57,255,20,1)) brightness(1.3)' }}
-                      whileTap={{ filter: 'drop-shadow(0 0 20px rgba(57,255,20,0.8)) brightness(1.1)' }}
-                      style={{ filter: 'drop-shadow(0 0 20px rgba(57,255,20,0.7)) brightness(1.1)' }}
+                <div className="flex flex-col items-center justify-center mb-8 mt-4">
+                  {/* Top Arrow Wrapper */}
+                  <div className="w-full flex justify-center items-end overflow-hidden h-[70px] relative z-0 -mb-[2px]">
+                    <motion.button
+                      initial="idle"
+                      animate={animatingNext ? "click" : (canGoNext ? "idle" : "hidden")}
+                      whileHover={canGoNext && !animatingNext ? "hover" : undefined}
+                      variants={{
+                        hidden: { opacity: 0, y: 70 },
+                        idle: { opacity: 1, y: 50 }, // Tip visible
+                        hover: { opacity: 1, y: 20 }, // Partially extracted
+                        click: { opacity: 1, y: 0 } // Fully extracted
+                      }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      onClick={handleNextClick}
+                      className="flex items-center justify-center focus:outline-none disabled:cursor-default"
+                      disabled={!canGoNext || animatingNext}
                     >
                       <Image 
-                        src="/images/ui/direction-arrow-green.webp" 
+                        src="/images/ui/web_1.webp" 
                         alt="Prossimo Anno" 
-                        width={75} 
-                        height={75} 
-                        className="-rotate-90"
+                        width={85} 
+                        height={50} 
+                        className="rotate-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.8)]"
                         unoptimized
                       />
-                    </motion.div>
-                  </motion.button>
+                    </motion.button>
+                  </div>
                   
-                  <h2 className="font-neo text-white text-3xl md:text-5xl tracking-[0.3em] leading-none flex items-center justify-center pt-2 pb-1">
-                    <BrandedTitle text={currentYear.toString()} />
-                  </h2>
+                  {/* Container for Year (Tighter) */}
+                  <div className="relative z-10 bg-[#0a0a0a] shadow-[0_-15px_20px_-5px_rgba(57,255,20,0.5),0_15px_20px_-5px_rgba(57,255,20,0.5)] border-y border-[#39FF14]/30">
+                    <h2 className="font-neo text-white text-3xl md:text-5xl tracking-[0.3em] leading-none flex items-center justify-center -mr-[0.3em]">
+                      <BrandedTitle text={currentYear.toString()} />
+                    </h2>
+                  </div>
 
-                  {/* Bottom Arrow -> Previous available year */}
-                  <motion.button
-                    whileHover={canGoPrev ? { scale: 1.2, y: 5 } : {}}
-                    whileTap={canGoPrev ? { scale: 0.9 } : {}}
-                    onClick={() => changeYear('prev')}
-                    className="flex items-center justify-center focus:outline-none disabled:opacity-0 disabled:cursor-default group relative"
-                    disabled={!canGoPrev}
-                    style={{ transition: 'opacity 0.3s' }}
-                  >
-                    {/* Decorative Dots */}
-                    <div className="absolute -left-6 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#9AB830] shadow-[0_0_16px_rgba(154,184,48,0.8),0_0_30px_rgba(154,184,48,0.3)] opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute -right-6 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#9AB830] shadow-[0_0_16px_rgba(154,184,48,0.8),0_0_30px_rgba(154,184,48,0.3)] opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
-                    
-                    <motion.div
-                      whileHover={{ filter: 'drop-shadow(0 0 35px rgba(57,255,20,1)) brightness(1.3)' }}
-                      whileTap={{ filter: 'drop-shadow(0 0 20px rgba(57,255,20,0.8)) brightness(1.1)' }}
-                      style={{ filter: 'drop-shadow(0 0 20px rgba(57,255,20,0.7)) brightness(1.1)' }}
+                  {/* Bottom Arrow Wrapper */}
+                  <div className="w-full flex justify-center items-start overflow-hidden h-[70px] relative z-0 -mt-[2px]">
+                    <motion.button
+                      initial="idle"
+                      animate={animatingPrev ? "click" : (canGoPrev ? "idle" : "hidden")}
+                      whileHover={canGoPrev && !animatingPrev ? "hover" : undefined}
+                      variants={{
+                        hidden: { opacity: 0, y: -70 },
+                        idle: { opacity: 1, y: -50 },
+                        hover: { opacity: 1, y: -20 },
+                        click: { opacity: 1, y: 0 }
+                      }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      onClick={handlePrevClick}
+                      className="flex items-center justify-center focus:outline-none disabled:cursor-default"
+                      disabled={!canGoPrev || animatingPrev}
                     >
                       <Image 
-                        src="/images/ui/direction-arrow-green.webp" 
+                        src="/images/ui/web.webp" 
                         alt="Anno Precedente" 
-                        width={75} 
-                        height={75} 
-                        className="rotate-90"
+                        width={85} 
+                        height={50} 
+                        className="rotate-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.8)]"
                         unoptimized
                       />
-                    </motion.div>
-                  </motion.button>
+                    </motion.button>
+                  </div>
                 </div>
-                <div className="mt-1 w-16 h-[2px] bg-black/30 mx-auto" />
               </div>
 
               {/* Months */}
@@ -323,68 +342,27 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
 
         {/* Bottom Spacer */}
         <div className="h-16" />
+          </div>
+        </div>
+
+        {/* Right Column: Spacing placeholder to prevent calendar from overlapping sidebar */}
+        <div className="hidden md:block w-full md:col-span-1 pointer-events-none" />
       </div>
 
-      {/* Floating Actions: Home + Cart (matching Home style) */}
-      <div className="fixed bottom-[80px] right-6 md:bottom-[100px] md:right-10 z-[400] flex flex-col items-center gap-5">
-        {/* Home Button */}
-        <StateBasedNavButton
-          defaultIcon="/images/ui/web_5.webp"
-          hoverIcon="/images/ui/web_3.webp"
-          activeIcon="/images/ui/web_4.webp"
-          onClick={() => router.push('/home')}
-          title="Home"
-          alt="Torna alla home"
-        />
-
-        {/* Cart Button */}
-        <motion.button
-          animate={{
-            scale: cartHovered ? 1.5 : 1,
-          }}
-          transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-          whileTap={{ scale: 0.9 }}
-          onMouseEnter={() => setCartHovered(true)}
-          onMouseLeave={() => setCartHovered(false)}
-          onClick={() => setIsCartOpen(true)}
-          className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300 relative"
-          style={{
-            backgroundColor: cartHovered ? '#F45390' : '#B3828B',
-            boxShadow: cartHovered
-              ? '0 0 30px rgba(244, 83, 144, 0.8), 0 0 60px rgba(244, 83, 144, 0.3)'
-              : '0 0 10px rgba(0,0,0,0.3)',
-            zIndex: cartHovered ? 401 : undefined,
-          }}
-          title="Vai alla Cassa"
-        >
-          <motion.div
-            animate={{ rotate: count * 360 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="absolute inset-0 flex items-center justify-center pointer-events-none"
-          >
-            <Image
-              src={
-                cartHovered
-                  ? '/images/drops/carrellorosa_optimized.webp'
-                  : count > 0
-                    ? '/images/drops/carrelloverde_optimized.webp'
-                    : '/images/drops/carrello_optimized.webp'
-              }
-              alt="Carrello"
-              width={64}
-              height={64}
-              className="w-[62%] h-[62%] object-contain"
-              style={{ transform: 'scale(1.5)' }}
-              unoptimized
+      {/* Side Panel (Fixed position, works on both mobile and desktop) */}
+      <CalendarSidePanel 
+        socialLinks={socialLinks} 
+        eyeComponent={
+          <div className="relative w-[130px] h-[130px] md:w-[160px] md:h-[160px] flex-shrink-0">
+            <EyeScene
+              targetRoute="/home"
+              showCircularText={false}
+              globalTracking={true}
+              scaleMultiplier={1.1}
             />
-          </motion.div>
-          {count > 0 && (
-            <span className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-[#809829] rounded-full font-neo text-[8px] md:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)]">
-              {count}
-            </span>
-          )}
-        </motion.button>
-      </div>
+          </div>
+        }
+      />
 
       {/* Event Detail Modal */}
       <AnimatePresence>
@@ -402,9 +380,6 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
         isOpen={isContactOpen}
         onClose={() => setIsContactOpen(false)}
       />
-
-      {/* Social Linktree Bar */}
-      <SocialBar socialLinks={socialLinks} />
     </main>
   )
 }

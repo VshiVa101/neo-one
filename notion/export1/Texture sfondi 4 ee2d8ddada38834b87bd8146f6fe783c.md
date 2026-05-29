@@ -1,0 +1,16 @@
+# Texture/sfondi 4
+
+Status: In progress
+Last edited: March 23, 2026 6:46 PM
+
+### About asset
+
+Provide a brief overview describing the asset.
+
+### Supporting files
+
+![26-05-2013_sprayed_011.jpg](26-05-2013_sprayed_011%201.jpg)
+
+[https://www.notion.so](https://www.notion.so)
+
+[https://www.notion.so](https://www.notion.so)

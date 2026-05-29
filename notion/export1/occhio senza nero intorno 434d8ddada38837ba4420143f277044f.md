@@ -1,0 +1,16 @@
+# occhio senza nero intorno
+
+Status: Not started
+Last edited: March 23, 2026 6:46 PM
+
+### About asset
+
+Provide a brief overview describing the asset.
+
+### Supporting files
+
+![Senza titolo-2.png](Senza_titolo-2.png)
+
+[https://www.notion.so](https://www.notion.so)
+
+[https://www.notion.so](https://www.notion.so)

@@ -161,8 +161,8 @@ export async function fetchArtworkByNid(nid: string) {
   }
 }
 
-export async function fetchAdjacentArtworks(currentNid: string, subclusterId: string | null): Promise<{ prevNid: string | null; nextNid: string | null; currentIndex: number | null }> {
-  if (!subclusterId) return { prevNid: null, nextNid: null, currentIndex: null }
+export async function fetchAdjacentArtworks(currentNid: string, subclusterId: string | null): Promise<{ prevNid: string | null; nextNid: string | null; currentIndex: number | null; prevImage: string | null; nextImage: string | null }> {
+  if (!subclusterId) return { prevNid: null, nextNid: null, currentIndex: null, prevImage: null, nextImage: null }
 
   const payload = await getPayload({ config: configPromise })
   const decodedNid = decodeURIComponent(currentNid).trim()
@@ -171,17 +171,22 @@ export async function fetchAdjacentArtworks(currentNid: string, subclusterId: st
     collection: 'artworks',
     where: { subcluster: { equals: subclusterId } },
     sort: 'nid',
-    depth: 0,
+    depth: 1, // depth 1 needed to populate the image media URL
     limit: 200,
   })
 
   const index = docs.findIndex(a => String(a.nid) === String(decodedNid))
-  if (index === -1) return { prevNid: null, nextNid: null, currentIndex: null }
+  if (index === -1) return { prevNid: null, nextNid: null, currentIndex: null, prevImage: null, nextImage: null }
+
+  const prevDoc = index > 0 ? docs[index - 1] : null
+  const nextDoc = index < docs.length - 1 ? docs[index + 1] : null
 
   return {
-    prevNid: index > 0 ? String(docs[index - 1].nid) : null,
-    nextNid: index < docs.length - 1 ? String(docs[index + 1].nid) : null,
+    prevNid: prevDoc ? String(prevDoc.nid) : null,
+    nextNid: nextDoc ? String(nextDoc.nid) : null,
     currentIndex: index,
+    prevImage: prevDoc ? getImageUrl(prevDoc.mainImage, '/images/drops/placeholder.png') : null,
+    nextImage: nextDoc ? getImageUrl(nextDoc.mainImage, '/images/drops/placeholder.png') : null,
   }
 }
 

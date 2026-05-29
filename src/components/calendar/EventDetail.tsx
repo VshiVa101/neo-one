@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import type { NeoEvent } from '@/data/calendar-mock'
@@ -21,6 +21,14 @@ export function EventDetail({ event, quote, onClose }: EventDetailProps) {
   const [linkHovered, setLinkHovered] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
   const [addedToCart, setAddedToCart] = useState(false)
+  const [euroRotation, setEuroRotation] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setEuroRotation((prev) => prev + 360)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [])
 
   const handlePurchase = () => {
     addToCart({
@@ -214,10 +222,16 @@ export function EventDetail({ event, quote, onClose }: EventDetailProps) {
             onMouseLeave={() => setPurchaseHovered(false)}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#B3828B] rounded-full cursor-pointer transition-colors duration-300"
+            className="neo-interface-btn relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-[#B3828B] rounded-full cursor-pointer transition-colors duration-300"
             style={{ backgroundColor: addedToCart ? '#809829' : purchaseHovered ? '#F45390' : '#B3828B' }}
           >
-            <Image src="/images/ui/euros.webp" alt="Acquista" width={64} height={64} className="w-[72%] h-[72%] object-contain transition-all duration-300" style={{ transform: 'scale(1.5)' }} unoptimized />
+            <motion.div
+              animate={{ rotate: euroRotation }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            >
+              <Image src="/images/ui/euros.webp" alt="Acquista" width={64} height={64} className="w-[72%] h-[72%] object-contain" style={{ transform: 'scale(1.5)' }} unoptimized />
+            </motion.div>
           </motion.button>
 
           {/* Cart Button */}

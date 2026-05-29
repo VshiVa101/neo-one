@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { BrandedTitle } from '@/components/BrandedTitle'
 import { fetchCartSettings, submitCart } from '@/app/(frontend)/home/actions'
 import { normalizeNeoString } from '@/utilities/normalizeNeoText'
+import { useModalHistory } from '@/hooks/useModalHistory'
 
 interface CartItem {
   nid: string
@@ -39,6 +40,10 @@ export const useCart = () => useContext(CartContext)
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
+
+  // Back button support: close cart panel instead of navigating away
+  const closeCart = React.useCallback(() => setIsCartOpen(false), [])
+  useModalHistory(isCartOpen, closeCart, 'cart')
 
   // Form State
   const [name, setName] = useState('')
@@ -329,7 +334,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                     <textarea
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      placeholder="flame,insulti,e messaggi minatori saranno collezzionati"
+                      placeholder="flame,insulti,e messaggi minatori saranno collezionati"
                       className="w-full bg-white/5 border border-white/10 p-4 font-neo text-white text-sm focus:outline-none focus:border-[#809829] transition-colors min-h-[150px] resize-none uppercase"
                     />
                   </div>

@@ -1,0 +1,1 @@
+# descrizione modalità shop , con metodi pagamento e invio merce  👈

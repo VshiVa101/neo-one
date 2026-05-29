@@ -9,6 +9,7 @@ import { BrandedTitle } from '@/components/BrandedTitle'
 import { useNavigationHistory } from '@/hooks/useNavigationHistory'
 import { useAudio } from '@/contexts/AudioContext'
 import { startCrtNoise, stopCrtNoise, isCrtNoisePlaying } from '@/utilities/crtNoiseManager'
+import { CrumpledPaperPanel } from '@/components/artwork/CrumpledPaperPanel'
 
 let rumoreSessionActive = false
 let restartTimeout: ReturnType<typeof setTimeout> | null = null
@@ -30,6 +31,8 @@ interface ArtworkDetailClientProps {
   deckIndex?: number | null
   audioSnippetUrl?: string | null
   fullAudioUrl?: string | null
+  prevImage?: string | null
+  nextImage?: string | null
 }
 
 export const ArtworkDetailClient = ({
@@ -49,6 +52,8 @@ export const ArtworkDetailClient = ({
   deckIndex,
   audioSnippetUrl,
   fullAudioUrl,
+  prevImage,
+  nextImage,
 }: ArtworkDetailClientProps) => {
   const router = useRouter()
   const { goBackToGallery } = useNavigationHistory()
@@ -69,6 +74,7 @@ export const ArtworkDetailClient = ({
   const [isPreviewPlaying, setIsPreviewPlaying] = useState(false)
   const touchStartX = React.useRef<number | null>(null)
   const previewAudioRef = React.useRef<HTMLAudioElement | null>(null)
+  const [euroRotation, setEuroRotation] = useState(0)
 
   // ── Pinch-to-zoom refs ──
   const pinchStartDist = useRef<number | null>(null)
@@ -242,6 +248,13 @@ export const ArtworkDetailClient = ({
     }
   }, [])
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setEuroRotation((prev) => prev + 360)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <>
       {/* ── MODALE OVERLAY ZOOM A SCHERMO INTERO ── */}
@@ -301,47 +314,13 @@ export const ArtworkDetailClient = ({
         {/* ── MIDDLE ROW (Le 3 colonne su Desktop, Solo Centro su Mobile) ── */}
         <div className="flex flex-row items-stretch justify-center w-full h-[55vh] md:h-[60vh] lg:h-[65vh] gap-[2vw]">
           {/* 1. LEFT PANEL (Only on Large Screens) */}
-          <div className="relative hidden lg:flex w-[22vw] bg-black rounded-lg overflow-hidden flex-col items-center justify-center gap-12 pointer-events-none">
-            {/* Zebra BG */}
-            <Image
-              src="/images/ui/pink-zebra-bg.webp"
-              alt=""
-              fill
-              className="object-cover"
-              unoptimized
+          <div className="relative hidden lg:flex w-[22vw] bg-black rounded-lg overflow-hidden">
+            <CrumpledPaperPanel
+              artworkImage={prevImage ?? null}
+              alt="Opera Precedente"
+              side="left"
+              onClick={prevNid ? () => router.push(getNavUrl(prevNid)) : undefined}
             />
-            {/* Logo Neo-One */}
-            <div className="relative z-10 w-full aspect-[2/1] flex items-center justify-center">
-              <div className="w-full h-full bg-[#809829] drop-shadow-[0_0_20px_rgba(128,152,41,0.8)] neo-logo-mask" />
-            </div>
-            {/* Btn Prev */}
-            <div className="relative z-10 w-full flex justify-center">
-              {prevNid ? (
-                <motion.button
-                  className="neo-interface-btn pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#B3828B] rounded-full flex items-center justify-center transition-colors"
-                  onClick={() => router.push(getNavUrl(prevNid))}
-                  onMouseEnter={() => setPrevHovered(true)}
-                  onMouseLeave={() => setPrevHovered(false)}
-                  whileHover={{ scale: 1.15, backgroundColor: '#809829' }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Image
-                    src={
-                      prevHovered
-                        ? '/images/ui/direction-arrow-green.webp'
-                        : '/images/ui/direction-arrow-pink.webp'
-                    }
-                    alt="Precedente"
-                    width={44}
-                    height={44}
-                    className="w-[62%] h-[62%] object-contain rotate-180"
-                    unoptimized
-                  />
-                </motion.button>
-              ) : (
-                <div className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] opacity-0" />
-              )}
-            </div>
           </div>
 
           {/* 2. CENTER ARTWORK (With floating buttons for MD/SM screens) */}
@@ -549,48 +528,13 @@ export const ArtworkDetailClient = ({
           </div>
 
           {/* 3. RIGHT PANEL (Only on Large Screens) */}
-          <div className="relative hidden lg:flex w-[22vw] bg-black rounded-lg overflow-hidden flex-col items-center justify-center gap-12 pointer-events-none">
-            {/* Zebra BG */}
-            <Image
-              src="/images/ui/pink-zebra-bg.webp"
-              alt=""
-              fill
-              className="object-cover"
-              unoptimized
+          <div className="relative hidden lg:flex w-[22vw] bg-black rounded-lg overflow-hidden">
+            <CrumpledPaperPanel
+              artworkImage={nextImage ?? null}
+              alt="Opera Successiva"
+              side="right"
+              onClick={nextNid ? () => router.push(getNavUrl(nextNid)) : undefined}
             />
-            <div className="absolute inset-0 bg-black/10" />
-            {/* Logo Neo-One */}
-            <div className="relative z-10 w-full aspect-[2/1] flex items-center justify-center">
-              <div className="w-full h-full bg-[#809829] drop-shadow-[0_0_20px_rgba(128,152,41,0.8)] neo-logo-mask" />
-            </div>
-            {/* Btn Next */}
-            <div className="relative z-10 w-full flex justify-center">
-              {nextNid ? (
-                <motion.button
-                  className="neo-interface-btn pointer-events-auto cursor-pointer focus:outline-none w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] bg-[#B3828B] rounded-full flex items-center justify-center transition-colors"
-                  onClick={() => router.push(getNavUrl(nextNid))}
-                  onMouseEnter={() => setNextHovered(true)}
-                  onMouseLeave={() => setNextHovered(false)}
-                  whileHover={{ scale: 1.15, backgroundColor: '#809829' }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Image
-                    src={
-                      nextHovered
-                        ? '/images/ui/direction-arrow-green.webp'
-                        : '/images/ui/direction-arrow-pink.webp'
-                    }
-                    alt="Successiva"
-                    width={44}
-                    height={44}
-                    className="w-[62%] h-[62%] object-contain"
-                    unoptimized
-                  />
-                </motion.button>
-              ) : (
-                <div className="w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] opacity-0" />
-              )}
-            </div>
           </div>
         </div>
 
@@ -689,20 +633,37 @@ export const ArtworkDetailClient = ({
               onClick={handlePurchase}
               onMouseEnter={() => setPurchaseHovered(true)}
               onMouseLeave={() => setPurchaseHovered(false)}
-              whileHover={{ scale: 1.1 }}
+              animate={{
+                scale: addedToCart ? [1, 1.2, 1] : purchaseHovered ? 1.1 : [1, 1.06, 1],
+                boxShadow: addedToCart
+                  ? '0 0 30px rgba(128, 152, 41, 0.8)'
+                  : purchaseHovered
+                    ? '0 0 25px rgba(244, 83, 144, 0.6)'
+                    : ['0 0 8px rgba(244, 83, 144, 0.2)', '0 0 18px rgba(244, 83, 144, 0.5)', '0 0 8px rgba(244, 83, 144, 0.2)'],
+              }}
+              transition={{
+                scale: addedToCart ? { duration: 0.4 } : purchaseHovered ? { duration: 0.2 } : { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+                boxShadow: addedToCart ? { duration: 0.4 } : purchaseHovered ? { duration: 0.2 } : { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+              }}
               whileTap={{ scale: 0.9 }}
               className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
               style={{ backgroundColor: addedToCart ? '#809829' : purchaseHovered ? '#F45390' : '#B3828B' }}
             >
-              <Image
-                src="/images/ui/euros.webp"
-                alt="Acquista"
-                width={50}
-                height={50}
-                className="w-[72%] h-[72%] object-contain transition-all duration-300"
-                style={{ transform: 'scale(1.5)' }}
-                unoptimized
-              />
+              <motion.div
+                animate={{ rotate: euroRotation }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className="absolute inset-0 flex items-center justify-center pointer-events-none"
+              >
+                <Image
+                  src="/images/ui/euros.webp"
+                  alt="Acquista"
+                  width={50}
+                  height={50}
+                  className="w-[72%] h-[72%] object-contain"
+                  style={{ transform: 'scale(1.5)' }}
+                  unoptimized
+                />
+              </motion.div>
             </motion.button>
 
             {/* Carrello */}

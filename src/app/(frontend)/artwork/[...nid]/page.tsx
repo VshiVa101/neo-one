@@ -15,7 +15,7 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
 
   if (!artwork) return notFound()
 
-  const { prevNid, nextNid, currentIndex } = await fetchAdjacentArtworks(
+  const { prevNid, nextNid, currentIndex, prevImage, nextImage } = await fetchAdjacentArtworks(
     nidString,
     artwork.subclusterId ?? null,
   )
@@ -67,6 +67,8 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
           priceInfo={artwork.priceInfo}
           prevNid={prevNid}
           nextNid={nextNid}
+          prevImage={prevImage}
+          nextImage={nextImage}
           clusterId={artwork.clusterId}
           clusterSlug={artwork.clusterSlug}
           deckIndex={artwork.deckIndex}
