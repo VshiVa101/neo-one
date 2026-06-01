@@ -917,10 +917,19 @@ function SpaceInvadersGame({ onTransitionTriggered }: GameProps) {
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'
         ctx.strokeRect(barX, barY, barWidth, barHeight)
 
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-        ctx.font = '9px font-neo, monospace'
+        ctx.font = 'bold 10px font-neo, monospace'
         ctx.textAlign = 'center'
-        ctx.fillText(`INTEGRITÀ OCCHIO-INVADER (PICCOLO VERDE & VIOLA)`, canvas.width / 2, barY - 6)
+        const centerX = canvas.width / 2
+        
+        // Brand colors for each letter
+        ctx.fillStyle = '#809829' // Acid Green
+        ctx.fillText('N', centerX - 8, barY - 6)
+        
+        ctx.fillStyle = '#F45390' // Vibrant Pink
+        ctx.fillText('E', centerX, barY - 6)
+        
+        ctx.fillStyle = '#B026FF' // Purple/Violet
+        ctx.fillText('O', centerX + 8, barY - 6)
 
         // Indicator arrow above player Eye
         ctx.fillStyle = '#809829'
