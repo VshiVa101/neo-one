@@ -232,12 +232,12 @@ export const NeoUncensoredHero: React.FC<HeroProps> = () => {
           }
 
           .neo-bg--hero {
-            background-image: url('/neo-assets/hero/backgrounds/bg-herosection.gif');
+            background-image: url('/images/drops/bg-herosection.gif');
             opacity: 1;
           }
 
           .neo-bg--home {
-            background-image: url('/neo-assets/hero/backgrounds/bg-home.gif');
+            background-image: url('/images/drops/bg-home.gif');
           }
 
           .neo-hero-center {

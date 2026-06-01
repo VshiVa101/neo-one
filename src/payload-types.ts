@@ -306,6 +306,7 @@ export interface Category {
  */
 export interface Artwork {
   id: number;
+  subcluster: number | Category;
   /**
    * Identificativo unico dell'opera. Usato anche come URL.
    */
@@ -336,7 +337,6 @@ export interface Artwork {
    * Testo libero: prezzo originale, prezzo stampe, su richiesta, ecc.
    */
   priceInfo?: string | null;
-  subcluster: number | Category;
   /**
    * Carica un file audio breve (es. MP3). Perfetto per il cluster Rumore.
    */
@@ -1242,6 +1242,7 @@ export interface CategoriesSelect<T extends boolean = true> {
  * via the `definition` "artworks_select".
  */
 export interface ArtworksSelect<T extends boolean = true> {
+  subcluster?: T;
   nid?: T;
   title?: T;
   mainImage?: T;
@@ -1257,7 +1258,6 @@ export interface ArtworksSelect<T extends boolean = true> {
   originalDimensions?: T;
   availability?: T;
   priceInfo?: T;
-  subcluster?: T;
   sampleAudio?: T;
   fullAudioUrl?: T;
   updatedAt?: T;

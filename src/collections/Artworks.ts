@@ -16,6 +16,13 @@ export const Artworks: CollectionConfig = {
   },
   fields: [
     {
+      name: 'subcluster',
+      label: 'Sottocluster (Mazzo)',
+      type: 'relationship',
+      relationTo: 'categories',
+      required: true,
+    },
+    {
       name: 'nid',
       label: 'N.ID (Codice Neo)',
       type: 'text',
@@ -62,13 +69,19 @@ export const Artworks: CollectionConfig = {
       name: 'executionMethod',
       label: 'Metodo di Esecuzione',
       type: 'text',
-      admin: { placeholder: 'es. Acrilico su tela, Digitale...' },
+      admin: { 
+        placeholder: 'es. Acrilico su tela, Digitale...',
+        condition: (data) => data?.subcluster !== 5,
+      },
     },
     {
       name: 'support',
       label: 'Supporto',
       type: 'text',
-      admin: { placeholder: 'es. Tela, Carta 300g, Tavola...' },
+      admin: { 
+        placeholder: 'es. Tela, Carta 300g, Tavola...',
+        condition: (data) => data?.subcluster !== 5,
+      },
     },
     {
       name: 'creationDate',
@@ -77,13 +90,17 @@ export const Artworks: CollectionConfig = {
       admin: {
         placeholder: 'es. 2023, Marzo 2024...',
         description: 'Testo libero.',
+        condition: (data) => data?.subcluster !== 5,
       },
     },
     {
       name: 'originalDimensions',
       label: 'Dimensioni Originali',
       type: 'text',
-      admin: { placeholder: 'es. 70×100 cm' },
+      admin: { 
+        placeholder: 'es. 70×100 cm',
+        condition: (data) => data?.subcluster !== 5,
+      },
     },
     {
       name: 'availability',
@@ -104,13 +121,6 @@ export const Artworks: CollectionConfig = {
       admin: {
         description: 'Testo libero: prezzo originale, prezzo stampe, su richiesta, ecc.',
       },
-    },
-    {
-      name: 'subcluster',
-      label: 'Sottocluster (Mazzo)',
-      type: 'relationship',
-      relationTo: 'categories',
-      required: true,
     },
 
     {
