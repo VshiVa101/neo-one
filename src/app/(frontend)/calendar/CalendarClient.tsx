@@ -223,7 +223,11 @@ const CalendarYearCard = ({
                       } : undefined
                     }, // Shifts UP so tip rests on paper, base enters hole (with periodic elastic wiggle)
                     hover: { opacity: 1, y: -16 }, // Slides further UP on top of paper
-                    click: { opacity: 1, y: -26 }
+                    click: { 
+                      opacity: 1, 
+                      y: -26,
+                      transition: { duration: 1.0, ease: "easeOut" }
+                    }
                   }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   onClick={handleNextClick}
@@ -295,7 +299,11 @@ const CalendarYearCard = ({
                       } : undefined
                     }, // Shifts DOWN so base rests on paper, tip enters hole (with periodic elastic wiggle)
                     hover: { opacity: 1, y: 16 }, // Slides further DOWN on top of paper
-                    click: { opacity: 1, y: 26 }
+                    click: { 
+                      opacity: 1, 
+                      y: 26,
+                      transition: { duration: 1.0, ease: "easeOut" }
+                    }
                   }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   onClick={handlePrevClick}
@@ -449,7 +457,7 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
 
   const variants = {
     initial: (direction: number) => ({
-      y: direction > 0 ? 2500 : -2500, // direction 1 (next) -> from bottom, direction 0/-1 -> from top
+      y: direction > 0 ? "150%" : "-150%", // direction 1 (next) -> from bottom, direction 0/-1 -> from top
       opacity: 1,
       rotate: 0
     }),
@@ -465,7 +473,7 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
       }
     },
     exit: (direction: number) => ({
-      y: direction > 0 ? -2500 : 2500, // direction 1 (next) -> exits top
+      y: direction > 0 ? "-150%" : "150%", // direction 1 (next) -> exits top
       opacity: 1,
       rotate: 0,
       transition: {
