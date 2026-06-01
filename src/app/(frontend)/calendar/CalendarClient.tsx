@@ -75,47 +75,23 @@ const MonthRow = ({ events, month, monthIndex, setActiveEvent }: { events: NeoEv
 
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
-export default function CalendarClient({ initialEvents, initialEventId, quote, socialLinks }: CalendarClientProps) {
-  const { isTouchMode } = useInputMode()
-  const [activeEvent, setActiveEvent] = useState<NeoEvent | null>(null)
-  const [isContactOpen, setIsContactOpen] = useState(false)
-  const [cartHovered, setCartHovered] = useState(false)
-  
-  // Extract unique sorted years from events
-  const availableYears = useMemo(() => {
-    const years = Array.from(new Set(initialEvents.map(e => parseInt(e.year))))
-    return years.sort((a, b) => a - b)
-  }, [initialEvents])
-
-  // Default to current actual year if it exists in data, otherwise the most recent available
-  const initialYear = useMemo(() => {
-    const now = new Date().getFullYear()
-    if (availableYears.includes(now)) return now
-    return availableYears.length > 0 ? availableYears[availableYears.length - 1] : now
-  }, [availableYears])
-
-  const [currentYear, setCurrentYear] = useState(initialYear)
-  const [direction, setDirection] = useState(0)
-  const [animatingNext, setAnimatingNext] = useState(false)
-  const [animatingPrev, setAnimatingPrev] = useState(false)
-  
+const CalendarYearCard = ({ 
+  currentYear, 
+  eventsByMonth, 
+  quote, 
+  setActiveEvent, 
+  canGoNext, 
+  canGoPrev, 
+  animatingNext, 
+  animatingPrev, 
+  handleNextClick, 
+  handlePrevClick, 
+  nudgeActive 
+}: any) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const topHoleRef = useRef<HTMLDivElement>(null)
   const bottomHoleRef = useRef<HTMLDivElement>(null)
   const [paperHoles, setPaperHoles] = useState<{ top: number, left: number, width: number, height: number }[]>([])
-  const [nudgeActive, setNudgeActive] = useState(false)
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout
-    const interval = setInterval(() => {
-      setNudgeActive(true)
-      timeout = setTimeout(() => setNudgeActive(false), 1000)
-    }, 4000)
-    return () => {
-      clearInterval(interval)
-      clearTimeout(timeout)
-    }
-  }, [])
 
   useIsomorphicLayoutEffect(() => {
     const container = containerRef.current
@@ -169,23 +145,15 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
       ])
     }
 
-    // Measure initially
     measure()
 
-    // Setup ResizeObserver to perfectly adapt to font-loads and layout shifts
-    const observer = new ResizeObserver(() => {
-      measure()
-    })
-
+    const observer = new ResizeObserver(() => measure())
     observer.observe(container)
     if (topHole.parentElement) {
       observer.observe(topHole.parentElement)
     }
 
-    // Setup resize listener
     window.addEventListener('resize', measure)
-
-    // Layered fallback timeouts
     const t1 = setTimeout(measure, 100)
     const t2 = setTimeout(measure, 400)
     const t3 = setTimeout(measure, 1000)
@@ -198,6 +166,216 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
       clearTimeout(t3)
     }
   }, [currentYear])
+
+  return (
+    <TornPaper holes={paperHoles} className="px-4 py-8 md:px-8 md:py-12">
+      {/* Reference container for accurate hole measurement */}
+      <div ref={containerRef} className="w-full h-full relative">
+      {/* Calendar Header */}
+      <div className="text-center mb-4 pt-8 md:pt-14">
+        <motion.div
+          className="max-w-xs md:max-w-md mx-auto mb-3"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          <p 
+            className="font-neo text-white text-base md:text-xl tracking-widest uppercase opacity-95 leading-relaxed"
+            style={{
+              textShadow: '1px 1px 0px #000, -1px 1px 0px #000, 1px -1px 0px #000, -1px -1px 0px #000, 0px 1px 0px #000, 0px -1px 0px #000, 1px 0px 0px #000, -1px 0px 0px #000'
+            }}
+          >
+            <BrandedTitle text={quote || "vieni a molestarmi dal vivo"} />
+          </p>
+        </motion.div>
+
+        <div className="flex flex-col items-center justify-center mt-12 mb-16 md:mt-16 md:mb-24 py-4 relative w-full gap-6">
+          {/* Top Arrow Wrapper (Rectangular Hole) */}
+          <div ref={topHoleRef} className="relative w-[200px] md:w-[280px] h-[8px] mx-auto">
+            {/* The hole is now physically punched in the background using SVG masking! */}
+            
+            {/* Arrow container with inner shadow - overflow-visible to let arrow rest on paper */}
+            <div className="absolute inset-0 overflow-visible flex justify-center items-center shadow-[inset_0_1px_3px_rgba(0,0,0,0.95)] border border-[#111]/50 rounded-[2px] pointer-events-none">
+              <div 
+                className="pointer-events-auto flex justify-center items-center w-full h-full"
+                style={{
+                  clipPath: 'polygon(-1000% -10000%, 1000% -10000%, 1000% 100%, -1000% 100%)',
+                  WebkitClipPath: 'polygon(-1000% -10000%, 1000% -10000%, 1000% 100%, -1000% 100%)',
+                  overflow: 'visible'
+                }}
+              >
+                <motion.button
+                  initial="idle"
+                  animate={animatingNext ? "click" : (canGoNext ? "idle" : "hidden")}
+                  whileHover={canGoNext && !animatingNext ? "hover" : undefined}
+                  variants={{
+                    hidden: { opacity: 0, y: 30 },
+                    idle: { 
+                      opacity: 1, 
+                      y: nudgeActive ? [-6, -16, -2, -8, -6] : -6,
+                      transition: nudgeActive ? {
+                        duration: 1.0,
+                        times: [0, 0.25, 0.5, 0.75, 1],
+                        ease: "easeInOut"
+                      } : undefined
+                    }, // Shifts UP so tip rests on paper, base enters hole (with periodic elastic wiggle)
+                    hover: { opacity: 1, y: -16 }, // Slides further UP on top of paper
+                    click: { opacity: 1, y: -26 }
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  onClick={handleNextClick}
+                  className="flex items-center justify-center focus:outline-none disabled:cursor-default"
+                  disabled={!canGoNext || animatingNext}
+                >
+                  <Image 
+                    src="/images/ui/web_1.webp" 
+                    alt="Prossimo Anno" 
+                    width={110} 
+                    height={65} 
+                    className="rotate-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.8)]"
+                    unoptimized
+                  />
+                </motion.button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Container for Year */}
+          <div className="relative py-0 w-full flex justify-center items-center">
+            {/* Eraser text to punch hole in TornPaper */}
+            <h2 
+              className="font-neo text-4xl md:text-6xl tracking-[0.3em] leading-none flex items-center justify-center -mr-[0.3em] font-bold text-white m-0 p-0"
+              style={{
+                transform: 'translateZ(0)'
+              }}
+            >
+              <BrandedTitle text={currentYear.toString()} />
+            </h2>
+            {/* Optional shadow overlay to maintain depth/legibility */}
+            <h2 
+              className="absolute font-neo text-4xl md:text-6xl tracking-[0.3em] leading-none flex items-center justify-center -mr-[0.3em] font-bold pointer-events-none text-white m-0 p-0"
+              style={{
+                filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))'
+              }}
+              aria-hidden="true"
+            >
+              <BrandedTitle text={currentYear.toString()} />
+            </h2>
+          </div>
+
+          {/* Bottom Arrow Wrapper (Rectangular Hole) */}
+          <div ref={bottomHoleRef} className="relative w-[200px] md:w-[280px] h-[8px] mx-auto">
+            {/* The hole is now physically punched in the background using SVG masking! */}
+            
+            <div className="absolute inset-0 overflow-visible flex justify-center items-center shadow-[inset_0_1px_3px_rgba(0,0,0,0.95)] border border-[#111]/50 rounded-[2px] pointer-events-none">
+              <div 
+                className="pointer-events-auto flex justify-center items-center w-full h-full"
+                style={{
+                  clipPath: 'polygon(-1000% 0%, 1000% 0%, 1000% 10000%, -1000% 10000%)',
+                  WebkitClipPath: 'polygon(-1000% 0%, 1000% 0%, 1000% 10000%, -1000% 10000%)',
+                  overflow: 'visible'
+                }}
+              >
+                <motion.button
+                  initial="idle"
+                  animate={animatingPrev ? "click" : (canGoPrev ? "idle" : "hidden")}
+                  whileHover={canGoPrev && !animatingPrev ? "hover" : undefined}
+                  variants={{
+                    hidden: { opacity: 0, y: -30 },
+                    idle: { 
+                      opacity: 1, 
+                      y: nudgeActive ? [6, 16, 2, 8, 6] : 6,
+                      transition: nudgeActive ? {
+                        duration: 1.0,
+                        times: [0, 0.25, 0.5, 0.75, 1],
+                        ease: "easeInOut"
+                      } : undefined
+                    }, // Shifts DOWN so base rests on paper, tip enters hole (with periodic elastic wiggle)
+                    hover: { opacity: 1, y: 16 }, // Slides further DOWN on top of paper
+                    click: { opacity: 1, y: 26 }
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  onClick={handlePrevClick}
+                  className="flex items-center justify-center focus:outline-none disabled:cursor-default"
+                  disabled={!canGoPrev || animatingPrev}
+                >
+                  <Image 
+                    src="/images/ui/web.webp" 
+                    alt="Anno Precedente" 
+                    width={110} 
+                    height={65} 
+                    className="rotate-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.8)]"
+                    unoptimized
+                  />
+                </motion.button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Months */}
+      <div className="flex flex-col gap-4">
+        {Object.keys(eventsByMonth).length > 0 ? (
+          Object.entries(eventsByMonth).map(([month, events], monthIndex) => (
+            <MonthRow 
+              key={month}
+              month={month}
+              events={events as NeoEvent[]}
+              monthIndex={monthIndex}
+              setActiveEvent={setActiveEvent}
+            />
+          ))
+        ) : (
+          <div className="py-20 text-center">
+            <p className="font-neo text-white/30 text-sm tracking-widest uppercase">
+              <BrandedTitle text="nessun evento programmato per quest'anno" />
+            </p>
+          </div>
+        )}
+      </div>
+      </div>
+    </TornPaper>
+  )
+}
+
+export default function CalendarClient({ initialEvents, initialEventId, quote, socialLinks }: CalendarClientProps) {
+  const { isTouchMode } = useInputMode()
+  const [activeEvent, setActiveEvent] = useState<NeoEvent | null>(null)
+  const [isContactOpen, setIsContactOpen] = useState(false)
+  const [cartHovered, setCartHovered] = useState(false)
+  
+  // Extract unique sorted years from events
+  const availableYears = useMemo(() => {
+    const years = Array.from(new Set(initialEvents.map(e => parseInt(e.year))))
+    return years.sort((a, b) => a - b)
+  }, [initialEvents])
+
+  // Default to current actual year if it exists in data, otherwise the most recent available
+  const initialYear = useMemo(() => {
+    const now = new Date().getFullYear()
+    if (availableYears.includes(now)) return now
+    return availableYears.length > 0 ? availableYears[availableYears.length - 1] : now
+  }, [availableYears])
+
+  const [currentYear, setCurrentYear] = useState(initialYear)
+  const [direction, setDirection] = useState(0)
+  const [animatingNext, setAnimatingNext] = useState(false)
+  const [animatingPrev, setAnimatingPrev] = useState(false)
+  
+  const [nudgeActive, setNudgeActive] = useState(false)
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout
+    const interval = setInterval(() => {
+      setNudgeActive(true)
+      timeout = setTimeout(() => setNudgeActive(false), 1000)
+    }, 4000)
+    return () => {
+      clearInterval(interval)
+      clearTimeout(timeout)
+    }
+  }, [])
   
   const { isCartOpen, setIsCartOpen, count } = useCart()
   const router = useRouter()
@@ -335,174 +513,19 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
             exit="exit"
             className="w-full"
           >
-            <TornPaper holes={paperHoles} className="px-4 py-8 md:px-8 md:py-12">
-              {/* Reference container for accurate hole measurement */}
-              <div ref={containerRef} className="w-full h-full relative">
-              {/* Calendar Header */}
-              <div className="text-center mb-4 pt-8 md:pt-14">
-                <motion.div
-                  className="max-w-xs md:max-w-md mx-auto mb-3"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.5 }}
-                >
-                  <p 
-                    className="font-neo text-white text-base md:text-xl tracking-widest uppercase opacity-95 leading-relaxed"
-                    style={{
-                      textShadow: '1px 1px 0px #000, -1px 1px 0px #000, 1px -1px 0px #000, -1px -1px 0px #000, 0px 1px 0px #000, 0px -1px 0px #000, 1px 0px 0px #000, -1px 0px 0px #000'
-                    }}
-                  >
-                    <BrandedTitle text={quote || "vieni a molestarmi dal vivo"} />
-                  </p>
-                </motion.div>
-
-                <div className="flex flex-col items-center justify-center mt-12 mb-16 md:mt-16 md:mb-24 py-4 relative w-full gap-6">
-                  {/* Top Arrow Wrapper (Rectangular Hole) */}
-                  <div ref={topHoleRef} className="relative w-[200px] md:w-[280px] h-[8px] mx-auto">
-                    {/* The hole is now physically punched in the background using SVG masking! */}
-                    
-                    {/* Arrow container with inner shadow - overflow-visible to let arrow rest on paper */}
-                    <div className="absolute inset-0 overflow-visible flex justify-center items-center shadow-[inset_0_1px_3px_rgba(0,0,0,0.95)] border border-[#111]/50 rounded-[2px] pointer-events-none">
-                      <div 
-                        className="pointer-events-auto flex justify-center items-center w-full h-full"
-                        style={{
-                          clipPath: 'polygon(-1000% -10000%, 1000% -10000%, 1000% 100%, -1000% 100%)',
-                          WebkitClipPath: 'polygon(-1000% -10000%, 1000% -10000%, 1000% 100%, -1000% 100%)',
-                          overflow: 'visible'
-                        }}
-                      >
-                        <motion.button
-                          initial="idle"
-                          animate={animatingNext ? "click" : (canGoNext ? "idle" : "hidden")}
-                          whileHover={canGoNext && !animatingNext ? "hover" : undefined}
-                          variants={{
-                            hidden: { opacity: 0, y: 30 },
-                            idle: { 
-                              opacity: 1, 
-                              y: nudgeActive ? [-6, -16, -2, -8, -6] : -6,
-                              transition: nudgeActive ? {
-                                duration: 1.0,
-                                times: [0, 0.25, 0.5, 0.75, 1],
-                                ease: "easeInOut"
-                              } : undefined
-                            }, // Shifts UP so tip rests on paper, base enters hole (with periodic elastic wiggle)
-                            hover: { opacity: 1, y: -16 }, // Slides further UP on top of paper
-                            click: { opacity: 1, y: -26 }
-                          }}
-                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                          onClick={handleNextClick}
-                          className="flex items-center justify-center focus:outline-none disabled:cursor-default"
-                          disabled={!canGoNext || animatingNext}
-                        >
-                          <Image 
-                            src="/images/ui/web_1.webp" 
-                            alt="Prossimo Anno" 
-                            width={110} 
-                            height={65} 
-                            className="rotate-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.8)]"
-                            unoptimized
-                          />
-                        </motion.button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Container for Year */}
-                  <div className="relative py-0 w-full flex justify-center items-center">
-                    {/* Eraser text to punch hole in TornPaper */}
-                    <h2 
-                      className="font-neo text-4xl md:text-6xl tracking-[0.3em] leading-none flex items-center justify-center -mr-[0.3em] font-bold text-white m-0 p-0"
-                      style={{
-                        transform: 'translateZ(0)'
-                      }}
-                    >
-                      <BrandedTitle text={currentYear.toString()} />
-                    </h2>
-                    {/* Optional shadow overlay to maintain depth/legibility */}
-                    <h2 
-                      className="absolute font-neo text-4xl md:text-6xl tracking-[0.3em] leading-none flex items-center justify-center -mr-[0.3em] font-bold pointer-events-none text-white m-0 p-0"
-                      style={{
-                        filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))'
-                      }}
-                      aria-hidden="true"
-                    >
-                      <BrandedTitle text={currentYear.toString()} />
-                    </h2>
-                  </div>
-
-                  {/* Bottom Arrow Wrapper (Rectangular Hole) */}
-                  <div ref={bottomHoleRef} className="relative w-[200px] md:w-[280px] h-[8px] mx-auto">
-                    {/* The hole is now physically punched in the background using SVG masking! */}
-                    
-                    <div className="absolute inset-0 overflow-visible flex justify-center items-center shadow-[inset_0_1px_3px_rgba(0,0,0,0.95)] border border-[#111]/50 rounded-[2px] pointer-events-none">
-                      <div 
-                        className="pointer-events-auto flex justify-center items-center w-full h-full"
-                        style={{
-                          clipPath: 'polygon(-1000% 0%, 1000% 0%, 1000% 10000%, -1000% 10000%)',
-                          WebkitClipPath: 'polygon(-1000% 0%, 1000% 0%, 1000% 10000%, -1000% 10000%)',
-                          overflow: 'visible'
-                        }}
-                      >
-                        <motion.button
-                          initial="idle"
-                          animate={animatingPrev ? "click" : (canGoPrev ? "idle" : "hidden")}
-                          whileHover={canGoPrev && !animatingPrev ? "hover" : undefined}
-                          variants={{
-                            hidden: { opacity: 0, y: -30 },
-                            idle: { 
-                              opacity: 1, 
-                              y: nudgeActive ? [6, 16, 2, 8, 6] : 6,
-                              transition: nudgeActive ? {
-                                duration: 1.0,
-                                times: [0, 0.25, 0.5, 0.75, 1],
-                                ease: "easeInOut"
-                              } : undefined
-                            }, // Shifts DOWN so base rests on paper, tip enters hole (with periodic elastic wiggle)
-                            hover: { opacity: 1, y: 16 }, // Slides further DOWN on top of paper
-                            click: { opacity: 1, y: 26 }
-                          }}
-                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                          onClick={handlePrevClick}
-                          className="flex items-center justify-center focus:outline-none disabled:cursor-default"
-                          disabled={!canGoPrev || animatingPrev}
-                        >
-                          <Image 
-                            src="/images/ui/web.webp" 
-                            alt="Anno Precedente" 
-                            width={110} 
-                            height={65} 
-                            className="rotate-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.8)]"
-                            unoptimized
-                          />
-                        </motion.button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Months */}
-              <div className="flex flex-col gap-4">
-                {Object.keys(eventsByMonth).length > 0 ? (
-                  Object.entries(eventsByMonth).map(([month, events], monthIndex) => (
-                    <MonthRow 
-                      key={month}
-                      month={month}
-                      events={events}
-                      monthIndex={monthIndex}
-                      setActiveEvent={setActiveEvent}
-                    />
-                  ))
-                ) : (
-                  <div className="py-20 text-center">
-                    <p className="font-neo text-white/30 text-sm tracking-widest uppercase">
-                      <BrandedTitle text="nessun evento programmato per quest'anno" />
-                    </p>
-                  </div>
-                )}
-              </div>
-              </div>
-            </TornPaper>
+            <CalendarYearCard 
+              currentYear={currentYear}
+              eventsByMonth={eventsByMonth}
+              quote={quote}
+              setActiveEvent={setActiveEvent}
+              canGoNext={canGoNext}
+              canGoPrev={canGoPrev}
+              animatingNext={animatingNext}
+              animatingPrev={animatingPrev}
+              handleNextClick={handleNextClick}
+              handlePrevClick={handlePrevClick}
+              nudgeActive={nudgeActive}
+            />
           </motion.div>
         </AnimatePresence>
 
