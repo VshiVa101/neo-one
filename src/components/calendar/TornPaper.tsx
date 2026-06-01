@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import type { ReactNode } from 'react'
+import { type ReactNode, useId } from 'react'
 
 interface TornPaperProps {
   children: ReactNode
@@ -13,6 +13,12 @@ const topEdgePolygon = "polygon(0% 100%, 0% 80%, 2% 0%, 5% 60%, 8% 0%, 12% 80%, 
 const bottomEdgePolygon = "polygon(100% 0%, 100% 0%, 98% 100%, 95% 25%, 92% 100%, 88% 0%, 84% 75%, 80% 100%, 76% 0%, 72% 50%, 68% 100%, 65% 25%, 62% 100%, 58% 50%, 54% 100%, 50% 0%, 46% 75%, 42% 100%, 38% 0%, 35% 50%, 32% 100%, 28% 25%, 25% 100%, 22% 50%, 18% 100%, 15% 0%, 12% 75%, 8% 100%, 5% 0%, 2% 100%, 0% 0%)"
 
 export function TornPaper({ children, className = '', holes }: TornPaperProps) {
+  const uniqueId = useId()
+  const cleanId = uniqueId.replace(/:/g, '')
+  const patternId = `paper-bg-pattern-${cleanId}`
+  const filterId = `torn-hole-filter-${cleanId}`
+  const maskId = `paper-holes-mask-${cleanId}`
+
   return (
     <div className={`relative isolate text-black flex flex-col ${className}`}>
       {/* Top Torn Edge (Sibling 1) */}
@@ -33,17 +39,29 @@ export function TornPaper({ children, className = '', holes }: TornPaperProps) {
         {holes ? (
           <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
             <defs>
-              <pattern id="paper-bg-pattern" patternUnits="userSpaceOnUse" width="1024" height="1024">
+              <pattern id={patternId} patternUnits="userSpaceOnUse" width="1024" height="1024">
                 <image href="/images/textures/paper-texture-v3.webp" width="1024" height="1024" preserveAspectRatio="xMidYMid slice" />
               </pattern>
-              <mask id="paper-holes-mask">
+              <filter id={filterId} x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="4" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+              <mask id={maskId}>
                 <rect width="100%" height="100%" fill="white" />
                 {holes.map((hole, i) => (
-                  <rect key={i} x={hole.left} y={hole.top} width={hole.width} height={hole.height} fill="black" />
+                  <rect 
+                    key={i} 
+                    x={hole.left} 
+                    y={hole.top} 
+                    width={hole.width} 
+                    height={hole.height} 
+                    fill="black" 
+                    filter={`url(#${filterId})`}
+                  />
                 ))}
               </mask>
             </defs>
-            <rect width="100%" height="100%" fill="url(#paper-bg-pattern)" mask="url(#paper-holes-mask)" />
+            <rect width="100%" height="100%" fill={`url(#${patternId})`} mask={`url(#${maskId})`} />
           </svg>
         ) : (
           <div 

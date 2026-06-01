@@ -103,41 +103,99 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
   const topHoleRef = useRef<HTMLDivElement>(null)
   const bottomHoleRef = useRef<HTMLDivElement>(null)
   const [paperHoles, setPaperHoles] = useState<{ top: number, left: number, width: number, height: number }[]>([])
+  const [nudgeActive, setNudgeActive] = useState(false)
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout
+    const interval = setInterval(() => {
+      setNudgeActive(true)
+      timeout = setTimeout(() => setNudgeActive(false), 1000)
+    }, 4000)
+    return () => {
+      clearInterval(interval)
+      clearTimeout(timeout)
+    }
+  }, [])
 
   useIsomorphicLayoutEffect(() => {
-    const measure = () => {
-      if (containerRef.current && topHoleRef.current && bottomHoleRef.current) {
-        const containerRect = containerRef.current.getBoundingClientRect()
-        const topRect = topHoleRef.current.getBoundingClientRect()
-        const bottomRect = bottomHoleRef.current.getBoundingClientRect()
+    const container = containerRef.current
+    const topHole = topHoleRef.current
+    const bottomHole = bottomHoleRef.current
 
-        setPaperHoles([
-          {
-            top: topRect.top - containerRect.top,
-            left: topRect.left - containerRect.left,
-            width: topRect.width,
-            height: topRect.height,
-          },
-          {
-            top: bottomRect.top - containerRect.top,
-            left: bottomRect.left - containerRect.left,
-            width: bottomRect.width,
-            height: bottomRect.height,
+    if (!container || !topHole || !bottomHole) return
+
+    const measure = () => {
+      const getRelativeOffset = (element: HTMLElement, targetParent: HTMLElement) => {
+        let top = 0
+        let left = 0
+        let curr: HTMLElement | null = element
+        let found = false
+        while (curr) {
+          if (curr === targetParent) {
+            found = true
+            break
           }
-        ])
+          top += curr.offsetTop
+          left += curr.offsetLeft
+          curr = curr.offsetParent as HTMLElement | null
+        }
+        if (!found) {
+          const targetRect = targetParent.getBoundingClientRect()
+          const elemRect = element.getBoundingClientRect()
+          return {
+            top: elemRect.top - targetRect.top,
+            left: elemRect.left - targetRect.left
+          }
+        }
+        return { top, left }
       }
+
+      const topOffset = getRelativeOffset(topHole, container)
+      const bottomOffset = getRelativeOffset(bottomHole, container)
+
+      setPaperHoles([
+        {
+          top: topOffset.top,
+          left: topOffset.left,
+          width: topHole.offsetWidth,
+          height: topHole.offsetHeight,
+        },
+        {
+          top: bottomOffset.top,
+          left: bottomOffset.left,
+          width: bottomHole.offsetWidth,
+          height: bottomHole.offsetHeight,
+        }
+      ])
     }
 
     // Measure initially
     measure()
 
+    // Setup ResizeObserver to perfectly adapt to font-loads and layout shifts
+    const observer = new ResizeObserver(() => {
+      measure()
+    })
+
+    observer.observe(container)
+    if (topHole.parentElement) {
+      observer.observe(topHole.parentElement)
+    }
+
     // Setup resize listener
     window.addEventListener('resize', measure)
-    const timeout = setTimeout(measure, 100)
+
+    // Layered fallback timeouts
+    const t1 = setTimeout(measure, 100)
+    const t2 = setTimeout(measure, 400)
+    const t3 = setTimeout(measure, 1000)
 
     return () => {
+      observer.disconnect()
       window.removeEventListener('resize', measure)
-      clearTimeout(timeout)
+      clearTimeout(t1)
+      clearTimeout(t2)
+      clearTimeout(t3)
     }
   }, [currentYear])
   
@@ -298,23 +356,38 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
                   </p>
                 </motion.div>
 
-                <div className="flex flex-col items-center justify-center mb-8 mt-4">
+                <div className="flex flex-col items-center justify-center mt-12 mb-16 md:mt-16 md:mb-24 py-4 relative w-full gap-6">
                   {/* Top Arrow Wrapper (Rectangular Hole) */}
-                  <div ref={topHoleRef} className="relative w-[200px] md:w-[280px] h-[24px] mx-auto mb-2">
+                  <div ref={topHoleRef} className="relative w-[200px] md:w-[280px] h-[8px] mx-auto">
                     {/* The hole is now physically punched in the background using SVG masking! */}
                     
-                    {/* Arrow container with inner shadow */}
-                    <div className="absolute inset-0 overflow-hidden flex justify-center items-center shadow-[inset_0_3px_8px_rgba(0,0,0,0.9)] border border-[#111]/50 rounded-[2px] pointer-events-none">
-                      <div className="pointer-events-auto flex justify-center items-center w-full h-full">
+                    {/* Arrow container with inner shadow - overflow-visible to let arrow rest on paper */}
+                    <div className="absolute inset-0 overflow-visible flex justify-center items-center shadow-[inset_0_1px_3px_rgba(0,0,0,0.95)] border border-[#111]/50 rounded-[2px] pointer-events-none">
+                      <div 
+                        className="pointer-events-auto flex justify-center items-center w-full h-full"
+                        style={{
+                          clipPath: 'polygon(-1000% -10000%, 1000% -10000%, 1000% 100%, -1000% 100%)',
+                          WebkitClipPath: 'polygon(-1000% -10000%, 1000% -10000%, 1000% 100%, -1000% 100%)',
+                          overflow: 'visible'
+                        }}
+                      >
                         <motion.button
                           initial="idle"
                           animate={animatingNext ? "click" : (canGoNext ? "idle" : "hidden")}
                           whileHover={canGoNext && !animatingNext ? "hover" : undefined}
                           variants={{
-                            hidden: { opacity: 0, y: 65 },
-                            idle: { opacity: 1, y: 42 }, // Tip visible at bottom of hole
-                            hover: { opacity: 1, y: 20 }, // Slides UP into hole
-                            click: { opacity: 1, y: 0 }
+                            hidden: { opacity: 0, y: 30 },
+                            idle: { 
+                              opacity: 1, 
+                              y: nudgeActive ? [-6, -16, -2, -8, -6] : -6,
+                              transition: nudgeActive ? {
+                                duration: 1.0,
+                                times: [0, 0.25, 0.5, 0.75, 1],
+                                ease: "easeInOut"
+                              } : undefined
+                            }, // Shifts UP so tip rests on paper, base enters hole (with periodic elastic wiggle)
+                            hover: { opacity: 1, y: -16 }, // Slides further UP on top of paper
+                            click: { opacity: 1, y: -26 }
                           }}
                           transition={{ type: "spring", stiffness: 300, damping: 20 }}
                           onClick={handleNextClick}
@@ -324,8 +397,8 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
                           <Image 
                             src="/images/ui/web_1.webp" 
                             alt="Prossimo Anno" 
-                            width={85} 
-                            height={50} 
+                            width={110} 
+                            height={65} 
                             className="rotate-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.8)]"
                             unoptimized
                           />
@@ -335,10 +408,10 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
                   </div>
                   
                   {/* Container for Year */}
-                  <div className="relative py-3 w-full flex justify-center items-center">
+                  <div className="relative py-0 w-full flex justify-center items-center">
                     {/* Eraser text to punch hole in TornPaper */}
                     <h2 
-                      className="font-neo text-5xl md:text-7xl tracking-[0.3em] leading-none flex items-center justify-center -mr-[0.3em] font-bold text-white"
+                      className="font-neo text-4xl md:text-6xl tracking-[0.3em] leading-none flex items-center justify-center -mr-[0.3em] font-bold text-white m-0 p-0"
                       style={{
                         transform: 'translateZ(0)'
                       }}
@@ -347,7 +420,7 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
                     </h2>
                     {/* Optional shadow overlay to maintain depth/legibility */}
                     <h2 
-                      className="absolute font-neo text-5xl md:text-7xl tracking-[0.3em] leading-none flex items-center justify-center -mr-[0.3em] font-bold pointer-events-none text-white"
+                      className="absolute font-neo text-4xl md:text-6xl tracking-[0.3em] leading-none flex items-center justify-center -mr-[0.3em] font-bold pointer-events-none text-white m-0 p-0"
                       style={{
                         filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))'
                       }}
@@ -358,20 +431,35 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
                   </div>
 
                   {/* Bottom Arrow Wrapper (Rectangular Hole) */}
-                  <div ref={bottomHoleRef} className="relative w-[200px] md:w-[280px] h-[24px] mx-auto mt-2">
+                  <div ref={bottomHoleRef} className="relative w-[200px] md:w-[280px] h-[8px] mx-auto">
                     {/* The hole is now physically punched in the background using SVG masking! */}
                     
-                    <div className="absolute inset-0 overflow-hidden flex justify-center items-center shadow-[inset_0_3px_8px_rgba(0,0,0,0.9)] border border-[#111]/50 rounded-[2px] pointer-events-none">
-                      <div className="pointer-events-auto flex justify-center items-center w-full h-full">
+                    <div className="absolute inset-0 overflow-visible flex justify-center items-center shadow-[inset_0_1px_3px_rgba(0,0,0,0.95)] border border-[#111]/50 rounded-[2px] pointer-events-none">
+                      <div 
+                        className="pointer-events-auto flex justify-center items-center w-full h-full"
+                        style={{
+                          clipPath: 'polygon(-1000% 0%, 1000% 0%, 1000% 10000%, -1000% 10000%)',
+                          WebkitClipPath: 'polygon(-1000% 0%, 1000% 0%, 1000% 10000%, -1000% 10000%)',
+                          overflow: 'visible'
+                        }}
+                      >
                         <motion.button
                           initial="idle"
                           animate={animatingPrev ? "click" : (canGoPrev ? "idle" : "hidden")}
                           whileHover={canGoPrev && !animatingPrev ? "hover" : undefined}
                           variants={{
-                            hidden: { opacity: 0, y: -65 },
-                            idle: { opacity: 1, y: -42 }, // Tip visible at top of hole
-                            hover: { opacity: 1, y: -20 }, // Slides DOWN into hole
-                            click: { opacity: 1, y: 0 }
+                            hidden: { opacity: 0, y: -30 },
+                            idle: { 
+                              opacity: 1, 
+                              y: nudgeActive ? [6, 16, 2, 8, 6] : 6,
+                              transition: nudgeActive ? {
+                                duration: 1.0,
+                                times: [0, 0.25, 0.5, 0.75, 1],
+                                ease: "easeInOut"
+                              } : undefined
+                            }, // Shifts DOWN so base rests on paper, tip enters hole (with periodic elastic wiggle)
+                            hover: { opacity: 1, y: 16 }, // Slides further DOWN on top of paper
+                            click: { opacity: 1, y: 26 }
                           }}
                           transition={{ type: "spring", stiffness: 300, damping: 20 }}
                           onClick={handlePrevClick}
@@ -381,8 +469,8 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
                           <Image 
                             src="/images/ui/web.webp" 
                             alt="Anno Precedente" 
-                            width={85} 
-                            height={50} 
+                            width={110} 
+                            height={65} 
                             className="rotate-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.8)]"
                             unoptimized
                           />
@@ -432,7 +520,7 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
         socialLinks={socialLinks} 
         eyeComponent={
           // Spacer that exactly matches the icon bar width/height to keep flex layout perfectly centered
-          <div className="relative flex justify-center items-center w-[44px] h-[44px] sm:w-[56px] sm:h-[56px] md:w-[88px] md:h-[88px] lg:w-[110px] lg:h-[110px] flex-shrink-0 z-50">
+          <div className="relative flex justify-center items-center w-[72px] h-[72px] md:w-[88px] md:h-[88px] lg:w-[110px] lg:h-[110px] flex-shrink-0 z-50">
             {/* Absolute container that holds the Canvas at a large physical resolution to prevent pixelation */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140px] h-[140px] md:w-[180px] md:h-[180px]">
               <EyeScene

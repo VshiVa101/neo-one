@@ -6,6 +6,19 @@ import type { NeoEvent } from '@/data/calendar-mock'
 
 export const dynamic = 'force-dynamic'
 
+import { Metadata } from 'next'
+import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+
+export const metadata: Metadata = {
+  title: 'Calendar | Neo-One Art Hub',
+  description: 'Scopri i prossimi drop, eventi e segnali radio dall\'universo di Neo-One.',
+  openGraph: mergeOpenGraph({
+    title: 'Calendar | Neo-One Art Hub',
+    description: 'Tutti gli eventi e drop futuri.',
+    url: '/calendar',
+  }),
+}
+
 const monthNames = [
   'GENNAIO', 'FEBBRAIO', 'MARZO', 'APRILE', 'MAGGIO', 'GIUGNO',
   'LUGLIO', 'AGOSTO', 'SETTEMBRE', 'OTTOBRE', 'NOVEMBRE', 'DICEMBRE'

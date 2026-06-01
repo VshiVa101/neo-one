@@ -34,6 +34,8 @@ export default buildConfig({
     },
     user: Users.slug,
   },
+  defaultDepth: 1,
+  maxDepth: 3,
   email: resendAdapter({
     defaultFromAddress: process.env.EMAIL_FROM_ADDRESS || 'system@neo-one.art',
     defaultFromName: 'Neo-One Art Hub',

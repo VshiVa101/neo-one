@@ -85,7 +85,7 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
       <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2 md:gap-4 lg:gap-6">
         {/* Eye Component */}
         {eyeComponent && (
-          <div className="flex justify-center items-center overflow-visible shrink-0">
+          <div className="flex justify-center items-center overflow-visible shrink-0 mb-[140px] sm:mb-0">
             {eyeComponent}
           </div>
         )}
@@ -94,8 +94,7 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
         <div className="relative flex flex-col items-center justify-center">
           {/* Aged paper container background — rotated 90° to act as vertical strip */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-            w-[280px] h-[56px]
-            sm:w-[360px] sm:h-[68px]
+            w-[440px] h-[80px]
             md:w-[520px] md:h-[100px]
             lg:w-[640px] lg:h-[120px]
             rotate-90 pointer-events-none select-none opacity-90 z-0">
@@ -110,17 +109,17 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
           </div>
 
           {/* Icons column — width matches the paper strip width when rotated */}
-          <div className="relative w-[44px] sm:w-[56px] md:w-[88px] lg:w-[110px]">
+          <div className="relative w-[72px] md:w-[88px] lg:w-[110px]">
 
             {/* ── UNIFIED BAR ── */}
-            <div className="relative z-10 flex flex-col items-center w-full pt-3 pb-4 sm:pt-4 sm:pb-5 md:pt-6 md:pb-8 lg:pt-8 lg:pb-10">
+            <div className="relative z-10 flex flex-col items-center w-full pt-5 pb-6 md:pt-6 md:pb-8 lg:pt-8 lg:pb-10">
 
               {/* ALBERO / FRECCIA (Sempre visibile, fissa in cima) */}
               <motion.button
                 onClick={handleTreeClick}
                 whileHover={{ scale: 1.2, y: -3 }}
                 whileTap={{ scale: 0.9 }}
-                className="w-[36px] h-[36px] sm:w-[44px] sm:h-[44px] md:w-[60px] md:h-[60px] lg:w-[72px] lg:h-[72px] relative cursor-pointer focus:outline-none shrink-0"
+                className="w-[52px] h-[52px] md:w-[60px] md:h-[60px] lg:w-[72px] lg:h-[72px] relative cursor-pointer focus:outline-none shrink-0"
                 title={isLinksOpen ? "Torna indietro" : "Links"}
               >
                 <Image
@@ -142,17 +141,17 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
               </motion.button>
 
               {/* CONTENITORE INFERIORE (Icone Principali o Link Social) */}
-              <div className="relative w-full mt-1.5 sm:mt-2 md:mt-3 lg:mt-4 flex flex-col items-center flex-1">
+              <div className="relative w-full mt-2 md:mt-3 lg:mt-4 flex flex-col items-center flex-1">
                 
                 {/* ── MAIN BAR ICONS ── */}
-                <div className={`flex flex-col items-center gap-3 sm:gap-4 md:gap-6 lg:gap-8 w-full transition-opacity duration-300 ${isLinksOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                <div className={`flex flex-col items-center gap-5 md:gap-6 lg:gap-8 w-full transition-opacity duration-300 ${isLinksOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                   
                   {/* Bio */}
                   <motion.button
                     onClick={() => router.push('/bio')}
                     whileHover={{ scale: 1.2, y: -3 }}
                     whileTap={{ scale: 0.9 }}
-                    className="w-[36px] h-[36px] sm:w-[44px] sm:h-[44px] md:w-[60px] md:h-[60px] lg:w-[72px] lg:h-[72px] relative cursor-pointer focus:outline-none"
+                    className="w-[52px] h-[52px] md:w-[60px] md:h-[60px] lg:w-[72px] lg:h-[72px] relative cursor-pointer focus:outline-none"
                     title="Bio"
                   >
                     <Image
@@ -177,7 +176,7 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                       }}
                       whileTap={{ scale: 0.9 }}
                       onClick={toggleMute}
-                      className="w-[36px] h-[36px] sm:w-[44px] sm:h-[44px] md:w-[60px] md:h-[60px] lg:w-[72px] lg:h-[72px] relative cursor-pointer focus:outline-none"
+                      className="w-[52px] h-[52px] md:w-[60px] md:h-[60px] lg:w-[72px] lg:h-[72px] relative cursor-pointer focus:outline-none"
                       title={isMuted ? 'Attiva audio' : 'Disattiva audio'}
                     >
                       <motion.div
@@ -204,7 +203,7 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                     whileHover={{ scale: 1.2, y: -3 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setIsCartOpen(true)}
-                    className="w-[36px] h-[36px] sm:w-[44px] sm:h-[44px] md:w-[60px] md:h-[60px] lg:w-[72px] lg:h-[72px] relative cursor-pointer focus:outline-none group"
+                    className="w-[52px] h-[52px] md:w-[60px] md:h-[60px] lg:w-[72px] lg:h-[72px] relative cursor-pointer focus:outline-none group"
                     title={count > 0 ? 'Carrello' : 'Contatta Neo'}
                   >
                     <Image
@@ -235,7 +234,7 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                     whileHover={{ scale: 1.2, y: -3 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => router.push('/home')}
-                    className="w-[36px] h-[36px] sm:w-[44px] sm:h-[44px] md:w-[60px] md:h-[60px] lg:w-[72px] lg:h-[72px] relative cursor-pointer focus:outline-none"
+                    className="w-[52px] h-[52px] md:w-[60px] md:h-[60px] lg:w-[72px] lg:h-[72px] relative cursor-pointer focus:outline-none"
                     title="Home"
                   >
                     <Image
@@ -266,7 +265,7 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                       drag="y"
                       dragConstraints={linksContainerRef}
                       dragElastic={0.1}
-                      className="flex flex-col items-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 py-2 cursor-grab active:cursor-grabbing h-max w-full"
+                      className="flex flex-col items-center gap-10 md:gap-10 lg:gap-12 py-2 cursor-grab active:cursor-grabbing h-max w-full"
                     >
                       {socialLinks && socialLinks.length > 0 && socialLinks.map((link) => (
                         <motion.div
@@ -290,7 +289,7 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                             onTap={() => window.open(link.url, '_blank', 'noopener,noreferrer')}
                             whileHover={{ scale: 1.15, y: -3 }}
                             whileTap={{ scale: 0.9 }}
-                            className="w-[36px] h-[36px] sm:w-[46px] sm:h-[46px] md:w-[62px] md:h-[62px] lg:w-[72px] lg:h-[72px] relative shrink-0 cursor-pointer"
+                            className="w-[52px] h-[52px] md:w-[62px] md:h-[62px] lg:w-[72px] lg:h-[72px] relative shrink-0 cursor-pointer"
                             title={link.label}
                             draggable={false}
                             onDragStart={(e: any) => e.preventDefault()}
