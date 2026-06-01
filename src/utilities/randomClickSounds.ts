@@ -10,6 +10,12 @@ const SOUNDS = [
   '/media/click-sounds/40876__davy-bartoloni__gridobartoloni.wav',
   '/media/click-sounds/564079__ameafterdark__dom-orgasm-medium.wav',
   '/media/click-sounds/734421__magicalmysticva__cute-hentai-girl-voice-orgasm-sound-effect-magicalmysticva.wav',
+  '/media/click-sounds/abisso.wav',
+  '/media/click-sounds/buona visione.wav',
+  '/media/click-sounds/cristo santon.wav',
+  '/media/click-sounds/eccheccazzo.wav',
+  '/media/click-sounds/ma minimo.wav',
+  '/media/click-sounds/porca troia.wav',
 ]
 
 const TRIGGER_OPTIONS = [9, 12, 18]
