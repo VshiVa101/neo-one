@@ -47,7 +47,7 @@ function getPool(): HTMLAudioElement[] {
 
 export function tryPlayRandomClickSound(event: MouseEvent): void {
   const target = event.target as HTMLElement
-  if (target.closest('[data-hero]')) return
+  if (target.closest('[data-hero]') || target.closest('[data-minigame]')) return
 
   clickCount++
   if (clickCount < nextTarget) return

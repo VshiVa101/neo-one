@@ -1624,7 +1624,11 @@ function SpaceInvadersGame({ onTransitionTriggered }: GameProps) {
   }, [onTransitionTriggered])
 
   return (
-    <div className="relative group w-full max-w-full h-full flex flex-col mx-auto select-none min-w-0">
+    <div 
+      data-minigame="true"
+      onClick={(e) => e.stopPropagation()}
+      className="relative group w-full max-w-full h-full flex flex-col mx-auto select-none min-w-0"
+    >
       {/* Decorative Arcade Monitor Bezels */}
       <div className="absolute -inset-1.5 bg-gradient-to-r from-[#F45390] via-[#809829] to-[#F45390] rounded-xl blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200 pointer-events-none" />
       
