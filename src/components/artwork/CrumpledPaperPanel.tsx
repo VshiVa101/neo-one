@@ -39,45 +39,94 @@ const PANELS = [
  */
 export function CrumpledPaperPanel({ artworkImage, alt, onClick, side }: CrumpledPaperPanelProps) {
   const [isHovered, setIsHovered] = useState(false)
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 })
+  const spotlightRef = React.useRef<HTMLDivElement>(null)
   
-  // Randomizzatore per le 3 palline iniziali (run-once on mount)
-  const [randomBall] = useState(() => {
+  // Randomizzatore per le 3 palline iniziali (SSR-safe: valore deterministico al primo render,
+  // randomizzazione solo dopo il mount per evitare hydration mismatch)
+  const [randomBall, setRandomBall] = useState('paper_ball.png')
+
+  React.useEffect(() => {
     const num = Math.floor(Math.random() * 3) + 1;
-    return num === 1 ? 'paper_ball.png' : `paper_ball_${num}.png`;
-  });
+    setRandomBall(num === 1 ? 'paper_ball.png' : `paper_ball_${num}.png`);
+  }, [])
 
   if (!artworkImage) {
-    return <div className="absolute inset-0 bg-[#080808]" />
+    return (
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ 
+          backgroundImage: 'url(/images/ui/artwork-scene-bg.jpeg)',
+          transform: side === 'left' ? 'scaleX(-1)' : 'none',
+          filter: 'brightness(1.5)'
+        }}
+      />
+    )
   }
 
   // Easing tattile a molla per lo snap di apertura
   const springTransition = {
     type: 'spring',
-    damping: 16,
-    stiffness: 110,
-    mass: 0.8
+    damping: 18,
+    stiffness: 90,
+    mass: 0.9
   } as const;
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isHovered) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setMousePos({ x, y });
+    // Aggiornamento diretto del DOM per evitare re-render Framer Motion sul background
+    if (spotlightRef.current) {
+      spotlightRef.current.style.background = 
+        `radial-gradient(circle at ${x}% ${y}%, rgba(80, 230, 120, 0.18) 0%, rgba(80, 230, 120, 0.07) 35%, transparent 65%)`;
+    }
+  }
 
   return (
     <div
-      className="absolute inset-0 overflow-hidden cursor-pointer bg-[#080808] flex items-center justify-center"
+      className="absolute inset-0 overflow-hidden cursor-pointer flex items-center justify-center"
       style={{ perspective: '1400px' }}
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={() => {
+        setIsHovered(false)
+        setMousePos({ x: 50, y: 50 })
+        if (spotlightRef.current) {
+          spotlightRef.current.style.background = 'transparent';
+        }
+      }}
+      onMouseMove={handleMouseMove}
     >
+      {/* SFONDO DEL BANNER (SPECCHIATO SE A SINISTRA) */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none"
+        style={{ 
+          backgroundImage: 'url(/images/ui/artwork-scene-bg.jpeg)',
+          transform: side === 'left' ? 'scaleX(-1)' : 'none',
+          filter: 'brightness(1.5)'
+        }}
+      />
+
       {/* ── GRIGLIA 3x3 3D (L'OPERA CHE SI SROTOLA) ── */}
-      {/* Grid container prevents sub-pixel gaps between panels */}
       <motion.div
         className="relative w-full h-full grid grid-cols-3 grid-rows-3"
         initial={false}
         animate={{
-          scale: isHovered ? 1 : 0.4,
-          opacity: isHovered ? 1 : 0,
-          rotateZ: isHovered ? 0 : (side === 'left' ? -25 : 25)
+          scaleX: isHovered ? 0.88 : 0.45,
+          scaleY: isHovered ? 0.86 : 0.45,
+          rotateZ: isHovered ? 0 : (side === 'left' ? -25 : 25),
+          rotateX: isHovered ? (50 - mousePos.y) / 3 : 0,
+          rotateY: isHovered ? (mousePos.x - 50) / 3 : 0,
         }}
-        transition={{ ...springTransition, opacity: { duration: 0.25 } }}
-        style={{ transformStyle: 'preserve-3d' }}
+        transition={springTransition}
+        style={{ 
+          transformStyle: 'preserve-3d',
+          willChange: 'transform',
+          clipPath: 'polygon(1% 2%, 10% 0%, 20% 1%, 30% 0%, 40% 2%, 50% 0%, 60% 1%, 70% 0%, 85% 2%, 98% 1%, 99% 15%, 98% 30%, 100% 45%, 98% 60%, 99% 75%, 98% 90%, 98% 98%, 85% 97%, 70% 99%, 50% 98%, 35% 99%, 20% 97%, 10% 99%, 2% 98%, 0% 85%, 2% 70%, 1% 50%, 2% 30%, 0% 15%)'
+        }}
       >
         {PANELS.map((panel) => (
           <motion.div
@@ -87,7 +136,8 @@ export function CrumpledPaperPanel({ artworkImage, alt, onClick, side }: Crumple
             animate={{
               rotateX: isHovered ? 0 : panel.rx,
               rotateY: isHovered ? 0 : panel.ry,
-              // Inner shadow per simulare luce ambientale sui pannelli piegati
+              opacity: isHovered ? 1 : 0,
+              // Ombra interna sulle pieghe quando è chiuso, via via che si apre svanisce
               boxShadow: isHovered 
                 ? 'inset 0 0 0px rgba(0,0,0,0)' 
                 : 'inset 0 0 30px rgba(0,0,0,0.85)'
@@ -96,40 +146,47 @@ export function CrumpledPaperPanel({ artworkImage, alt, onClick, side }: Crumple
             style={{
               transformOrigin: panel.origin,
               transformStyle: 'preserve-3d',
-              /* 
-                IL TRUCCO FONDAMENTALE: 
-                Texture fotografica della carta distesa e Artwork applicati nello stesso layer! 
-                Il blend mode multiply li unisce a livello rendering pixel.
-              */
-              backgroundImage: `url(/images/ui/paper_flat.png), url(${artworkImage})`,
-              backgroundSize: '300% 300%, 300% 300%',
-              backgroundPosition: `${panel.pos}, ${panel.pos}`,
-              backgroundBlendMode: 'multiply, normal',
-              backgroundColor: '#dedede', 
+              willChange: 'transform, opacity',
+              backgroundImage: `url(/images/ui/crumpled_paper_texture.png), url(/images/ui/crumpled_paper_texture.png), url(${artworkImage})`,
+              backgroundSize: '300% 300%, 300% 300%, 300% 300%',
+              backgroundPosition: `${panel.pos}, ${panel.pos}, ${panel.pos}`,
+              backgroundBlendMode: 'multiply, multiply, normal',
+              backgroundColor: '#ffffff',
+              filter: 'saturate(1.05) contrast(1.02)'
             }}
           >
-            {/* LAYER SCREEN PER I RIFLESSI SPECULARI SULLE PIEGHE */}
-            {/* Essendo figlio diretto del pannello 3D, segue perfettamente ogni minima rotazione */}
+            {/* LAYER SCREEN PER I RIFLESSI DELLA CARTA ACCARTOCCIATA */}
             <div 
               className="absolute inset-0 pointer-events-none"
               style={{
-                backgroundImage: `url(/images/ui/paper_flat.png)`,
+                backgroundImage: `url(/images/ui/crumpled_paper_texture.png)`,
                 backgroundSize: '300% 300%',
                 backgroundPosition: panel.pos,
                 mixBlendMode: 'screen',
-                opacity: 0.55 
+                opacity: 0.4
               }}
             />
           </motion.div>
         ))}
         
-        {/* VIGNETTE FINALE QUANDO IL FOGLIO È APERTO */}
+        {/* LUCE VERDE DINAMICA — aggiornata direttamente via ref, zero re-render */}
+        <div
+          ref={spotlightRef}
+          className="absolute inset-0 pointer-events-none z-20"
+          style={{ 
+            mixBlendMode: 'screen',
+            transition: 'opacity 0.6s ease',
+            opacity: isHovered ? 1 : 0
+          }}
+        />
+        
+        {/* VIGNETTE AI BORDI */}
         <motion.div
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none z-10"
           initial={false}
           animate={{ opacity: isHovered ? 1 : 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          style={{ boxShadow: 'inset 0 0 80px 15px rgba(0,0,0,0.6)' }}
+          transition={{ ...springTransition }}
+          style={{ boxShadow: 'inset 0 0 80px 15px rgba(0, 10, 3, 0.65)' }}
         />
       </motion.div>
 

@@ -77,6 +77,54 @@ export async function fetchArtworkByNid(nid: string) {
     limit: 1,
   })
 
+  // Fallback 1a: Trailing dot handling
+  if (!docs || docs.length === 0) {
+    if (!cleanNid.endsWith('.')) {
+      const { docs: dotDocs } = await payload.find({
+        collection: 'artworks',
+        where: { nid: { equals: cleanNid + '.' } },
+        depth: 1,
+        limit: 1,
+      })
+      if (dotDocs && dotDocs.length > 0) docs = dotDocs
+    } else {
+      const { docs: noDotDocs } = await payload.find({
+        collection: 'artworks',
+        where: { nid: { equals: cleanNid.slice(0, -1) } },
+        depth: 1,
+        limit: 1,
+      })
+      if (noDotDocs && noDotDocs.length > 0) docs = noDotDocs
+    }
+  }
+
+  // Fallback 1b: Slash routing character decoding handling (e.g. "a/b" -> "a / b")
+  if (!docs || docs.length === 0) {
+    if (cleanNid.includes('/')) {
+      const spacedNid = cleanNid.split('/').map(s => s.trim()).join(' / ')
+      const { docs: slashDocs } = await payload.find({
+        collection: 'artworks',
+        where: { nid: { equals: spacedNid } },
+        depth: 1,
+        limit: 1,
+      })
+      if (slashDocs && slashDocs.length > 0) {
+        docs = slashDocs
+      } else {
+        // Try spacedNid with trailing dot
+        if (!spacedNid.endsWith('.')) {
+          const { docs: slashDotDocs } = await payload.find({
+            collection: 'artworks',
+            where: { nid: { equals: spacedNid + '.' } },
+            depth: 1,
+            limit: 1,
+          })
+          if (slashDotDocs && slashDotDocs.length > 0) docs = slashDotDocs
+        }
+      }
+    }
+  }
+
   // 2. Try by ID (fallback)
   if (!docs || docs.length === 0) {
     // Check if it's a number (for Postgres/SQLite IDs) or a valid ID string
@@ -175,7 +223,17 @@ export async function fetchAdjacentArtworks(currentNid: string, subclusterId: st
     limit: 200,
   })
 
-  const index = docs.findIndex(a => String(a.nid) === String(decodedNid))
+  // Normalizzazione per confronto robusto contro slash o punti finali
+  const normalizeNid = (n: string) => {
+    return n
+      .toLowerCase()
+      .replace(/\s*\/\s*/g, '/') // Spazi intorno a / rimossi
+      .replace(/\.+$/, '')       // Punti finali rimossi
+      .trim()
+  }
+  const targetNormalized = normalizeNid(decodedNid)
+
+  const index = docs.findIndex(a => normalizeNid(String(a.nid)) === targetNormalized)
   if (index === -1) return { prevNid: null, nextNid: null, currentIndex: null, prevImage: null, nextImage: null }
 
   const prevDoc = index > 0 ? docs[index - 1] : null

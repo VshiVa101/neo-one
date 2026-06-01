@@ -260,6 +260,11 @@
 
   body {
     @apply bg-background text-foreground min-h-[100vh] flex flex-col;
+    word-spacing: 0.5rem;
+  }
+
+  .neo-uncensored-hero {
+    word-spacing: normal;
   }
 
   /* Parole intere — nessuna parola spezzata su due righe (escluso hero) */

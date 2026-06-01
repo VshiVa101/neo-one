@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect, useRef, useLayoutEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -16,6 +16,7 @@ import { SocialBar } from '@/components/calendar/SocialBar'
 import { CalendarSidePanel } from '@/components/calendar/CalendarSidePanel'
 import type { NeoEvent } from '@/data/calendar-mock'
 import { useCart } from '@/contexts/CartContext'
+import { useInputMode } from '@/contexts/InputModeContext'
 import { ShoppingCart } from 'lucide-react'
 
 interface CalendarClientProps {
@@ -72,7 +73,10 @@ const MonthRow = ({ events, month, monthIndex, setActiveEvent }: { events: NeoEv
   )
 }
 
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
+
 export default function CalendarClient({ initialEvents, initialEventId, quote, socialLinks }: CalendarClientProps) {
+  const { isTouchMode } = useInputMode()
   const [activeEvent, setActiveEvent] = useState<NeoEvent | null>(null)
   const [isContactOpen, setIsContactOpen] = useState(false)
   const [cartHovered, setCartHovered] = useState(false)
@@ -94,6 +98,48 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
   const [direction, setDirection] = useState(0)
   const [animatingNext, setAnimatingNext] = useState(false)
   const [animatingPrev, setAnimatingPrev] = useState(false)
+  
+  const containerRef = useRef<HTMLDivElement>(null)
+  const topHoleRef = useRef<HTMLDivElement>(null)
+  const bottomHoleRef = useRef<HTMLDivElement>(null)
+  const [paperHoles, setPaperHoles] = useState<{ top: number, left: number, width: number, height: number }[]>([])
+
+  useIsomorphicLayoutEffect(() => {
+    const measure = () => {
+      if (containerRef.current && topHoleRef.current && bottomHoleRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect()
+        const topRect = topHoleRef.current.getBoundingClientRect()
+        const bottomRect = bottomHoleRef.current.getBoundingClientRect()
+
+        setPaperHoles([
+          {
+            top: topRect.top - containerRect.top,
+            left: topRect.left - containerRect.left,
+            width: topRect.width,
+            height: topRect.height,
+          },
+          {
+            top: bottomRect.top - containerRect.top,
+            left: bottomRect.left - containerRect.left,
+            width: bottomRect.width,
+            height: bottomRect.height,
+          }
+        ])
+      }
+    }
+
+    // Measure initially
+    measure()
+
+    // Setup resize listener
+    window.addEventListener('resize', measure)
+    const timeout = setTimeout(measure, 100)
+
+    return () => {
+      window.removeEventListener('resize', measure)
+      clearTimeout(timeout)
+    }
+  }, [currentYear])
   
   const { isCartOpen, setIsCartOpen, count } = useCart()
   const router = useRouter()
@@ -218,7 +264,7 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
       <div className="relative z-10 w-full min-h-screen flex flex-col md:grid md:grid-cols-4">
         {/* Left 3 Columns: Calendar */}
         <div className="w-full md:col-span-3 flex flex-col justify-start">
-          <div className="w-full max-w-3xl mx-auto md:mx-0 md:ml-auto md:mr-12 lg:mr-24 pl-4 pr-24 md:px-4 pt-[18vh] md:pt-[28vh] pb-32 flex flex-col items-center">
+          <div className="w-full max-w-3xl mx-auto md:mx-0 md:ml-auto md:mr-12 lg:mr-24 pl-8 pr-24 md:pl-16 md:pr-4 lg:pl-24 lg:pr-8 pt-[18vh] md:pt-[28vh] pb-32 flex flex-col items-center">
         
         {/* Navigation Wrapper for AnimatePresence */}
         <AnimatePresence mode="wait" custom={direction}>
@@ -231,7 +277,9 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
             exit="exit"
             className="w-full"
           >
-            <TornPaper className="px-4 py-8 md:px-8 md:py-12">
+            <TornPaper holes={paperHoles} className="px-4 py-8 md:px-8 md:py-12">
+              {/* Reference container for accurate hole measurement */}
+              <div ref={containerRef} className="w-full h-full relative">
               {/* Calendar Header */}
               <div className="text-center mb-4 pt-8 md:pt-14">
                 <motion.div
@@ -251,67 +299,96 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
                 </motion.div>
 
                 <div className="flex flex-col items-center justify-center mb-8 mt-4">
-                  {/* Top Arrow Wrapper */}
-                  <div className="w-full flex justify-center items-end overflow-hidden h-[70px] relative z-0 -mb-[2px]">
-                    <motion.button
-                      initial="idle"
-                      animate={animatingNext ? "click" : (canGoNext ? "idle" : "hidden")}
-                      whileHover={canGoNext && !animatingNext ? "hover" : undefined}
-                      variants={{
-                        hidden: { opacity: 0, y: 70 },
-                        idle: { opacity: 1, y: 50 }, // Tip visible
-                        hover: { opacity: 1, y: 20 }, // Partially extracted
-                        click: { opacity: 1, y: 0 } // Fully extracted
-                      }}
-                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                      onClick={handleNextClick}
-                      className="flex items-center justify-center focus:outline-none disabled:cursor-default"
-                      disabled={!canGoNext || animatingNext}
-                    >
-                      <Image 
-                        src="/images/ui/web_1.webp" 
-                        alt="Prossimo Anno" 
-                        width={85} 
-                        height={50} 
-                        className="rotate-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.8)]"
-                        unoptimized
-                      />
-                    </motion.button>
+                  {/* Top Arrow Wrapper (Rectangular Hole) */}
+                  <div ref={topHoleRef} className="relative w-[200px] md:w-[280px] h-[24px] mx-auto mb-2">
+                    {/* The hole is now physically punched in the background using SVG masking! */}
+                    
+                    {/* Arrow container with inner shadow */}
+                    <div className="absolute inset-0 overflow-hidden flex justify-center items-center shadow-[inset_0_3px_8px_rgba(0,0,0,0.9)] border border-[#111]/50 rounded-[2px] pointer-events-none">
+                      <div className="pointer-events-auto flex justify-center items-center w-full h-full">
+                        <motion.button
+                          initial="idle"
+                          animate={animatingNext ? "click" : (canGoNext ? "idle" : "hidden")}
+                          whileHover={canGoNext && !animatingNext ? "hover" : undefined}
+                          variants={{
+                            hidden: { opacity: 0, y: 65 },
+                            idle: { opacity: 1, y: 42 }, // Tip visible at bottom of hole
+                            hover: { opacity: 1, y: 20 }, // Slides UP into hole
+                            click: { opacity: 1, y: 0 }
+                          }}
+                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                          onClick={handleNextClick}
+                          className="flex items-center justify-center focus:outline-none disabled:cursor-default"
+                          disabled={!canGoNext || animatingNext}
+                        >
+                          <Image 
+                            src="/images/ui/web_1.webp" 
+                            alt="Prossimo Anno" 
+                            width={85} 
+                            height={50} 
+                            className="rotate-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.8)]"
+                            unoptimized
+                          />
+                        </motion.button>
+                      </div>
+                    </div>
                   </div>
                   
-                  {/* Container for Year (Tighter) */}
-                  <div className="relative z-10 bg-[#0a0a0a] shadow-[0_-15px_20px_-5px_rgba(57,255,20,0.5),0_15px_20px_-5px_rgba(57,255,20,0.5)] border-y border-[#39FF14]/30">
-                    <h2 className="font-neo text-white text-3xl md:text-5xl tracking-[0.3em] leading-none flex items-center justify-center -mr-[0.3em]">
+                  {/* Container for Year */}
+                  <div className="relative py-3 w-full flex justify-center items-center">
+                    {/* Eraser text to punch hole in TornPaper */}
+                    <h2 
+                      className="font-neo text-5xl md:text-7xl tracking-[0.3em] leading-none flex items-center justify-center -mr-[0.3em] font-bold text-white"
+                      style={{
+                        transform: 'translateZ(0)'
+                      }}
+                    >
+                      <BrandedTitle text={currentYear.toString()} />
+                    </h2>
+                    {/* Optional shadow overlay to maintain depth/legibility */}
+                    <h2 
+                      className="absolute font-neo text-5xl md:text-7xl tracking-[0.3em] leading-none flex items-center justify-center -mr-[0.3em] font-bold pointer-events-none text-white"
+                      style={{
+                        filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))'
+                      }}
+                      aria-hidden="true"
+                    >
                       <BrandedTitle text={currentYear.toString()} />
                     </h2>
                   </div>
 
-                  {/* Bottom Arrow Wrapper */}
-                  <div className="w-full flex justify-center items-start overflow-hidden h-[70px] relative z-0 -mt-[2px]">
-                    <motion.button
-                      initial="idle"
-                      animate={animatingPrev ? "click" : (canGoPrev ? "idle" : "hidden")}
-                      whileHover={canGoPrev && !animatingPrev ? "hover" : undefined}
-                      variants={{
-                        hidden: { opacity: 0, y: -70 },
-                        idle: { opacity: 1, y: -50 },
-                        hover: { opacity: 1, y: -20 },
-                        click: { opacity: 1, y: 0 }
-                      }}
-                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                      onClick={handlePrevClick}
-                      className="flex items-center justify-center focus:outline-none disabled:cursor-default"
-                      disabled={!canGoPrev || animatingPrev}
-                    >
-                      <Image 
-                        src="/images/ui/web.webp" 
-                        alt="Anno Precedente" 
-                        width={85} 
-                        height={50} 
-                        className="rotate-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.8)]"
-                        unoptimized
-                      />
-                    </motion.button>
+                  {/* Bottom Arrow Wrapper (Rectangular Hole) */}
+                  <div ref={bottomHoleRef} className="relative w-[200px] md:w-[280px] h-[24px] mx-auto mt-2">
+                    {/* The hole is now physically punched in the background using SVG masking! */}
+                    
+                    <div className="absolute inset-0 overflow-hidden flex justify-center items-center shadow-[inset_0_3px_8px_rgba(0,0,0,0.9)] border border-[#111]/50 rounded-[2px] pointer-events-none">
+                      <div className="pointer-events-auto flex justify-center items-center w-full h-full">
+                        <motion.button
+                          initial="idle"
+                          animate={animatingPrev ? "click" : (canGoPrev ? "idle" : "hidden")}
+                          whileHover={canGoPrev && !animatingPrev ? "hover" : undefined}
+                          variants={{
+                            hidden: { opacity: 0, y: -65 },
+                            idle: { opacity: 1, y: -42 }, // Tip visible at top of hole
+                            hover: { opacity: 1, y: -20 }, // Slides DOWN into hole
+                            click: { opacity: 1, y: 0 }
+                          }}
+                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                          onClick={handlePrevClick}
+                          className="flex items-center justify-center focus:outline-none disabled:cursor-default"
+                          disabled={!canGoPrev || animatingPrev}
+                        >
+                          <Image 
+                            src="/images/ui/web.webp" 
+                            alt="Anno Precedente" 
+                            width={85} 
+                            height={50} 
+                            className="rotate-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.8)]"
+                            unoptimized
+                          />
+                        </motion.button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -336,6 +413,7 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
                   </div>
                 )}
               </div>
+              </div>
             </TornPaper>
           </motion.div>
         </AnimatePresence>
@@ -353,13 +431,17 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
       <CalendarSidePanel 
         socialLinks={socialLinks} 
         eyeComponent={
-          <div className="relative w-[130px] h-[130px] md:w-[160px] md:h-[160px] flex-shrink-0">
-            <EyeScene
-              targetRoute="/home"
-              showCircularText={false}
-              globalTracking={true}
-              scaleMultiplier={1.1}
-            />
+          // Spacer that exactly matches the icon bar width/height to keep flex layout perfectly centered
+          <div className="relative flex justify-center items-center w-[44px] h-[44px] sm:w-[56px] sm:h-[56px] md:w-[88px] md:h-[88px] lg:w-[110px] lg:h-[110px] flex-shrink-0 z-50">
+            {/* Absolute container that holds the Canvas at a large physical resolution to prevent pixelation */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140px] h-[140px] md:w-[180px] md:h-[180px]">
+              <EyeScene
+                targetRoute="/home"
+                showCircularText={false}
+                globalTracking={true}
+                scaleMultiplier={isTouchMode ? 1.5 : 1.1}
+              />
+            </div>
           </div>
         }
       />

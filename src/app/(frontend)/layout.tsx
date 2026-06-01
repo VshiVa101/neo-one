@@ -19,6 +19,7 @@ import { TransitionProvider } from '@/contexts/TransitionContext'
 import { TransitionOverlay } from '@/components/TransitionOverlay'
 import { CartProvider } from '@/contexts/CartContext'
 import { AudioProvider } from '@/contexts/AudioContext'
+import { InputModeProvider } from '@/contexts/InputModeContext'
 import { AudioBackground } from '@/components/AudioBackground'
 import { ClickSoundListener } from '@/components/ClickSoundListener'
 
@@ -35,10 +36,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
-      </head>
-      <body className="font-neo bg-black text-white selection:bg-white selection:text-black custom-scrollbar">
-        <script
+        <Script
           id="theme-script"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
       (function () {
@@ -76,10 +76,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       `,
           }}
         />
+      </head>
+      <body className="font-neo bg-black text-white selection:bg-white selection:text-black custom-scrollbar">
         <AppProviders>
-          <AudioProvider>
-            <CartProvider>
-              <TransitionProvider>
+          <InputModeProvider>
+            <AudioProvider>
+              <CartProvider>
+                <TransitionProvider>
                 <AdminBar
                   adminBarProps={{
                     preview: isEnabled,
@@ -97,6 +100,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </TransitionProvider>
             </CartProvider>
           </AudioProvider>
+          </InputModeProvider>
         </AppProviders>
       </body>
     </html>

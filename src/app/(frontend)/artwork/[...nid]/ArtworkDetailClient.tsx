@@ -10,6 +10,7 @@ import { useNavigationHistory } from '@/hooks/useNavigationHistory'
 import { useAudio } from '@/contexts/AudioContext'
 import { startCrtNoise, stopCrtNoise, isCrtNoisePlaying } from '@/utilities/crtNoiseManager'
 import { CrumpledPaperPanel } from '@/components/artwork/CrumpledPaperPanel'
+import { VinylCoverPanel } from '@/components/artwork/VinylCoverPanel'
 
 let rumoreSessionActive = false
 let restartTimeout: ReturnType<typeof setTimeout> | null = null
@@ -313,65 +314,56 @@ export const ArtworkDetailClient = ({
       <div className="flex flex-col w-full h-full max-w-[100vw] lg:max-w-[95vw] mx-auto justify-center items-center pb-2 relative z-20 px-2 lg:px-0">
         {/* ── MIDDLE ROW (Le 3 colonne su Desktop, Solo Centro su Mobile) ── */}
         <div className="flex flex-row items-stretch justify-center w-full h-[55vh] md:h-[60vh] lg:h-[65vh] gap-[2vw]">
-          {/* 1. LEFT PANEL (Only on Large Screens) */}
-          <div className="relative hidden lg:flex w-[22vw] bg-black rounded-lg overflow-hidden">
-            <CrumpledPaperPanel
-              artworkImage={prevImage ?? null}
-              alt="Opera Precedente"
-              side="left"
-              onClick={prevNid ? () => router.push(getNavUrl(prevNid)) : undefined}
-            />
+          {/* 1. LEFT PANEL / COLUMN (Previews on lg, narrow navigation column when smaller) */}
+          <div className={`relative flex items-center justify-center rounded-lg transition-all duration-300 w-[50px] sm:w-[60px] md:w-[80px] lg:w-[22vw] lg:bg-black ${isRumoreCluster ? 'overflow-visible z-50' : 'overflow-hidden'}`}>
+            {/* Full Preview Cover (visible only on lg and above) */}
+            <div className="hidden lg:block absolute inset-0 w-full h-full">
+              {isRumoreCluster ? (
+                <VinylCoverPanel
+                  artworkImage={prevImage ?? null}
+                  alt="Opera Precedente"
+                  side="left"
+                  onClick={prevNid ? () => router.push(getNavUrl(prevNid)) : undefined}
+                />
+              ) : (
+                <CrumpledPaperPanel
+                  artworkImage={prevImage ?? null}
+                  alt="Opera Precedente"
+                  side="left"
+                  onClick={prevNid ? () => router.push(getNavUrl(prevNid)) : undefined}
+                />
+              )}
+            </div>
+
+            {/* Simple Navigation Button (visible only on sm/md and hidden on lg and above) */}
+            {prevNid && (
+              <div className="block lg:hidden z-10">
+                <motion.button
+                  className="neo-interface-btn w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] bg-[#B3828B] rounded-full flex items-center justify-center transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    router.push(getNavUrl(prevNid))
+                  }}
+                  onMouseEnter={() => setPrevHovered(true)}
+                  onMouseLeave={() => setPrevHovered(false)}
+                  whileHover={{ scale: 1.15, backgroundColor: '#809829' }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Image
+                    src={prevHovered ? '/images/ui/direction-arrow-green.webp' : '/images/ui/direction-arrow-pink.webp'}
+                    alt="Precedente"
+                    width={32}
+                    height={32}
+                    className="w-[60%] h-[60%] object-contain rotate-180"
+                    unoptimized
+                  />
+                </motion.button>
+              </div>
+            )}
           </div>
 
-          {/* 2. CENTER ARTWORK (With floating buttons for MD/SM screens) */}
-          <div className="relative flex-1 mx-2 sm:mx-16 lg:mx-0 bg-black rounded-lg p-1 lg:p-3 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-white/5 overflow-hidden group perspective-[1000px]">
-            {/* Floating Prev Button (Tablet/PC only, hidden on small mobile) */}
-            {prevNid && (
-              <motion.button
-                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-50 hidden sm:flex lg:hidden neo-interface-btn w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] bg-[#B3828B] rounded-full items-center justify-center transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  router.push(getNavUrl(prevNid))
-                }}
-                onMouseEnter={() => setPrevHovered(true)}
-                onMouseLeave={() => setPrevHovered(false)}
-                whileHover={{ scale: 1.15, backgroundColor: '#809829' }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <Image
-                  src={prevHovered ? '/images/ui/direction-arrow-green.webp' : '/images/ui/direction-arrow-pink.webp'}
-                  alt="Precedente"
-                  width={32}
-                  height={32}
-                  className="w-[60%] h-[60%] object-contain rotate-180"
-                  unoptimized
-                />
-              </motion.button>
-            )}
-
-            {/* Floating Next Button (Tablet/PC only, hidden on small mobile) */}
-            {nextNid && (
-              <motion.button
-                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-50 hidden sm:flex lg:hidden neo-interface-btn w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] bg-[#B3828B] rounded-full items-center justify-center transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  router.push(getNavUrl(nextNid))
-                }}
-                onMouseEnter={() => setNextHovered(true)}
-                onMouseLeave={() => setNextHovered(false)}
-                whileHover={{ scale: 1.15, backgroundColor: '#809829' }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <Image
-                  src={nextHovered ? '/images/ui/direction-arrow-green.webp' : '/images/ui/direction-arrow-pink.webp'}
-                  alt="Successiva"
-                  width={32}
-                  height={32}
-                  className="w-[60%] h-[60%] object-contain"
-                  unoptimized
-                />
-              </motion.button>
-            )}
+          {/* 2. CENTER ARTWORK */}
+          <div className="relative flex-1 mx-2 sm:mx-4 lg:mx-0 bg-black rounded-lg p-1 lg:p-3 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-white/5 overflow-hidden group perspective-[1000px]">
 
             <motion.div
               className="w-full h-full relative"
@@ -527,14 +519,52 @@ export const ArtworkDetailClient = ({
             </motion.div>
           </div>
 
-          {/* 3. RIGHT PANEL (Only on Large Screens) */}
-          <div className="relative hidden lg:flex w-[22vw] bg-black rounded-lg overflow-hidden">
-            <CrumpledPaperPanel
-              artworkImage={nextImage ?? null}
-              alt="Opera Successiva"
-              side="right"
-              onClick={nextNid ? () => router.push(getNavUrl(nextNid)) : undefined}
-            />
+          {/* 3. RIGHT PANEL / COLUMN (Previews on lg, narrow navigation column when smaller) */}
+          <div className={`relative flex items-center justify-center rounded-lg transition-all duration-300 w-[50px] sm:w-[60px] md:w-[80px] lg:w-[22vw] lg:bg-black ${isRumoreCluster ? 'overflow-visible z-50' : 'overflow-hidden'}`}>
+            {/* Full Preview Cover (visible only on lg and above) */}
+            <div className="hidden lg:block absolute inset-0 w-full h-full">
+              {isRumoreCluster ? (
+                <VinylCoverPanel
+                  artworkImage={nextImage ?? null}
+                  alt="Opera Successiva"
+                  side="right"
+                  onClick={nextNid ? () => router.push(getNavUrl(nextNid)) : undefined}
+                />
+              ) : (
+                <CrumpledPaperPanel
+                  artworkImage={nextImage ?? null}
+                  alt="Opera Successiva"
+                  side="right"
+                  onClick={nextNid ? () => router.push(getNavUrl(nextNid)) : undefined}
+                />
+              )}
+            </div>
+
+            {/* Simple Navigation Button (visible only on sm/md and hidden on lg and above) */}
+            {nextNid && (
+              <div className="block lg:hidden z-10">
+                <motion.button
+                  className="neo-interface-btn w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] bg-[#B3828B] rounded-full flex items-center justify-center transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    router.push(getNavUrl(nextNid))
+                  }}
+                  onMouseEnter={() => setNextHovered(true)}
+                  onMouseLeave={() => setNextHovered(false)}
+                  whileHover={{ scale: 1.15, backgroundColor: '#809829' }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Image
+                    src={nextHovered ? '/images/ui/direction-arrow-green.webp' : '/images/ui/direction-arrow-pink.webp'}
+                    alt="Successiva"
+                    width={32}
+                    height={32}
+                    className="w-[60%] h-[60%] object-contain"
+                    unoptimized
+                  />
+                </motion.button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -543,7 +573,7 @@ export const ArtworkDetailClient = ({
           <div className="w-full flex flex-row items-center justify-evenly px-2 lg:px-0 gap-3 lg:gap-6">
             {/* Tasto Back - Esc */}
             <motion.button
-              whileHover={{ scale: 1.1, backgroundColor: '#F45390' }}
+              whileHover={{ scale: 1.1, rotate: 90, backgroundColor: '#F45390' }}
               whileTap={{ scale: 0.9 }}
               onClick={handleExitToGallery}
               className="neo-interface-btn w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex items-center justify-center outline-none z-20 transition-colors duration-300"
@@ -561,29 +591,31 @@ export const ArtworkDetailClient = ({
             </motion.button>
 
             {/* Info Flip Button */}
-            <motion.button
-              className="neo-interface-btn w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex items-center justify-center focus:outline-none transition-colors duration-300"
-              onClick={(e) => {
-                e.stopPropagation()
-                setIsFlipped(!isFlipped)
-              }}
-              onMouseEnter={() => setInfoHovered(true)}
-              onMouseLeave={() => setInfoHovered(false)}
-              style={{ backgroundColor: infoHovered ? '#F45390' : '#B3828B' }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              title="Dettagli Opera"
-            >
-              <Image
-                src={infoHovered ? '/images/ui/inforverde.webp' : '/images/ui/inforosa.webp'}
-                alt="Info"
-                width={46}
-                height={46}
-                className="w-[66%] h-[66%] object-contain drop-shadow-[0_0_10px_rgba(0,0,0,1)]"
-                style={{ transform: 'scale(1.5)' }}
-                unoptimized
-              />
-            </motion.button>
+            {!isRumoreCluster && (
+              <motion.button
+                className="neo-interface-btn w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex items-center justify-center focus:outline-none transition-colors duration-300"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsFlipped(!isFlipped)
+                }}
+                onMouseEnter={() => setInfoHovered(true)}
+                onMouseLeave={() => setInfoHovered(false)}
+                style={{ backgroundColor: infoHovered ? '#F45390' : '#B3828B' }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                title="Dettagli Opera"
+              >
+                <Image
+                  src={infoHovered ? '/images/ui/inforverde.webp' : '/images/ui/inforosa.webp'}
+                  alt="Info"
+                  width={46}
+                  height={46}
+                  className="w-[66%] h-[66%] object-contain drop-shadow-[0_0_10px_rgba(0,0,0,1)]"
+                  style={{ transform: 'scale(1.5)' }}
+                  unoptimized
+                />
+              </motion.button>
+            )}
 
             {isRumoreCluster && audioSnippetUrl && (
               <motion.button

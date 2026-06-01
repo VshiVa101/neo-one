@@ -49,32 +49,37 @@ export function StateBasedNavButton({
 
   return (
     <motion.button
-      animate={{ scale: state === 'hovered' || state === 'pressed' ? 1.5 : 1 }}
-      transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+      whileHover="hover"
+      initial="idle"
+      animate="idle"
+      variants={{
+        idle: { scale: 1, y: 0 },
+        hover: { scale: 1.2, y: -3 }
+      }}
       whileTap={{ scale: 0.9 }}
+      onClick={onClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
-      onClick={onClick}
-      className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 cursor-pointer rounded-full flex items-center justify-center focus:outline-none overflow-hidden relative"
-      style={{
-        backgroundColor: state === 'hovered' || state === 'pressed' ? '#F45390' : '#B3828B',
-        boxShadow:
-          state === 'hovered' || state === 'pressed'
-            ? '0 0 30px rgba(244, 83, 144, 0.8), 0 0 60px rgba(244, 83, 144, 0.3)'
-            : '0 0 10px rgba(0,0,0,0.3)',
-        zIndex: state === 'hovered' || state === 'pressed' ? 401 : undefined,
-      }}
+      className="w-[30px] h-[30px] md:w-[38px] md:h-[38px] lg:w-[46px] lg:h-[46px] relative cursor-pointer focus:outline-none"
       title={title}
     >
-      <Image
-        src={iconSrc[state]}
-        alt={alt}
-        fill
-        className="object-contain p-1"
-        unoptimized
-      />
+      <motion.div
+        variants={{
+          idle: { scale: 1, filter: 'brightness(1) drop-shadow(0 0 8px rgba(0,0,0,0.5))' },
+          hover: { scale: 1.15, filter: 'brightness(1.3) drop-shadow(0 0 10px rgba(255,255,255,0.95))' }
+        }}
+        className="w-full h-full relative"
+      >
+        <Image
+          src={iconSrc[state]}
+          alt={alt}
+          fill
+          className="object-contain transition-all duration-300"
+          unoptimized
+        />
+      </motion.div>
     </motion.button>
   )
 }

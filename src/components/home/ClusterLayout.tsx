@@ -16,6 +16,8 @@ import { ClusterMainStage } from './ClusterMainStage'
 import { ClusterNavFooter } from './ClusterNavFooter'
 import { ExpandedClusterModal } from './ExpandedClusterModal'
 import { useModalHistory } from '@/hooks/useModalHistory'
+import { AnimatedPixelCircle } from './AnimatedPixelCircle'
+import { use8BitHover, HoverNoteType } from '@/hooks/use8BitHover'
 
 export interface SubclusterData {
   id: number | string
@@ -65,12 +67,26 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
   const router = useRouter()
   const [cartHovered, setCartHovered] = useState(false)
+  const [muteHovered, setMuteHovered] = useState(false)
+  const [calHovered, setCalHovered] = useState(false)
   const [isHoveringFooter, setIsHoveringFooter] = useState(false)
   const [expandedClusterId, setExpandedClusterId] = useState<number | string | null>(null)
   const [cachedSubclusters, setCachedSubclusters] = useState<Record<string, SubclusterData[]>>({})
   const [isLoadingExpanded, setIsLoadingExpanded] = useState(false)
   const [expandedDeckIndex, setExpandedDeckIndex] = useState<number | null>(null)
   const [activeDeckIndex, setActiveDeckIndex] = useState(0)
+
+  const { startHoverSound, stopHoverSound } = use8BitHover()
+
+  const handleHoverStart = (setter: React.Dispatch<React.SetStateAction<boolean>>, noteType: HoverNoteType) => {
+    setter(true)
+    startHoverSound(noteType)
+  }
+
+  const handleHoverEnd = (setter: React.Dispatch<React.SetStateAction<boolean>>) => {
+    setter(false)
+    stopHoverSound()
+  }
 
   // Back button support: close overlays instead of navigating away
   const closeCluster = useCallback(() => setExpandedClusterId(null), [])
@@ -82,7 +98,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       setExpandedClusterId(null)
     }
   }, [expandedClusterId, cachedSubclusters])
-  useModalHistory(!!expandedClusterId && expandedDeckIndex === null, closeCluster, 'cluster')
+  useModalHistory(!!expandedClusterId && !isLoadingExpanded && expandedDeckIndex === null, closeCluster, 'cluster')
   useModalHistory(expandedDeckIndex !== null, closeGallery, 'gallery')
 
   useEffect(() => {
@@ -286,61 +302,80 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         footerX={footerX}
         onHoverChange={setIsHoveringFooter}
       >
-        <div className="pointer-events-auto flex flex-col items-center justify-center gap-5">
-          <MuteNavButton />
-          <StateBasedNavButton
-            defaultIcon="/images/ui/web_2.webp"
-            hoverIcon="/images/ui/web_6.webp"
-            activeIcon="/images/ui/web_7.webp"
-            onClick={() => router.push('/calendar')}
-            title="Calendario"
-            alt="Vai al calendario"
-          />
-
-          <motion.button
-            animate={{ scale: cartHovered ? 1.5 : 1 }}
-            transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-            whileTap={{ scale: 0.9 }}
-            onMouseEnter={() => setCartHovered(true)}
-            onMouseLeave={() => setCartHovered(false)}
-            onClick={() => setIsCartOpen(true)}
-            className="neo-interface-btn w-12 h-12 md:w-16 md:h-16 cursor-pointer rounded-full flex items-center justify-center focus:outline-none p-2 transition-colors duration-300 relative"
-            style={{
-              backgroundColor: cartHovered ? '#F45390' : '#B3828B',
-              boxShadow: cartHovered
-                ? '0 0 30px rgba(244, 83, 144, 0.8), 0 0 60px rgba(244, 83, 144, 0.3)'
-                : '0 0 10px rgba(0,0,0,0.3)',
-              zIndex: cartHovered ? 401 : undefined,
-            }}
-            title="Vai alla Cassa"
-          >
-            <motion.div
-              animate={{ rotate: count * 360 }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
-              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        <div className="pointer-events-auto relative flex flex-col items-center justify-center">
+          {/* Icons stack */}
+          <div className="relative z-10 flex flex-col items-center justify-center gap-2 md:gap-4 lg:gap-5 py-3 md:py-4 lg:py-5 w-[40px] md:w-[60px] lg:w-[72px]">
+            <div 
+              className="relative flex items-center justify-center w-[36px] h-[36px] md:w-[46px] md:h-[46px] lg:w-[54px] lg:h-[54px]"
+              onMouseEnter={() => handleHoverStart(setMuteHovered, 'A6')}
+              onMouseLeave={() => handleHoverEnd(setMuteHovered)}
             >
-              <Image
-                src={
-                  cartHovered
-                    ? '/images/drops/carrellorosa_optimized.webp'
-                    : count > 0
-                      ? '/images/drops/carrelloverde_optimized.webp'
-                      : '/images/drops/carrello_optimized.webp'
-                }
-                alt="Carrello"
-                width={64}
-                height={64}
-                className="w-[62%] h-[62%] object-contain"
-                style={{ transform: 'scale(1.5)' }}
-                unoptimized
+              <AnimatedPixelCircle color="#F45390" isHovered={muteHovered} className="inset-0 w-full h-full opacity-80" />
+              <MuteNavButton />
+            </div>
+
+            <div 
+              className="relative flex items-center justify-center w-[36px] h-[36px] md:w-[46px] md:h-[46px] lg:w-[54px] lg:h-[54px]"
+              onMouseEnter={() => handleHoverStart(setCartHovered, 'E6')}
+              onMouseLeave={() => handleHoverEnd(setCartHovered)}
+            >
+              <AnimatedPixelCircle color="#FF82B2" isHovered={cartHovered} className="inset-0 w-full h-full opacity-80" />
+              <motion.button
+                whileHover={{ scale: 1.2, y: -3 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setIsCartOpen(true)}
+                className="w-[30px] h-[30px] md:w-[38px] md:h-[38px] lg:w-[46px] lg:h-[46px] relative cursor-pointer focus:outline-none group"
+                title={count > 0 ? 'Vai alla Cassa' : 'Contatta Neo'}
+              >
+                <motion.div
+                  variants={{
+                    idle: { scale: 1, filter: 'brightness(1) drop-shadow(0 0 8px rgba(0,0,0,0.5))' },
+                    hover: { scale: 1.15, filter: 'brightness(1.3) drop-shadow(0 0 10px rgba(255,255,255,0.95))' }
+                  }}
+                  animate={cartHovered ? "hover" : "idle"}
+                  className="w-full h-full relative"
+                >
+                  {/* Default icon */}
+                  <Image
+                    src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-vuoto(3).webp'}
+                    alt={count > 0 ? 'Carrello' : 'Contatta'}
+                    fill
+                    className="object-contain group-hover:opacity-0 transition-opacity duration-200"
+                    unoptimized
+                  />
+                  {/* Hover icon */}
+                  <Image
+                    src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-verde(2).webp'}
+                    alt={count > 0 ? 'Carrello' : 'Contatta'}
+                    fill
+                    className="object-contain opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    unoptimized
+                  />
+                </motion.div>
+                {count > 0 && (
+                  <span className="absolute -top-1 -right-1 w-[12px] h-[12px] md:w-[16px] md:h-[16px] lg:w-[20px] lg:h-[20px] flex items-center justify-center bg-[#809829] rounded-full font-neo text-[6px] md:text-[8px] lg:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)] z-20">
+                    {count}
+                  </span>
+                )}
+              </motion.button>
+            </div>
+
+            <div 
+              className="relative flex items-center justify-center w-[36px] h-[36px] md:w-[46px] md:h-[46px] lg:w-[54px] lg:h-[54px]"
+              onMouseEnter={() => handleHoverStart(setCalHovered, 'D#6')}
+              onMouseLeave={() => handleHoverEnd(setCalHovered)}
+            >
+              <AnimatedPixelCircle color="#809829" isHovered={calHovered} className="inset-0 w-full h-full opacity-80" />
+              <StateBasedNavButton
+                defaultIcon="/images/ui/web_2.webp"
+                hoverIcon="/images/ui/web_6.webp"
+                activeIcon="/images/ui/web_7.webp"
+                onClick={() => router.push('/calendar')}
+                title="Calendario"
+                alt="Vai al calendario"
               />
-            </motion.div>
-            {count > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-[#809829] rounded-full font-neo text-[8px] md:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)] z-20">
-                {count}
-              </span>
-            )}
-          </motion.button>
+            </div>
+          </div>
         </div>
       </ClusterNavFooter>
       )}

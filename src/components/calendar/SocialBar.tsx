@@ -68,7 +68,7 @@ export function SocialBar({ socialLinks }: SocialBarProps) {
                     }
                   }}
                   style={{ WebkitUserDrag: 'none', filter: 'none' } as React.CSSProperties}
-                  className="block w-[3rem] h-[3rem] md:w-[4rem] md:h-[4rem] relative
+                  className="block w-[2.85rem] h-[2.85rem] md:w-[3.8rem] md:h-[3.8rem] relative
                     transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
                     group-hover:-translate-y-2 group-hover:scale-110 group-hover:brightness-125
                     select-none"
