@@ -919,17 +919,12 @@ function SpaceInvadersGame({ onTransitionTriggered }: GameProps) {
 
         ctx.font = 'bold 10px font-neo, monospace'
         ctx.textAlign = 'center'
-        const centerX = canvas.width / 2
-        
-        // Brand colors for each letter
-        ctx.fillStyle = '#809829' // Acid Green
-        ctx.fillText('N', centerX - 8, barY - 6)
-        
-        ctx.fillStyle = '#F45390' // Vibrant Pink
-        ctx.fillText('E', centerX, barY - 6)
-        
-        ctx.fillStyle = '#B026FF' // Purple/Violet
-        ctx.fillText('O', centerX + 8, barY - 6)
+        ctx.fillStyle = '#809829' // N
+        ctx.fillText('N', (canvas.width / 2) - 8, barY - 6)
+        ctx.fillStyle = '#FF82B2' // E
+        ctx.fillText('E', canvas.width / 2, barY - 6)
+        ctx.fillStyle = '#F45390' // O
+        ctx.fillText('O', (canvas.width / 2) + 8, barY - 6)
 
         // Indicator arrow above player Eye
         ctx.fillStyle = '#809829'
