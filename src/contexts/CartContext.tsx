@@ -418,10 +418,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                           <Image
                             src={
                               submitHovered && isActive
-                                ? '/images/ui/invia-mailverde.webp'
+                                ? '/images/ui/invia-mail-verde.webp'
                                 : isActive
-                                  ? '/images/ui/invia-mailrosa.webp'
-                                  : '/images/ui/invia-ssmail.webp'
+                                  ? '/images/ui/invia-mail-rosa.webp'
+                                  : '/images/ui/invia-mail-vuoto.webp'
                             }
                             alt="Invia"
                             width={40}

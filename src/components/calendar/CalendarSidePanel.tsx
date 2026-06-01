@@ -207,7 +207,7 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                     title={count > 0 ? 'Carrello' : 'Contatta Neo'}
                   >
                     <Image
-                      src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-vuoto(3).webp'}
+                      src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-vuoto.webp'}
                       alt={count > 0 ? 'Carrello' : 'Contatta'}
                       fill
                       className="object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.5)] group-hover:opacity-0 transition-opacity duration-200"
@@ -215,7 +215,7 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                       draggable={false}
                     />
                     <Image
-                      src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-verde(2).webp'}
+                      src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-verde.webp'}
                       alt={count > 0 ? 'Carrello' : 'Contatta'}
                       fill
                       className="object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.5)] opacity-0 group-hover:opacity-100 transition-opacity duration-200"

@@ -337,7 +337,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                 >
                   {/* Default icon */}
                   <Image
-                    src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-vuoto(3).webp'}
+                    src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-vuoto.webp'}
                     alt={count > 0 ? 'Carrello' : 'Contatta'}
                     fill
                     className="object-contain group-hover:opacity-0 transition-opacity duration-200"
@@ -345,7 +345,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                   />
                   {/* Hover icon */}
                   <Image
-                    src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-verde(2).webp'}
+                    src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-verde.webp'}
                     alt={count > 0 ? 'Carrello' : 'Contatta'}
                     fill
                     className="object-contain opacity-0 group-hover:opacity-100 transition-opacity duration-200"

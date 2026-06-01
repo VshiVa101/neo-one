@@ -154,16 +154,19 @@ const CalendarYearCard = ({
     }
 
     window.addEventListener('resize', measure)
-    const t1 = setTimeout(measure, 100)
-    const t2 = setTimeout(measure, 400)
-    const t3 = setTimeout(measure, 1000)
+    
+    // Periodically measure during the slow spring transition animation to capture accurate layout offsets
+    const interval = setInterval(measure, 100)
+    const fallbackTimeout = setTimeout(() => {
+      clearInterval(interval)
+      measure() // one final precise measure after animation has fully settled
+    }, 3000)
 
     return () => {
       observer.disconnect()
       window.removeEventListener('resize', measure)
-      clearTimeout(t1)
-      clearTimeout(t2)
-      clearTimeout(t3)
+      clearInterval(interval)
+      clearTimeout(fallbackTimeout)
     }
   }, [currentYear])
 
@@ -431,7 +434,7 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
   const handleNextClick = async () => {
     if (!canGoNext || animatingNext) return
     setAnimatingNext(true)
-    await new Promise(r => setTimeout(r, 300))
+    await new Promise(r => setTimeout(r, 1000))
     changeYear('next')
     setAnimatingNext(false)
   }
@@ -439,14 +442,14 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
   const handlePrevClick = async () => {
     if (!canGoPrev || animatingPrev) return
     setAnimatingPrev(true)
-    await new Promise(r => setTimeout(r, 300))
+    await new Promise(r => setTimeout(r, 1000))
     changeYear('prev')
     setAnimatingPrev(false)
   }
 
   const variants = {
     initial: (direction: number) => ({
-      y: direction > 0 ? 1200 : -1200, // direction 1 (next) -> from bottom, direction 0/-1 -> from top
+      y: direction > 0 ? 2500 : -2500, // direction 1 (next) -> from bottom, direction 0/-1 -> from top
       opacity: 1,
       rotate: 0
     }),
@@ -462,7 +465,7 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
       }
     },
     exit: (direction: number) => ({
-      y: direction > 0 ? -1200 : 1200, // direction 1 (next) -> exits top
+      y: direction > 0 ? -2500 : 2500, // direction 1 (next) -> exits top
       opacity: 1,
       rotate: 0,
       transition: {
