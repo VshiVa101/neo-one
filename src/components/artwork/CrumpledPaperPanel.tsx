@@ -147,7 +147,7 @@ export function CrumpledPaperPanel({ artworkImage, alt, onClick, side }: Crumple
               transformOrigin: panel.origin,
               transformStyle: 'preserve-3d',
               willChange: 'transform, opacity',
-              backgroundImage: `url(/images/ui/crumpled_paper_texture.png), url(/images/ui/crumpled_paper_texture.png), url(${artworkImage})`,
+              backgroundImage: `url(/images/ui/crumpled_paper_texture.png), url(/images/ui/crumpled_paper_texture.png), url("${artworkImage}")`,
               backgroundSize: '300% 300%, 300% 300%, 300% 300%',
               backgroundPosition: `${panel.pos}, ${panel.pos}, ${panel.pos}`,
               backgroundBlendMode: 'multiply, multiply, normal',

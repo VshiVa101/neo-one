@@ -76,6 +76,7 @@ export const ArtworkDetailClient = ({
   const touchStartX = React.useRef<number | null>(null)
   const previewAudioRef = React.useRef<HTMLAudioElement | null>(null)
   const [euroRotation, setEuroRotation] = useState(0)
+  const [showEuroIconInRumore, setShowEuroIconInRumore] = useState(true)
 
   // ── Pinch-to-zoom refs ──
   const pinchStartDist = useRef<number | null>(null)
@@ -252,6 +253,7 @@ export const ArtworkDetailClient = ({
   useEffect(() => {
     const interval = setInterval(() => {
       setEuroRotation((prev) => prev + 360)
+      setShowEuroIconInRumore((prev) => !prev)
     }, 5000)
     return () => clearInterval(interval)
   }, [])
@@ -638,48 +640,29 @@ export const ArtworkDetailClient = ({
               </motion.button>
             )}
 
-            {isRumoreCluster && fullAudioUrl && (
-              <motion.button
-                whileHover={{ scale: 1.1, backgroundColor: '#809829' }}
-                whileTap={{ scale: 0.9 }}
-                onMouseEnter={() => setLinkHovered(true)}
-                onMouseLeave={() => setLinkHovered(false)}
-                onClick={() => window.open(fullAudioUrl, '_blank', 'noopener,noreferrer')}
-                className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
-                title="Link Audio Completo"
-              >
-                <Image
-                  src={linkHovered ? '/images/ui/condividiverde.webp' : '/images/ui/condivcidi.webp'}
-                  alt="Link"
-                  width={44}
-                  height={44}
-                  className="w-[62%] h-[62%] object-contain"
-                  style={{ transform: 'scale(1.5)' }}
-                  unoptimized
-                />
-              </motion.button>
-            )}
-
-            {/* Pulsante PRE-ORDER LOGO */}
+            {/* Pulsante PRE-ORDER LOGO / LINK (Alternate in Rumore) */}
             <motion.button
-              onClick={handlePurchase}
+              onClick={isRumoreCluster ? () => {
+                if (fullAudioUrl) window.open(fullAudioUrl, '_blank', 'noopener,noreferrer')
+              } : handlePurchase}
               onMouseEnter={() => setPurchaseHovered(true)}
               onMouseLeave={() => setPurchaseHovered(false)}
               animate={{
-                scale: addedToCart ? [1, 1.2, 1] : purchaseHovered ? 1.1 : [1, 1.06, 1],
-                boxShadow: addedToCart
+                scale: (!isRumoreCluster && addedToCart) ? [1, 1.2, 1] : purchaseHovered ? 1.1 : [1, 1.06, 1],
+                boxShadow: (!isRumoreCluster && addedToCart)
                   ? '0 0 30px rgba(128, 152, 41, 0.8)'
                   : purchaseHovered
                     ? '0 0 25px rgba(244, 83, 144, 0.6)'
                     : ['0 0 8px rgba(244, 83, 144, 0.2)', '0 0 18px rgba(244, 83, 144, 0.5)', '0 0 8px rgba(244, 83, 144, 0.2)'],
               }}
               transition={{
-                scale: addedToCart ? { duration: 0.4 } : purchaseHovered ? { duration: 0.2 } : { duration: 2, repeat: Infinity, ease: 'easeInOut' },
-                boxShadow: addedToCart ? { duration: 0.4 } : purchaseHovered ? { duration: 0.2 } : { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+                scale: (!isRumoreCluster && addedToCart) ? { duration: 0.4 } : purchaseHovered ? { duration: 0.2 } : { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+                boxShadow: (!isRumoreCluster && addedToCart) ? { duration: 0.4 } : purchaseHovered ? { duration: 0.2 } : { duration: 2, repeat: Infinity, ease: 'easeInOut' },
               }}
               whileTap={{ scale: 0.9 }}
               className="neo-interface-btn relative w-[50px] h-[50px] lg:w-[70px] lg:h-[70px] flex-shrink-0 bg-[#B3828B] rounded-full flex outline-none justify-center items-center cursor-pointer transition-colors duration-300"
-              style={{ backgroundColor: addedToCart ? '#809829' : purchaseHovered ? '#F45390' : '#B3828B' }}
+              style={{ backgroundColor: (!isRumoreCluster && addedToCart) ? '#809829' : purchaseHovered ? (isRumoreCluster && !showEuroIconInRumore ? '#809829' : '#F45390') : '#B3828B' }}
+              title={isRumoreCluster ? "Link Audio Completo" : "Acquista"}
             >
               <motion.div
                 animate={{ rotate: euroRotation }}
@@ -687,11 +670,11 @@ export const ArtworkDetailClient = ({
                 className="absolute inset-0 flex items-center justify-center pointer-events-none"
               >
                 <Image
-                  src="/images/ui/euros.webp"
-                  alt="Acquista"
-                  width={50}
-                  height={50}
-                  className="w-[72%] h-[72%] object-contain"
+                  src={isRumoreCluster && !showEuroIconInRumore ? (purchaseHovered ? '/images/ui/condividiverde.webp' : '/images/ui/condivcidi.webp') : "/images/ui/euros.webp"}
+                  alt={isRumoreCluster && !showEuroIconInRumore ? "Link" : "Acquista"}
+                  width={isRumoreCluster && !showEuroIconInRumore ? 44 : 50}
+                  height={isRumoreCluster && !showEuroIconInRumore ? 44 : 50}
+                  className={isRumoreCluster && !showEuroIconInRumore ? "w-[62%] h-[62%] object-contain" : "w-[72%] h-[72%] object-contain"}
                   style={{ transform: 'scale(1.5)' }}
                   unoptimized
                 />

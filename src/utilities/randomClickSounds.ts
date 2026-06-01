@@ -18,18 +18,21 @@ const SOUNDS = [
   '/media/click-sounds/porca troia.wav',
 ]
 
-const TRIGGER_OPTIONS = [9, 12, 18]
+const TRIGGER_OPTIONS = [12, 17, 14, 20]
+let targetIndex = 0
 
 let audioPool: HTMLAudioElement[] = []
 let unplayedIndices: number[] = []
 let lastPlayedIndex: number | null = null
 let clickCount = 0
 
-function getRandomTarget(): number {
-  return TRIGGER_OPTIONS[Math.floor(Math.random() * TRIGGER_OPTIONS.length)]
+function getNextTarget(): number {
+  const target = TRIGGER_OPTIONS[targetIndex]
+  targetIndex = (targetIndex + 1) % TRIGGER_OPTIONS.length
+  return target
 }
 
-let nextTarget = getRandomTarget()
+let nextTarget = getNextTarget()
 
 function getPool(): HTMLAudioElement[] {
   if (audioPool.length === 0) {
@@ -51,7 +54,7 @@ export function tryPlayRandomClickSound(event: MouseEvent): void {
 
   // Reset count and pick new target
   clickCount = 0
-  nextTarget = getRandomTarget()
+  nextTarget = getNextTarget()
 
   const pool = getPool()
 

@@ -153,12 +153,17 @@ const EyeModel = ({
     if (hovered) setHovered(false)
     setIsIgnoringPointer(true)
     
+    if (onClick) {
+      onClick()
+      return
+    }
+    
     if (disableTransitionOverlay) {
-      router.push('/home')
+      router.push(targetRoute)
     } else {
       triggerTransition()
       setTimeout(() => {
-        router.push('/home')
+        router.push(targetRoute)
       }, 1500)
     }
   }

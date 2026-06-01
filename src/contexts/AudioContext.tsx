@@ -115,7 +115,16 @@ export const AudioProvider = ({ children }: { children: React.ReactNode }) => {
     if (!audioRef.current) return
 
     const nextMuted = !isMuted
-    audioRef.current.volume = nextMuted ? 0 : DEFAULT_VOLUME
+    
+    if (nextMuted) {
+      audioRef.current.pause()
+      audioRef.current.volume = 0
+    } else {
+      audioRef.current.volume = DEFAULT_VOLUME
+      audioRef.current.play().catch(() => {})
+      setIsPlaying(true)
+    }
+
     setIsMuted(nextMuted)
     try {
       localStorage.setItem(LS_MUTED, String(nextMuted))
