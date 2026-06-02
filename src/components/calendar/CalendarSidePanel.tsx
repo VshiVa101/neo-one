@@ -92,27 +92,23 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
 
         {/* UI Bar */}
         <div className="relative flex flex-col items-center justify-center">
-          {/* Aged paper container background — rotated 90° to act as vertical strip */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-            w-[440px] h-[80px]
-            md:w-[520px] md:h-[100px]
-            lg:w-[640px] lg:h-[120px]
-            rotate-90 pointer-events-none select-none opacity-90 z-0">
-            <Image
-              src="/images/ui/aged-paper-container.webp"
-              alt=""
-              fill
-              className="object-fill"
-              unoptimized
-              draggable={false}
-            />
-          </div>
 
-          {/* Icons column — width matches the paper strip width when rotated */}
+          {/* Icons column */}
           <div className="relative w-[72px] md:w-[88px] lg:w-[110px]">
 
             {/* ── UNIFIED BAR ── */}
             <div className="relative z-10 flex flex-col items-center w-full pt-5 pb-6 md:pt-6 md:pb-8 lg:pt-8 lg:pb-10">
+              
+              <div className="absolute inset-0 w-full h-full -z-10 pointer-events-none select-none scale-110 translate-y-[20px] -translate-x-[10px]">
+                <Image
+                  src="/images/ui/web_3.webp"
+                  alt=""
+                  fill
+                  className="object-fill"
+                  unoptimized
+                  draggable={false}
+                />
+              </div>
 
               {/* ALBERO / FRECCIA (Sempre visibile, fissa in cima) */}
               <motion.button
@@ -122,14 +118,27 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                 className="w-[52px] h-[52px] md:w-[60px] md:h-[60px] lg:w-[72px] lg:h-[72px] relative cursor-pointer focus:outline-none shrink-0"
                 title={isLinksOpen ? "Torna indietro" : "Links"}
               >
-                <Image
-                  src="/images/ui/linkthree.webp"
-                  alt="Links"
-                  fill
-                  className={`object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.5)] transition-opacity duration-300 ${isLinksOpen ? 'opacity-0' : 'opacity-100'}`}
-                  unoptimized
-                  draggable={false}
-                />
+                <motion.div
+                  className={`absolute inset-0 w-full h-full transition-opacity duration-300 ${isLinksOpen ? 'opacity-0' : 'opacity-100'}`}
+                  animate={{
+                    skewX: [0, -7, 6, -5, 7, 0]
+                  }}
+                  transition={{
+                    duration: 6,
+                    ease: "easeInOut",
+                    repeat: Infinity,
+                  }}
+                  style={{ originX: 0.752, originY: 0.984 }}
+                >
+                  <Image
+                    src="/images/ui/linkthree.webp"
+                    alt="Links"
+                    fill
+                    className="object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]"
+                    unoptimized
+                    draggable={false}
+                  />
+                </motion.div>
                 <Image
                   src="/images/ui/direction-arrow-green.webp"
                   alt="Indietro"
@@ -154,14 +163,25 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                     className="w-[52px] h-[52px] md:w-[60px] md:h-[60px] lg:w-[72px] lg:h-[72px] relative cursor-pointer focus:outline-none"
                     title="Bio"
                   >
-                    <Image
-                      src="/images/ui/bio.webp"
-                      alt="Bio"
-                      fill
-                      className="object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]"
-                      unoptimized
-                      draggable={false}
-                    />
+                    <motion.div
+                      animate={{ rotateY: 360 }}
+                      transition={{
+                        duration: 8,
+                        ease: [0.76, 0, 0.24, 1],
+                        repeat: Infinity,
+                        repeatType: "loop",
+                      }}
+                      style={{ transformStyle: 'preserve-3d', width: '100%', height: '100%', position: 'relative' }}
+                    >
+                      <Image
+                        src="/images/ui/bio.webp"
+                        alt="Bio"
+                        fill
+                        className="object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]"
+                        unoptimized
+                        draggable={false}
+                      />
+                    </motion.div>
                   </motion.button>
 
                   {/* Mute Toggle */}
@@ -245,6 +265,44 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                       unoptimized
                       draggable={false}
                     />
+                    <div
+                      className="absolute rounded-full overflow-hidden pointer-events-none select-none z-10"
+                      style={{
+                        width: '28%',
+                        height: '38%',
+                        left: '51.6%',
+                        top: '43.6%',
+                        transform: 'translate(-50%, -50%)',
+                        filter: 'blur(1.5px)',
+                      }}
+                    >
+                      {/* Top Eyelid */}
+                      <motion.div
+                        className="absolute top-0 left-0 w-full h-1/2 bg-black"
+                        animate={{
+                          y: ['-100%', '-100%', '0%', '-100%', '-100%']
+                        }}
+                        transition={{
+                          duration: 5,
+                          ease: "easeInOut",
+                          times: [0, 0.92, 0.95, 0.98, 1],
+                          repeat: Infinity,
+                        }}
+                      />
+                      {/* Bottom Eyelid */}
+                      <motion.div
+                        className="absolute bottom-0 left-0 w-full h-1/2 bg-black"
+                        animate={{
+                          y: ['100%', '100%', '0%', '100%', '100%']
+                        }}
+                        transition={{
+                          duration: 5,
+                          ease: "easeInOut",
+                          times: [0, 0.92, 0.95, 0.98, 1],
+                          repeat: Infinity,
+                        }}
+                      />
+                    </div>
                   </motion.button>
 
                 </div>

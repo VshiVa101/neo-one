@@ -438,8 +438,8 @@ export const ArtworkDetailClient = ({
                     src={image}
                     alt={`Opera ${nid}`}
                     fill
-                    className={`drop-shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-all duration-700 object-contain ${
-                      isPreviewPlaying && isRumoreCluster ? 'scale-[0.65]' : 'lg:group-hover:scale-[1.02]'
+                    className={`drop-shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-all duration-700 ${
+                      isPreviewPlaying && isRumoreCluster ? 'scale-[0.45] rounded-full border-2 border-white/10 object-cover' : 'lg:group-hover:scale-[1.02] object-contain'
                     }`}
                     sizes="(max-width: 1024px) 100vw, 60vw"
                     priority
@@ -458,8 +458,27 @@ export const ArtworkDetailClient = ({
                     transition={{ duration: 0.4, delay: isPreviewPlaying && isRumoreCluster ? 0.8 : 0 }}
                     className="absolute inset-0 rounded-full z-0 pointer-events-none"
                     style={{
-                      background: 'conic-gradient(from 0deg, transparent 0%, rgba(255,255,255,0.05) 15%, transparent 30%, transparent 50%, rgba(255,255,255,0.05) 65%, transparent 80%)'
+                      background: 'conic-gradient(from 0deg, transparent 0%, rgba(255,255,255,0.08) 15%, transparent 30%, transparent 50%, rgba(255,255,255,0.08) 65%, transparent 80%)'
                     }}
+                  />
+                  {/* Scanalature (grooves) */}
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isPreviewPlaying && isRumoreCluster ? 1 : 0 }}
+                    transition={{ duration: 0.4, delay: isPreviewPlaying && isRumoreCluster ? 0.8 : 0 }}
+                    className="absolute inset-0 rounded-full border border-white/5 m-[10%] pointer-events-none" 
+                  />
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isPreviewPlaying && isRumoreCluster ? 1 : 0 }}
+                    transition={{ duration: 0.4, delay: isPreviewPlaying && isRumoreCluster ? 0.8 : 0 }}
+                    className="absolute inset-0 rounded-full border border-white/5 m-[20%] pointer-events-none" 
+                  />
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isPreviewPlaying && isRumoreCluster ? 1 : 0 }}
+                    transition={{ duration: 0.4, delay: isPreviewPlaying && isRumoreCluster ? 0.8 : 0 }}
+                    className="absolute inset-0 rounded-full border border-white/5 m-[30%] pointer-events-none" 
                   />
                 </motion.div>
 
@@ -485,22 +504,41 @@ export const ArtworkDetailClient = ({
                           e.stopPropagation();
                           handleAudioPreview();
                         }}
-                        className="absolute top-0 left-0 w-[48px] h-[48px] lg:w-[64px] lg:h-[64px] bg-gradient-to-br from-[#666] via-[#222] to-[#111] rounded-full border-2 border-[#555] shadow-2xl flex items-center justify-center z-20 pointer-events-auto cursor-pointer transition-transform hover:scale-110 active:scale-95"
+                        className="absolute top-0 left-0 w-[48px] h-[48px] lg:w-[64px] lg:h-[64px] bg-gradient-to-br from-[#888] via-[#333] to-[#111] rounded-full border-4 border-[#222] shadow-[0_15px_25px_rgba(0,0,0,0.8),inset_0_2px_5px_rgba(255,255,255,0.3)] flex items-center justify-center z-20 pointer-events-auto cursor-pointer transition-transform hover:scale-110 active:scale-95"
                       >
-                        <div className="w-[16px] h-[16px] lg:w-[24px] lg:h-[24px] bg-gradient-to-t from-black to-[#444] rounded-full border border-[#888] shadow-inner pointer-events-none" />
+                        {/* Perno centrale */}
+                        <div className="w-[16px] h-[16px] lg:w-[24px] lg:h-[24px] bg-gradient-to-t from-black via-[#333] to-[#777] rounded-full border-[2px] border-[#111] shadow-inner pointer-events-none" />
+                        {/* Riflesso circolare */}
+                        <div className="absolute inset-2 rounded-full border border-white/10 pointer-events-none" />
                       </div>
                       
                       {/* Asta principale (Rod) */}
-                      <div className="absolute top-[21px] left-[24px] lg:top-[29px] lg:left-[32px] w-[180px] md:w-[240px] lg:w-[35vh] h-[6px] lg:h-[8px] bg-gradient-to-b from-[#e0e0e0] via-[#999] to-[#555] origin-left rounded-r-full shadow-[0_10px_20px_rgba(0,0,0,0.8)]" style={{ transform: 'rotate(110deg)' }}>
+                      <div className="absolute top-[21px] left-[24px] lg:top-[29px] lg:left-[32px] w-[180px] md:w-[240px] lg:w-[35vh] h-[6px] lg:h-[8px] bg-gradient-to-b from-[#e0e0e0] via-[#888] to-[#333] origin-left rounded-r-full shadow-[0_10px_20px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.8)]" style={{ transform: 'rotate(110deg)' }}>
+                         {/* Cavo visibile che esce dal rod */}
+                         <div className="absolute left-[10px] top-[-2px] w-[60%] h-[1px] bg-red-900/40 blur-[0.5px]" />
+
                          {/* Contrappeso (dietro il perno) */}
-                         <div className="absolute left-[-40px] lg:left-[-50px] top-1/2 -translate-y-1/2 w-[35px] lg:w-[45px] h-[16px] lg:h-[22px] bg-gradient-to-r from-[#222] via-[#555] to-[#222] rounded-l-md border border-[#444]" />
+                         <div className="absolute left-[-40px] lg:left-[-55px] top-1/2 -translate-y-1/2 w-[35px] lg:w-[50px] h-[20px] lg:h-[28px] bg-gradient-to-r from-[#111] via-[#555] to-[#111] rounded-l-md border-y border-l border-[#666] shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] flex items-center">
+                           <div className="w-[4px] h-full bg-[#111] mx-1" />
+                           <div className="w-[4px] h-full bg-[#111] mx-1" />
+                         </div>
                          
                          {/* Testina / Headshell */}
-                         <div className="absolute right-[-15px] top-1/2 -translate-y-1/2 w-[35px] lg:w-[45px] h-[18px] lg:h-[24px] bg-gradient-to-b from-[#333] to-[#111] rounded-sm transform rotate-[-25deg] border-b-2 border-r border-[#666] shadow-2xl flex items-center justify-end pr-1">
-                           {/* Dettaglio testina */}
-                           <div className="w-[4px] h-[8px] bg-[#809829] rounded-sm" />
+                         <div className="absolute right-[-15px] top-1/2 -translate-y-1/2 w-[35px] lg:w-[50px] h-[18px] lg:h-[26px] bg-gradient-to-b from-[#444] via-[#222] to-[#111] rounded-sm transform rotate-[-25deg] border-t border-[#777] border-b-2 border-r border-[#111] shadow-2xl flex items-center justify-end pr-1.5 gap-1">
+                           {/* Dettaglio hardware testina (viti) */}
+                           <div className="absolute left-2 top-1 w-1.5 h-1.5 bg-zinc-400 rounded-full shadow-inner" />
+                           <div className="absolute left-2 bottom-1 w-1.5 h-1.5 bg-zinc-400 rounded-full shadow-inner" />
+
+                           {/* LED testina */}
+                           <div 
+                             className={`w-[4px] h-[10px] rounded-sm transition-all duration-300 ${
+                               isPreviewPlaying 
+                                 ? 'bg-[#809829] shadow-[0_0_12px_3px_rgba(128,152,41,0.9)]' 
+                                 : 'bg-[#F45390] shadow-[0_0_6px_1px_rgba(244,83,144,0.6)]'
+                             }`} 
+                           />
                            {/* Puntina (Stylus) che tocca il disco */}
-                           <div className="absolute bottom-[-4px] left-[10px] w-[2px] h-[6px] bg-[#ccc] shadow-[0_5px_5px_rgba(0,0,0,1)]" />
+                           <div className="absolute bottom-[-6px] left-[12px] w-[2px] h-[8px] bg-gradient-to-b from-[#ccc] to-[#fff] shadow-[0_5px_5px_rgba(0,0,0,1)] origin-top rotate-12" />
                          </div>
                       </div>
                     </motion.div>
