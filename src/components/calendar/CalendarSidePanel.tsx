@@ -244,9 +244,9 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                     />
                     {count === 0 && (
                       <>
-                        {/* Sliding Eye Container with V-shaped clip-path and dark background to cover original eye */}
+                        {/* Sliding Eye Container with V-shaped clip-path and envelope paper matching background */}
                         <div
-                          className="absolute overflow-hidden pointer-events-none select-none z-[9] bg-[#080808]"
+                          className="absolute overflow-hidden pointer-events-none select-none z-[9] bg-[#faf8f5]"
                           style={{
                             width: '56%',
                             height: '42%',
