@@ -242,6 +242,55 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                       unoptimized
                       draggable={false}
                     />
+                    {count === 0 && (
+                      <>
+                        {/* Static black circle to cover the original eye */}
+                        <div
+                          className="absolute bg-[#080808] rounded-full z-[8] pointer-events-none select-none"
+                          style={{
+                            width: '21%',
+                            height: '21%',
+                            left: '49.4%',
+                            top: '47.5%',
+                            transform: 'translate(-50%, -50%)',
+                          }}
+                        />
+                        {/* Sliding Eye Container */}
+                        <div
+                          className="absolute rounded-full overflow-hidden pointer-events-none select-none z-[9]"
+                          style={{
+                            width: '21%',
+                            height: '21%',
+                            left: '49.4%',
+                            top: '47.5%',
+                            transform: 'translate(-50%, -50%)',
+                            filter: 'blur(0.5px)',
+                          }}
+                        >
+                          {/* Animated Eyeball */}
+                          <motion.div
+                            className="w-full h-full relative"
+                            animate={{
+                              y: ['0%', '0%', '115%', '115%', '0%', '0%']
+                            }}
+                            transition={{
+                              duration: 6,
+                              ease: "easeInOut",
+                              times: [0, 0.4, 0.45, 0.75, 0.8, 1],
+                              repeat: Infinity,
+                            }}
+                          >
+                            <div className="w-full h-full bg-white rounded-full relative flex items-center justify-center border border-black/80">
+                              {/* Iris */}
+                              <div className="w-[50%] h-[50%] bg-[#d11141] rounded-full flex items-center justify-center">
+                                {/* Pupil */}
+                                <div className="w-[45%] h-[45%] bg-black rounded-full" />
+                              </div>
+                            </div>
+                          </motion.div>
+                        </div>
+                      </>
+                    )}
                     {count > 0 && (
                       <span className="absolute -top-1 -right-1 w-[14px] h-[14px] sm:w-[16px] sm:h-[16px] md:w-[20px] md:h-[20px] lg:w-[24px] lg:h-[24px] flex items-center justify-center bg-[#809829] rounded-full font-neo text-[6px] sm:text-[7px] md:text-[9px] lg:text-[11px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)]">
                         {count}
