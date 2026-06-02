@@ -248,28 +248,33 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                         <div
                           className="absolute bg-[#080808] rounded-full z-[8] pointer-events-none select-none"
                           style={{
-                            width: '21%',
-                            height: '21%',
+                            width: '42%',
+                            height: '42%',
                             left: '49.4%',
                             top: '47.5%',
                             transform: 'translate(-50%, -50%)',
                           }}
                         />
-                        {/* Sliding Eye Container */}
+                        {/* Sliding Eye Container with V-shaped clip-path */}
                         <div
-                          className="absolute rounded-full overflow-hidden pointer-events-none select-none z-[9]"
+                          className="absolute overflow-hidden pointer-events-none select-none z-[9]"
                           style={{
-                            width: '21%',
-                            height: '21%',
+                            width: '42%',
+                            height: '70%',
                             left: '49.4%',
-                            top: '47.5%',
+                            top: '41%',
                             transform: 'translate(-50%, -50%)',
+                            clipPath: 'polygon(0% 0%, 100% 0%, 100% 55%, 50% 80%, 0% 55%)',
                             filter: 'blur(0.5px)',
                           }}
                         >
                           {/* Animated Eyeball */}
                           <motion.div
-                            className="w-full h-full relative"
+                            className="relative"
+                            style={{
+                              width: '100%',
+                              height: '60%', // 42% / 70% = 60% to keep a perfect 1:1 circle
+                            }}
                             animate={{
                               y: ['0%', '0%', '115%', '115%', '0%', '0%']
                             }}
