@@ -244,36 +244,28 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                     />
                     {count === 0 && (
                       <>
-                        {/* Static black circle to cover the original eye */}
+                        {/* Sliding Eye Container with V-shaped clip-path and dark background to cover original eye */}
                         <div
-                          className="absolute bg-[#080808] rounded-full z-[8] pointer-events-none select-none"
+                          className="absolute overflow-hidden pointer-events-none select-none z-[9] bg-[#080808]"
                           style={{
-                            width: '42%',
+                            width: '56%',
                             height: '42%',
                             left: '49.4%',
                             top: '47.5%',
                             transform: 'translate(-50%, -50%)',
-                          }}
-                        />
-                        {/* Sliding Eye Container with V-shaped clip-path */}
-                        <div
-                          className="absolute overflow-hidden pointer-events-none select-none z-[9]"
-                          style={{
-                            width: '42%',
-                            height: '70%',
-                            left: '49.4%',
-                            top: '41%',
-                            transform: 'translate(-50%, -50%)',
-                            clipPath: 'polygon(0% 0%, 100% 0%, 100% 55%, 50% 80%, 0% 55%)',
+                            clipPath: 'polygon(0% 0%, 100% 0%, 100% 48%, 50% 92%, 0% 48%)',
                             filter: 'blur(0.5px)',
                           }}
                         >
-                          {/* Animated Eyeball */}
+                          {/* Animated Eyeball web_4.webp */}
                           <motion.div
-                            className="relative"
+                            className="absolute"
                             style={{
-                              width: '100%',
-                              height: '60%', // 42% / 70% = 60% to keep a perfect 1:1 circle
+                              width: '74%',
+                              height: '100%',
+                              left: '50%',
+                              top: '0%',
+                              x: '-50%',
                             }}
                             animate={{
                               y: ['0%', '0%', '115%', '115%', '0%', '0%']
@@ -285,13 +277,14 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                               repeat: Infinity,
                             }}
                           >
-                            <div className="w-full h-full bg-white rounded-full relative flex items-center justify-center border border-black/80">
-                              {/* Iris */}
-                              <div className="w-[50%] h-[50%] bg-[#d11141] rounded-full flex items-center justify-center">
-                                {/* Pupil */}
-                                <div className="w-[45%] h-[45%] bg-black rounded-full" />
-                              </div>
-                            </div>
+                            <Image
+                              src="/images/ui/web_4.webp"
+                              alt="Eye"
+                              fill
+                              className="object-contain"
+                              unoptimized
+                              draggable={false}
+                            />
                           </motion.div>
                         </div>
                       </>
