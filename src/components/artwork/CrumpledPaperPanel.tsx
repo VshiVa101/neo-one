@@ -9,6 +9,7 @@ interface CrumpledPaperPanelProps {
   alt: string
   onClick?: () => void
   side: 'left' | 'right'
+  clusterSlug?: string | null
 }
 
 /* 
@@ -37,7 +38,7 @@ const PANELS = [
  * Questo assicura che immagine e texture si muovano come una singola entità fisica perfetta, 
  * risolvendo il problema dei "due tempi di animazione".
  */
-export function CrumpledPaperPanel({ artworkImage, alt, onClick, side }: CrumpledPaperPanelProps) {
+export function CrumpledPaperPanel({ artworkImage, alt, onClick, side, clusterSlug }: CrumpledPaperPanelProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 })
   const spotlightRef = React.useRef<HTMLDivElement>(null)
@@ -51,12 +52,15 @@ export function CrumpledPaperPanel({ artworkImage, alt, onClick, side }: Crumple
     setRandomBall(num === 1 ? 'paper_ball.png' : `paper_ball_${num}.png`);
   }, [])
 
+  const isNeon = clusterSlug?.toLowerCase() === 'neon'
+  const bgImage = isNeon ? '/images/ui/web_2_color_banner.webp' : '/images/ui/artwork-scene-bg.jpeg'
+
   if (!artworkImage) {
     return (
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
-          backgroundImage: 'url(/images/ui/artwork-scene-bg.jpeg)',
+          backgroundImage: `url(${bgImage})`,
           transform: side === 'left' ? 'scaleX(-1)' : 'none',
           filter: 'brightness(1.5)'
         }}
@@ -104,7 +108,7 @@ export function CrumpledPaperPanel({ artworkImage, alt, onClick, side }: Crumple
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none"
         style={{ 
-          backgroundImage: 'url(/images/ui/artwork-scene-bg.jpeg)',
+          backgroundImage: `url(${bgImage})`,
           transform: side === 'left' ? 'scaleX(-1)' : 'none',
           filter: 'brightness(1.5)'
         }}
@@ -136,6 +140,7 @@ export function CrumpledPaperPanel({ artworkImage, alt, onClick, side }: Crumple
             animate={{
               rotateX: isHovered ? 0 : panel.rx,
               rotateY: isHovered ? 0 : panel.ry,
+              scale: isHovered ? 1.006 : 1, // Sovrapposizione microscopica per chiudere i sub-pixel gaps (linee rette)
               opacity: isHovered ? 1 : 0,
               // Ombra interna sulle pieghe quando è chiuso, via via che si apre svanisce
               boxShadow: isHovered 
@@ -146,6 +151,7 @@ export function CrumpledPaperPanel({ artworkImage, alt, onClick, side }: Crumple
             style={{
               transformOrigin: panel.origin,
               transformStyle: 'preserve-3d',
+              outline: '1px solid transparent', // Hack CSS per l'anti-aliasing dei bordi 3D
               willChange: 'transform, opacity',
               backgroundImage: `url(/images/ui/crumpled_paper_texture.png), url(/images/ui/crumpled_paper_texture.png), url("${artworkImage}")`,
               backgroundSize: '300% 300%, 300% 300%, 300% 300%',
@@ -185,7 +191,11 @@ export function CrumpledPaperPanel({ artworkImage, alt, onClick, side }: Crumple
           className="absolute inset-0 pointer-events-none z-10"
           initial={false}
           animate={{ opacity: isHovered ? 1 : 0 }}
-          transition={{ ...springTransition }}
+          transition={
+            isHovered 
+              ? { duration: 0.5, delay: 0.35, ease: 'easeOut' } // Fix: Aspetta che la carta si stenda prima di mostrare l'ombra ai bordi
+              : { duration: 0.2, ease: 'easeIn' }
+          }
           style={{ boxShadow: 'inset 0 0 80px 15px rgba(0, 10, 3, 0.65)' }}
         />
       </motion.div>
@@ -196,11 +206,11 @@ export function CrumpledPaperPanel({ artworkImage, alt, onClick, side }: Crumple
         initial={false}
         animate={{
           opacity: isHovered ? 0 : 1,
-          scale: isHovered ? 1.3 : 0.45,
+          scale: isHovered ? 0.8 : 0.45, // Ridotto da 1.3 a 0.8 per evitare che l'ombra della palla schizzi fuori
           rotate: isHovered ? 0 : (side === 'left' ? -15 : 15)
         }}
         transition={{
-          opacity: { duration: 0.25, ease: 'easeOut' },
+          opacity: { duration: 0.2, ease: 'easeOut' }, // Svanisce un filo più veloce
           scale: springTransition,
           rotate: springTransition
         }}

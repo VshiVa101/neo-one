@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { useCart } from '@/contexts/CartContext'
@@ -57,6 +57,7 @@ export const ArtworkDetailClient = ({
   nextImage,
 }: ArtworkDetailClientProps) => {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { goBackToGallery } = useNavigationHistory()
   const { addToCart, count, setIsCartOpen } = useCart()
   const { fadeOutAndPause, restartFromStart } = useAudio()
@@ -125,6 +126,7 @@ export const ArtworkDetailClient = ({
   }, [])
 
   const isRumoreCluster = clusterSlug?.toLowerCase() === 'rumore'
+  console.log('ArtworkDetailClient rendering:', { nid, clusterSlug, isRumoreCluster })
 
   const handleAudioPreview = async () => {
     if (!audioSnippetUrl) return
@@ -164,16 +166,30 @@ export const ArtworkDetailClient = ({
 
   // Utility per costruire URL con parametri di navigazione (per tornare alla gallery corretta)
   const getNavUrl = (targetNid: string) => {
+    const urlCluster = searchParams.get('cluster')
+    const urlDeck = searchParams.get('deck')
+    const finalClusterId = urlCluster || clusterId
+    const finalDeckIndex = urlDeck !== null && urlDeck !== undefined
+      ? urlDeck
+      : deckIndex?.toString()
+
     const params = new URLSearchParams()
-    if (clusterId) params.set('cluster', clusterId)
-    if (deckIndex !== null && deckIndex !== undefined) params.set('deck', deckIndex.toString())
+    if (finalClusterId) params.set('cluster', finalClusterId)
+    if (finalDeckIndex !== null && finalDeckIndex !== undefined) params.set('deck', finalDeckIndex)
     const qs = params.toString()
     return `/artwork/${encodeURIComponent(targetNid)}${qs ? '?' + qs : ''}`
   }
 
   const handleExitToGallery = () => {
-    if (clusterId && deckIndex !== null && deckIndex !== undefined) {
-      router.push(`/home?cluster=${clusterId}&deck=${deckIndex}`)
+    const urlCluster = searchParams.get('cluster')
+    const urlDeck = searchParams.get('deck')
+    const finalClusterId = urlCluster || clusterId
+    const finalDeckIndex = urlDeck !== null && urlDeck !== undefined
+      ? parseInt(urlDeck, 10)
+      : deckIndex
+
+    if (finalClusterId && finalDeckIndex !== null && finalDeckIndex !== undefined) {
+      router.push(`/home?cluster=${finalClusterId}&deck=${finalDeckIndex}`)
     } else {
       goBackToGallery('/home')
     }
@@ -326,6 +342,7 @@ export const ArtworkDetailClient = ({
                   alt="Opera Precedente"
                   side="left"
                   onClick={prevNid ? () => router.push(getNavUrl(prevNid)) : undefined}
+                  clusterSlug={clusterSlug}
                 />
               ) : (
                 <CrumpledPaperPanel
@@ -333,6 +350,7 @@ export const ArtworkDetailClient = ({
                   alt="Opera Precedente"
                   side="left"
                   onClick={prevNid ? () => router.push(getNavUrl(prevNid)) : undefined}
+                  clusterSlug={clusterSlug}
                 />
               )}
             </div>
@@ -531,6 +549,7 @@ export const ArtworkDetailClient = ({
                   alt="Opera Successiva"
                   side="right"
                   onClick={nextNid ? () => router.push(getNavUrl(nextNid)) : undefined}
+                  clusterSlug={clusterSlug}
                 />
               ) : (
                 <CrumpledPaperPanel
@@ -538,6 +557,7 @@ export const ArtworkDetailClient = ({
                   alt="Opera Successiva"
                   side="right"
                   onClick={nextNid ? () => router.push(getNavUrl(nextNid)) : undefined}
+                  clusterSlug={clusterSlug}
                 />
               )}
             </div>

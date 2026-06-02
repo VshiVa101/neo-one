@@ -12,10 +12,14 @@ export async function fetchClusterSubclusters(clusterId: string): Promise<Subclu
   noStore()
   const payload = await getPayload({ config: configPromise })
 
+  const isNumeric = /^\d+$/.test(clusterId)
+  const queryId = isNumeric ? parseInt(clusterId, 10) : clusterId
+
   // Recupero solo le categorie (sottocluster) che appartengono a questo cluster!
   const { docs: categories } = await payload.find({
     collection: 'categories',
-    where: { cluster: { equals: clusterId } },
+    where: { cluster: { equals: queryId } },
+    sort: 'sortOrder',
     depth: 0,
     limit: 50,
   })

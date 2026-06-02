@@ -6,6 +6,7 @@ import { Html, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import { useTransition } from '@/contexts/TransitionContext'
 import { useRouter } from 'next/navigation'
+import { useInputMode } from '@/contexts/InputModeContext'
 
 type EyePointerState = {
   x: number
@@ -51,6 +52,7 @@ const EyeModel = ({
   const { triggerTransition } = useTransition()
   const router = useRouter()
   const [isIgnoringPointer, setIsIgnoringPointer] = useState(false)
+  const { isTouchMode } = useInputMode()
 
   const { scene: gltfScene } = useGLTF(GLB_URL, DRACO_URL)
   const scene = useMemo(() => gltfScene.clone(true), [gltfScene])
@@ -141,7 +143,7 @@ const EyeModel = ({
     animationRef.current.rotation.y = vibrationX
     animationRef.current.rotation.z = rollZ
 
-    const currentTargetLocal = hovered ? baseScale * 2.5 : baseScale
+    const currentTargetLocal = (hovered || isTouchMode) ? baseScale * 2.5 : baseScale
     eyeRef.current.scale.setScalar(
       THREE.MathUtils.lerp(eyeRef.current.scale.x, currentTargetLocal, 0.15),
     )

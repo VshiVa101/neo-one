@@ -8,8 +8,12 @@ import Image from 'next/image'
 
 export const dynamic = 'force-dynamic'
 
-export default async function ArtworkDetailPage(props: { params: Promise<{ nid: string[] }> }) {
+export default async function ArtworkDetailPage(props: {
+  params: Promise<{ nid: string[] }>
+  searchParams: Promise<{ cluster?: string; deck?: string }>
+}) {
   const params = await props.params
+  const searchParams = await props.searchParams
   const nidString = Array.isArray(params.nid) ? params.nid.join('/') : params.nid
   const artwork = await fetchArtworkByNid(nidString)
 
@@ -22,6 +26,11 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
 
   const progressiveNumber = currentIndex !== null ? String(currentIndex + 1) : ''
   const displayTitle = artwork.title ? artwork.title : progressiveNumber
+
+  const resolvedClusterId = searchParams.cluster || artwork.clusterId
+  const resolvedDeckIndex = searchParams.deck !== undefined && searchParams.deck !== null
+    ? parseInt(searchParams.deck, 10)
+    : artwork.deckIndex
 
   return (
     <main className="relative w-full h-screen overflow-hidden flex flex-col justify-between pt-[6vh] md:pt-[4vh] bg-[#151515]">
@@ -40,8 +49,8 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
       <div className="flex flex-col items-center flex-shrink-0 z-[500] relative">
         <div className="relative w-[14vh] h-[14vh] lg:w-[18vh] lg:h-[18vh] mb-1 drop-shadow-[0_0_20px_rgba(118,139,26,0.3)]">
           <EyeScene
-            targetRoute={artwork.clusterId && artwork.deckIndex !== null 
-              ? `/home?cluster=${artwork.clusterId}&deck=${artwork.deckIndex}` 
+            targetRoute={resolvedClusterId && resolvedDeckIndex !== null 
+              ? `/home?cluster=${resolvedClusterId}&deck=${resolvedDeckIndex}` 
               : '/home'}
             showCircularText={false}
             globalTracking={true}
@@ -69,9 +78,9 @@ export default async function ArtworkDetailPage(props: { params: Promise<{ nid: 
           nextNid={nextNid}
           prevImage={prevImage}
           nextImage={nextImage}
-          clusterId={artwork.clusterId}
+          clusterId={resolvedClusterId}
           clusterSlug={artwork.clusterSlug}
-          deckIndex={artwork.deckIndex}
+          deckIndex={resolvedDeckIndex}
           audioSnippetUrl={artwork.audioSnippetUrl}
           fullAudioUrl={artwork.fullAudioUrl}
         />

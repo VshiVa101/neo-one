@@ -15,9 +15,9 @@ import { MuteNavButton } from '@/components/MuteNavButton'
 import { ClusterMainStage } from './ClusterMainStage'
 import { ClusterNavFooter } from './ClusterNavFooter'
 import { ExpandedClusterModal } from './ExpandedClusterModal'
-import { useModalHistory } from '@/hooks/useModalHistory'
 import { AnimatedPixelCircle } from './AnimatedPixelCircle'
 import { use8BitHover, HoverNoteType } from '@/hooks/use8BitHover'
+import { useInputMode } from '@/contexts/InputModeContext'
 
 export interface SubclusterData {
   id: number | string
@@ -58,23 +58,89 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   const startLeft = initialLeft !== -1 ? initialLeft : 0
   const startRight = initialRight !== -1 ? initialRight : clusters.length > 1 ? 1 : 0
 
+  const { isTouchMode } = useInputMode()
   const [navState, setNavState] = useState({
     left: startLeft,
     right: startRight,
     next: 'left' as 'left' | 'right',
     pool: 2,
   })
+  const [swipeDirections, setSwipeDirections] = useState<Record<'left' | 'right', 'left' | 'right' | null>>({
+    left: null,
+    right: null,
+  })
 
   const router = useRouter()
+
+  const handlePanelSwipe = (side: 'left' | 'right', direction: 'left' | 'right') => {
+    const isNext = direction === 'left'
+    const otherIdx = side === 'left' ? navState.right : navState.left
+    const currentIdx = side === 'left' ? navState.left : navState.right
+
+    let nextIdx = currentIdx
+    const step = isNext ? 1 : -1
+
+    do {
+      nextIdx = (nextIdx + step + clusters.length) % clusters.length
+    } while (nextIdx === otherIdx)
+
+    setSwipeDirections((prev) => ({ ...prev, [side]: direction }))
+
+    setNavState((prev) => {
+      if (side === 'left') {
+        return { ...prev, left: nextIdx, next: 'right' }
+      } else {
+        return { ...prev, right: nextIdx, next: 'left' }
+      }
+    })
+  }
   const [cartHovered, setCartHovered] = useState(false)
   const [muteHovered, setMuteHovered] = useState(false)
   const [calHovered, setCalHovered] = useState(false)
   const [isHoveringFooter, setIsHoveringFooter] = useState(false)
-  const [expandedClusterId, setExpandedClusterId] = useState<number | string | null>(null)
   const [cachedSubclusters, setCachedSubclusters] = useState<Record<string, SubclusterData[]>>({})
   const [isLoadingExpanded, setIsLoadingExpanded] = useState(false)
-  const [expandedDeckIndex, setExpandedDeckIndex] = useState<number | null>(null)
   const [activeDeckIndex, setActiveDeckIndex] = useState(0)
+
+  const clusterParam = searchParams.get('cluster')
+  const deckParam = searchParams.get('deck')
+
+  const expandedClusterId = React.useMemo(() => {
+    if (!clusterParam) return null
+    const matched = clusters.find(c => c.slug?.toLowerCase() === clusterParam.toLowerCase() || String(c.id) === clusterParam)
+    return matched ? matched.id : clusterParam
+  }, [clusterParam, clusters])
+
+  const expandedDeckIndex = deckParam !== null && deckParam !== undefined ? parseInt(deckParam, 10) : null
+
+  const setExpandedClusterId = useCallback((id: string | number | null) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (id !== null) {
+      params.set('cluster', String(id))
+      params.delete('deck')
+    } else {
+      params.delete('cluster')
+      params.delete('deck')
+    }
+    const qs = params.toString()
+    router.push(`${pathname}${qs ? '?' + qs : ''}`, { scroll: false })
+  }, [searchParams, pathname, router])
+
+  const setExpandedDeckIndex = useCallback((index: number | null, replace = false) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (index !== null) {
+      params.set('deck', String(index))
+    } else {
+      params.delete('deck')
+    }
+    const qs = params.toString()
+    const url = `${pathname}${qs ? '?' + qs : ''}`
+    if (replace) {
+      router.replace(url, { scroll: false })
+    } else {
+      router.push(url, { scroll: false })
+    }
+  }, [searchParams, pathname, router])
 
   const { startHoverSound, stopHoverSound } = use8BitHover()
 
@@ -88,26 +154,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
     stopHoverSound()
   }
 
-  // Back button support: close overlays instead of navigating away
-  const closeCluster = useCallback(() => setExpandedClusterId(null), [])
-  const closeGallery = useCallback(() => {
-    setExpandedDeckIndex(null)
-    // If the cluster has only 1 subcluster, close cluster too
-    const subs = expandedClusterId ? cachedSubclusters[expandedClusterId] : null
-    if (subs && subs.length === 1) {
-      setExpandedClusterId(null)
-    }
-  }, [expandedClusterId, cachedSubclusters])
-  useModalHistory(!!expandedClusterId && !isLoadingExpanded && expandedDeckIndex === null, closeCluster, 'cluster')
-  useModalHistory(expandedDeckIndex !== null, closeGallery, 'gallery')
 
-  useEffect(() => {
-    const clusterParam = searchParams.get('cluster')
-    const deckParam = searchParams.get('deck')
-    if (clusterParam) setExpandedClusterId(clusterParam)
-    if (deckParam !== null && deckParam !== undefined)
-      setExpandedDeckIndex(parseInt(deckParam, 10))
-  }, [searchParams])
 
   useEffect(() => {
     if (expandedDeckIndex !== null) {
@@ -121,7 +168,8 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
     if (!expandedClusterId) return
     const cached = cachedSubclusters[expandedClusterId]
     if (cached) {
-      if (cached.length === 1) setExpandedDeckIndex(0)
+      // Don't auto-open deck here if we removed useModalHistory, because we want it tied to the user action
+      // or to the initial load, not repeatedly opening when user goes back.
       return
     }
 
@@ -139,7 +187,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
           if (validData.length === 1) {
             // Find the original index of the only valid subcluster
             const originalIdx = data.findIndex((sub) => sub.artworks && sub.artworks.length > 0)
-            setExpandedDeckIndex(originalIdx)
+            setExpandedDeckIndex(originalIdx, true) // replace URL so back button works correctly
           } else if (validData.length > 1) {
             setActiveDeckIndex(Math.floor(validData.length / 2))
           }
@@ -166,6 +214,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
   const replaceCluster = (newIdx: number, forcedSide?: 'left' | 'right') => {
     setNavState((prev) => {
       const side = forcedSide || prev.next
+      setSwipeDirections((prevSwipe) => ({ ...prevSwipe, [side]: null }))
       if (side === 'left') {
         if (newIdx === prev.right) return prev
         return { ...prev, left: newIdx, next: 'right' }
@@ -289,6 +338,10 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         leftCluster={leftCluster}
         rightCluster={rightCluster}
         onClusterClick={setExpandedClusterId}
+        isTouchMode={isTouchMode}
+        leftSwipeDirection={swipeDirections.left}
+        rightSwipeDirection={swipeDirections.right}
+        onPanelSwipe={handlePanelSwipe}
       />
 
       {/* ── FOOTER & BUTTONS (Aligned on same axis) — visibile solo in home, non in expanded/gallery ── */}
@@ -307,21 +360,21 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
           <div className="relative z-10 flex flex-col items-center justify-center gap-2 md:gap-4 lg:gap-5 py-3 md:py-4 lg:py-5 w-[40px] md:w-[60px] lg:w-[72px]">
             <div 
               className="relative flex items-center justify-center w-[36px] h-[36px] md:w-[46px] md:h-[46px] lg:w-[54px] lg:h-[54px]"
-              onMouseEnter={() => handleHoverStart(setMuteHovered, 'A6')}
-              onMouseLeave={() => handleHoverEnd(setMuteHovered)}
+              onMouseEnter={isTouchMode ? undefined : () => handleHoverStart(setMuteHovered, 'A6')}
+              onMouseLeave={isTouchMode ? undefined : () => handleHoverEnd(setMuteHovered)}
             >
-              <AnimatedPixelCircle color="#F45390" isHovered={muteHovered} className="inset-0 w-full h-full opacity-80" />
+              <AnimatedPixelCircle color="#F45390" isHovered={!isTouchMode && muteHovered} className="inset-0 w-full h-full opacity-80" />
               <MuteNavButton />
             </div>
 
             <div 
               className="relative flex items-center justify-center w-[36px] h-[36px] md:w-[46px] md:h-[46px] lg:w-[54px] lg:h-[54px]"
-              onMouseEnter={() => handleHoverStart(setCartHovered, 'E6')}
-              onMouseLeave={() => handleHoverEnd(setCartHovered)}
+              onMouseEnter={isTouchMode ? undefined : () => handleHoverStart(setCartHovered, 'E6')}
+              onMouseLeave={isTouchMode ? undefined : () => handleHoverEnd(setCartHovered)}
             >
-              <AnimatedPixelCircle color="#FF82B2" isHovered={cartHovered} className="inset-0 w-full h-full opacity-80" />
+              <AnimatedPixelCircle color="#FF82B2" isHovered={!isTouchMode && cartHovered} className="inset-0 w-full h-full opacity-80" />
               <motion.button
-                whileHover={{ scale: 1.2, y: -3 }}
+                whileHover={isTouchMode ? {} : { scale: 1.2, y: -3 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setIsCartOpen(true)}
                 className="w-[30px] h-[30px] md:w-[38px] md:h-[38px] lg:w-[46px] lg:h-[46px] relative cursor-pointer focus:outline-none group"
@@ -362,10 +415,10 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
             <div 
               className="relative flex items-center justify-center w-[36px] h-[36px] md:w-[46px] md:h-[46px] lg:w-[54px] lg:h-[54px]"
-              onMouseEnter={() => handleHoverStart(setCalHovered, 'D#6')}
-              onMouseLeave={() => handleHoverEnd(setCalHovered)}
+              onMouseEnter={isTouchMode ? undefined : () => handleHoverStart(setCalHovered, 'D#6')}
+              onMouseLeave={isTouchMode ? undefined : () => handleHoverEnd(setCalHovered)}
             >
-              <AnimatedPixelCircle color="#809829" isHovered={calHovered} className="inset-0 w-full h-full opacity-80" />
+              <AnimatedPixelCircle color="#809829" isHovered={!isTouchMode && calHovered} className="inset-0 w-full h-full opacity-80" />
               <StateBasedNavButton
                 defaultIcon="/images/ui/web_2.webp"
                 hoverIcon="/images/ui/web_6.webp"
@@ -396,9 +449,10 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
       <ExpandedGalleryOverlay
         isOpen={expandedDeckIndex !== null}
         onClose={() => {
-          setExpandedDeckIndex(null)
           if (currentSubclusters.length === 1) {
             setExpandedClusterId(null)
+          } else {
+            setExpandedDeckIndex(null)
           }
         }}
         artworks={

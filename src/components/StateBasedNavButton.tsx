@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import { useInputMode } from '@/contexts/InputModeContext'
 
 interface StateBasedNavButtonProps {
   defaultIcon: string
@@ -24,6 +25,7 @@ export function StateBasedNavButton({
   alt = '',
 }: StateBasedNavButtonProps) {
   const [state, setState] = useState<ButtonState>('idle')
+  const { isTouchMode } = useInputMode()
 
   const iconSrc: Record<ButtonState, string> = {
     idle: defaultIcon,
@@ -32,24 +34,36 @@ export function StateBasedNavButton({
   }
 
   const handleMouseEnter = useCallback(() => {
+    if (isTouchMode) return
     setState((prev) => (prev === 'pressed' ? 'pressed' : 'hovered'))
-  }, [])
+  }, [isTouchMode])
 
   const handleMouseLeave = useCallback(() => {
+    if (isTouchMode) return
     setState('idle')
-  }, [])
+  }, [isTouchMode])
 
   const handleMouseDown = useCallback(() => {
+    if (isTouchMode) return
+    setState('pressed')
+  }, [isTouchMode])
+
+  const handleMouseUp = useCallback(() => {
+    if (isTouchMode) return
+    setState('hovered')
+  }, [isTouchMode])
+
+  const handleTouchStart = useCallback(() => {
     setState('pressed')
   }, [])
 
-  const handleMouseUp = useCallback(() => {
-    setState('hovered')
+  const handleTouchEnd = useCallback(() => {
+    setState('idle')
   }, [])
 
   return (
     <motion.button
-      whileHover="hover"
+      whileHover={isTouchMode ? "idle" : "hover"}
       initial="idle"
       animate="idle"
       variants={{
@@ -62,6 +76,8 @@ export function StateBasedNavButton({
       onMouseLeave={handleMouseLeave}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
       className="w-[30px] h-[30px] md:w-[38px] md:h-[38px] lg:w-[46px] lg:h-[46px] relative cursor-pointer focus:outline-none"
       title={title}
     >

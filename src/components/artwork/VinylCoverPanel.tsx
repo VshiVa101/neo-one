@@ -9,17 +9,21 @@ interface VinylCoverPanelProps {
   alt: string
   onClick?: () => void
   side: 'left' | 'right'
+  clusterSlug?: string | null
 }
 
-export function VinylCoverPanel({ artworkImage, alt, onClick, side }: VinylCoverPanelProps) {
+export function VinylCoverPanel({ artworkImage, alt, onClick, side, clusterSlug }: VinylCoverPanelProps) {
   const [isHovered, setIsHovered] = useState(false)
+
+  const isNeon = clusterSlug?.toLowerCase() === 'neon'
+  const bgImage = isNeon ? '/images/ui/web_2_color_banner.webp' : '/images/ui/artwork-scene-bg.jpeg'
 
   if (!artworkImage) {
     return (
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
-          backgroundImage: 'url(/images/ui/artwork-scene-bg.jpeg)',
+          backgroundImage: `url(${bgImage})`,
           transform: side === 'left' ? 'scaleX(-1)' : 'none',
           filter: 'brightness(1.5)'
         }}
@@ -55,7 +59,7 @@ export function VinylCoverPanel({ artworkImage, alt, onClick, side }: VinylCover
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-90"
           style={{ 
-            backgroundImage: 'url(/images/ui/artwork-scene-bg.jpeg)',
+            backgroundImage: `url(${bgImage})`,
             transform: side === 'left' ? 'scaleX(-1)' : 'none',
             filter: 'brightness(1.5)'
           }}

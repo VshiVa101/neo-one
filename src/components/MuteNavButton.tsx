@@ -4,15 +4,17 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useAudio } from '@/contexts/AudioContext'
+import { useInputMode } from '@/contexts/InputModeContext'
 
 export function MuteNavButton() {
   const { isMuted, isPlaying, toggleMute } = useAudio()
+  const { isTouchMode } = useInputMode()
 
   if (!isPlaying) return null
 
   return (
     <motion.button
-      whileHover="hover"
+      whileHover={isTouchMode ? "idle" : "hover"}
       initial="idle"
       animate="idle"
       variants={{
