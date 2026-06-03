@@ -331,6 +331,7 @@ export const EyeScene = ({
   disableTransitionOverlay = true,
 }: EyeSceneProps) => {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [isHovered, setIsHovered] = useState(false)
   const globalMouse = useRef<EyePointerState>({
     x: 0,
     y: 0,
@@ -411,7 +412,12 @@ export const EyeScene = ({
   }, [globalTracking])
 
   return (
-    <div ref={containerRef} className={`w-full h-full absolute inset-0 z-10 ${className}`}>
+    <div
+      ref={containerRef}
+      className={`w-full h-full absolute inset-0 transition-all duration-300 ${isHovered ? 'z-[9999]' : 'z-10'} ${className}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <Canvas
         camera={{ position: [0, 0, 4.6], fov: 45 }}
         gl={{

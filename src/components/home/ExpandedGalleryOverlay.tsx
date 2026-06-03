@@ -6,6 +6,7 @@ import { MockArtwork } from './deckCardStyle'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { BrandedTitle } from '@/components/BrandedTitle'
+import { useInputMode } from '@/contexts/InputModeContext'
 
 interface ExpandedGalleryOverlayProps {
   isOpen: boolean
@@ -23,6 +24,7 @@ export const ExpandedGalleryOverlay = ({
   deckIndex,
 }: ExpandedGalleryOverlayProps) => {
   const router = useRouter()
+  const { isTouchMode } = useInputMode()
 
   React.useEffect(() => {
     // La logica pushState è stata rimossa per evitare conflitti con il router di Next.js
@@ -37,7 +39,7 @@ export const ExpandedGalleryOverlay = ({
           className="fixed inset-0 z-[200] bg-black/90 overflow-hidden"
         >
           {/* LAYER DI SCROLL: Contiene la griglia e l'ombra sticky */}
-          <div className="absolute inset-0 overflow-y-auto overflow-x-hidden custom-scrollbar" style={{ touchAction: 'pan-y' }}>
+          <div className="absolute inset-0 overflow-y-auto overflow-x-hidden custom-scrollbar gallery-scroll-container" style={{ touchAction: 'pan-y' }}>
             {/* HEADER SPACER (per lasciare spazio all'occhio e al titolo fixed) */}
             <div className="w-full h-[24vh] md:h-[45vh] pointer-events-none" />
 
@@ -50,7 +52,7 @@ export const ExpandedGalleryOverlay = ({
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    whileHover={{
+                    whileHover={isTouchMode ? undefined : {
                       scale: 1.03,
                       boxShadow: '0 0 30px rgba(118, 139, 26, 0.4)',
                     }}
@@ -67,7 +69,11 @@ export const ExpandedGalleryOverlay = ({
                       src={artwork.image}
                       alt={artwork.title}
                       fill
-                      className="object-contain p-2 grayscale brightness-110 contrast-125 sm:grayscale sm:brightness-110 sm:contrast-125 group-hover:grayscale-0 group-hover:brightness-100 group-hover:contrast-100 transition-all duration-700 max-sm:grayscale-0 max-sm:brightness-100 max-sm:contrast-100"
+                      className={`object-contain p-2 transition-all duration-700 ${
+                        isTouchMode 
+                          ? 'grayscale-0 brightness-100 contrast-100'
+                          : 'grayscale brightness-110 contrast-125 group-hover:grayscale-0 group-hover:brightness-100 group-hover:contrast-100'
+                      }`}
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                     />
 
@@ -76,7 +82,9 @@ export const ExpandedGalleryOverlay = ({
                       <p className="font-neo text-white text-base lg:text-lg tracking-widest mb-1 drop-shadow-md">
                         <BrandedTitle text={artwork.title} />
                       </p>
-                      <div className="h-0.5 w-8 lg:w-12 bg-[#809829] shadow-[0_0_10px_#809829] group-hover:w-full transition-all duration-500" />
+                      <div className={`h-0.5 bg-[#809829] shadow-[0_0_10px_#809829] transition-all duration-500 ${
+                        isTouchMode ? 'w-full' : 'w-8 lg:w-12 group-hover:w-full'
+                      }`} />
                     </div>
 
                     {/* Numero opera */}

@@ -64,12 +64,12 @@ export default async function CalendarPage({
         images: (doc.detailImages || []).map((imgObj: any) => 
           getImageUrl(imgObj.image, '/images/ui/pre-orderverde.webp')
         ),
-        comicBubble: doc.eventCTA || settings.defaultEventCTA || '',
+        comicBubble: doc.eventCTA || (settings && settings.defaultEventCTA) || '',
       },
     }
   })
 
-  const socialLinks = (settings.socialLinks || []).map((link: any) => ({
+  const socialLinks = ((settings && settings.socialLinks) || []).map((link: any) => ({
     id: link.id,
     url: link.url,
     label: link.label,
@@ -79,7 +79,7 @@ export default async function CalendarPage({
   return (
     <CalendarClient 
       initialEvents={events} 
-      quote={settings.calendarCTA}
+      quote={settings?.calendarCTA || "vieni a molestarmi dal vivo"}
       socialLinks={socialLinks}
       initialEventId={initialEventId}
     />

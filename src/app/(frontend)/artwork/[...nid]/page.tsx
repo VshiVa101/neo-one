@@ -33,7 +33,7 @@ export default async function ArtworkDetailPage(props: {
     : artwork.deckIndex
 
   return (
-    <main className="relative w-full h-screen overflow-hidden flex flex-col justify-between pt-[6vh] md:pt-[4vh] bg-[#151515]">
+    <main className="relative w-full h-screen overflow-hidden flex flex-col justify-between pt-[2vh] lg:pt-[0.5vh] bg-[#151515]">
       {/* Background GIF - Desktop first */}
       <div className="absolute inset-0 w-screen h-screen z-0 opacity-40 brightness-75 scale-100 md:scale-105 pointer-events-none">
         <Image
@@ -47,19 +47,17 @@ export default async function ArtworkDetailPage(props: {
 
       {/* ── AREA TOP: Occhio e NID in alto, sfondo nero globale trasparisce ── */}
       <div className="flex flex-col items-center flex-shrink-0 z-[500] relative">
-        <div className="relative w-[14vh] h-[14vh] lg:w-[18vh] lg:h-[18vh] mb-1 drop-shadow-[0_0_20px_rgba(118,139,26,0.3)]">
+        <div className="relative w-[15vh] h-[15vh] sm:w-[17vh] sm:h-[17vh] md:w-[20vh] md:h-[20vh] lg:w-[27vh] lg:h-[27vh] lg:-mt-[5vh] mb-0 md:-mb-[1vh] lg:-mb-[9vh] drop-shadow-[0_0_20px_rgba(118,139,26,0.3)] z-50">
           <EyeScene
             targetRoute={resolvedClusterId && resolvedDeckIndex !== null 
               ? `/home?cluster=${resolvedClusterId}&deck=${resolvedDeckIndex}` 
               : '/home'}
             showCircularText={false}
             globalTracking={true}
-            scaleMultiplier={1.3}
           />
         </div>
-        <span className="font-neo text-2xl lg:text-3xl tracking-widest font-bold leading-none text-white drop-shadow-[0_0_10px_rgba(244,83,144,0.15)] uppercase">
-          <BrandedTitle text={displayTitle} />
-        </span>
+
+
       </div>
 
       {/* ── AREA CENTRALE + PANNELLI LATERALI (Gestita dal Client per flex row) ── */}

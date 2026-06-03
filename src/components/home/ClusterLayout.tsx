@@ -157,12 +157,15 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
 
   useEffect(() => {
-    if (expandedDeckIndex !== null) {
+    if (expandedClusterId !== null || expandedDeckIndex !== null) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
     }
-  }, [expandedDeckIndex])
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [expandedClusterId, expandedDeckIndex])
 
   useEffect(() => {
     if (!expandedClusterId) return
@@ -209,7 +212,6 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
   const footerRef = React.useRef<HTMLDivElement>(null)
   const footerX = useMotionValue(0)
-  const touchStartX = React.useRef<number | null>(null)
 
   const replaceCluster = (newIdx: number, forcedSide?: 'left' | 'right') => {
     setNavState((prev) => {
@@ -230,8 +232,19 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
 
     const handleWheel = (e: WheelEvent) => {
       const target = e.target as HTMLElement
+      
+      if (expandedClusterId || isCartOpen) {
+        const isGalleryScroll = target.closest('.gallery-scroll-container')
+        const isCartScroll = target.closest('.cart-scroll-container')
+        if (isGalleryScroll || isCartScroll) {
+          return // allow default scrolling within these containers
+        }
+        e.preventDefault()
+        return
+      }
+
       const isOverFooter = target?.closest?.('.home-footer-container')
-      if (isOverFooter || isHoveringFooter || expandedClusterId || isCartOpen) return
+      if (isOverFooter || isHoveringFooter) return
 
       e.preventDefault()
       if (isScrolling) return
@@ -390,7 +403,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                 >
                   {/* Default icon */}
                   <Image
-                    src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-vuoto.webp'}
+                    src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-vuoto-v3.webp'}
                     alt={count > 0 ? 'Carrello' : 'Contatta'}
                     fill
                     className="object-contain group-hover:opacity-0 transition-opacity duration-200"
@@ -398,7 +411,7 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                   />
                   {/* Hover icon */}
                   <Image
-                    src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-verde.webp'}
+                    src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-verde-v3.webp'}
                     alt={count > 0 ? 'Carrello' : 'Contatta'}
                     fill
                     className="object-contain opacity-0 group-hover:opacity-100 transition-opacity duration-200"
@@ -442,7 +455,6 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
         activeDeckIndex={activeDeckIndex}
         onActiveDeckChange={setActiveDeckIndex}
         onDeckExpand={(idx) => setExpandedDeckIndex(idx)}
-        touchStartX={touchStartX}
       />
 
       {/* ── EXPANDED GALLERY GRID OVERLAY ── */}

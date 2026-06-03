@@ -15,7 +15,6 @@ interface ExpandedClusterModalProps {
   activeDeckIndex: number
   onActiveDeckChange: (index: number) => void
   onDeckExpand: (index: number) => void
-  touchStartX: React.MutableRefObject<number | null>
 }
 
 export const ExpandedClusterModal = ({
@@ -26,7 +25,6 @@ export const ExpandedClusterModal = ({
   activeDeckIndex,
   onActiveDeckChange,
   onDeckExpand,
-  touchStartX,
 }: ExpandedClusterModalProps) => {
   const validSubclusters = subclusters.filter(
     (sub) => sub.artworks && sub.artworks.length > 0,
@@ -46,22 +44,18 @@ export const ExpandedClusterModal = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
-          className="fixed inset-0 z-[150] bg-black/80 flex flex-col justify-center overflow-hidden"
-          style={{ touchAction: 'none' }}
+          className="fixed inset-0 z-[150] bg-black/80 flex flex-col justify-center overflow-hidden touch-pan-y select-none"
           onClick={onClose}
-          onTouchStart={(e) => {
-            touchStartX.current = e.touches[0].clientX
-          }}
-          onTouchEnd={(e) => {
-            if (touchStartX.current === null) return
-            const touchEndX = e.changedTouches[0].clientX
-            const deltaX = touchStartX.current - touchEndX
-            if (Math.abs(deltaX) > 50) {
-              if (deltaX > 0)
+          onPanEnd={(e, info) => {
+            if (Math.abs(info.offset.x) > 40 && Math.abs(info.offset.x) > Math.abs(info.offset.y)) {
+              if (info.offset.x < 0) {
+                // Swipe left -> Next deck
                 onActiveDeckChange(Math.min(validSubclusters.length - 1, activeDeckIndex + 1))
-              else onActiveDeckChange(Math.max(0, activeDeckIndex - 1))
+              } else {
+                // Swipe right -> Prev deck
+                onActiveDeckChange(Math.max(0, activeDeckIndex - 1))
+              }
             }
-            touchStartX.current = null
           }}
         >
           <div className="fixed bottom-6 left-6 md:bottom-10 md:left-10 z-[300] pointer-events-auto">
@@ -88,7 +82,7 @@ export const ExpandedClusterModal = ({
 
           {isLoading ? (
             <MiniMatrixLoader />
-          ) : (
+          ) : validSubclusters.length === 1 ? null : (
             <div className="relative w-full h-full flex items-center justify-center">
               {validSubclusters.length === 0 ? (
                 <div className="text-white font-neo tracking-widest opacity-50 uppercase">

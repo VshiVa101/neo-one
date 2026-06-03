@@ -23,7 +23,8 @@ export const AudioBackground = () => {
     <button
       onClick={toggleMute}
       className={[
-        'fixed top-3 right-3 z-[9999]',
+        'fixed right-4 sm:right-6 lg:right-8 z-[9999]',
+        'top-[7vh] sm:top-[8vh] md:top-[10vh] lg:top-[9vh]',
         'w-8 h-8',
         'flex items-center justify-center',
         'rounded-full',

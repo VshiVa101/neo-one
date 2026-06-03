@@ -66,7 +66,7 @@ export function VinylCoverPanel({ artworkImage, alt, onClick, side, clusterSlug 
         />
       </div>
 
-      <div className="relative w-[70%] aspect-square flex items-center justify-center perspective-[1000px]">
+      <div className="relative w-[70%] aspect-square flex items-center justify-center perspective-[1000px] overflow-visible">
         
         {/* VINYL DISC (Dietro) */}
         <motion.div

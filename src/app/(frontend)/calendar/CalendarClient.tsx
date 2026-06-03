@@ -11,13 +11,11 @@ import { BrandedTitle } from '@/components/BrandedTitle'
 import { TornPaper } from '@/components/calendar/TornPaper'
 import { EventItem } from '@/components/calendar/EventItem'
 import { EventDetail } from '@/components/calendar/EventDetail'
-import { ContactForm } from '@/components/calendar/ContactForm'
 import { SocialBar } from '@/components/calendar/SocialBar'
 import { CalendarSidePanel } from '@/components/calendar/CalendarSidePanel'
 import type { NeoEvent } from '@/data/calendar-mock'
 import { useCart } from '@/contexts/CartContext'
 import { useInputMode } from '@/contexts/InputModeContext'
-import { ShoppingCart } from 'lucide-react'
 
 interface CalendarClientProps {
   initialEvents: NeoEvent[]
@@ -353,8 +351,6 @@ const CalendarYearCard = ({
 export default function CalendarClient({ initialEvents, initialEventId, quote, socialLinks }: CalendarClientProps) {
   const { isTouchMode } = useInputMode()
   const [activeEvent, setActiveEvent] = useState<NeoEvent | null>(null)
-  const [isContactOpen, setIsContactOpen] = useState(false)
-  const [cartHovered, setCartHovered] = useState(false)
   
   // Extract unique sorted years from events
   const availableYears = useMemo(() => {
@@ -556,12 +552,12 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
           // Spacer that exactly matches the icon bar width/height to keep flex layout perfectly centered
           <div className="relative flex justify-center items-center w-[72px] h-[72px] md:w-[88px] md:h-[88px] lg:w-[110px] lg:h-[110px] flex-shrink-0 z-50">
             {/* Absolute container that holds the Canvas at a large physical resolution to prevent pixelation */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140px] h-[140px] md:w-[180px] md:h-[180px]">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90px] h-[90px] sm:w-[120px] sm:h-[120px] md:w-[180px] md:h-[180px]">
               <EyeScene
                 targetRoute="/home"
                 showCircularText={false}
                 globalTracking={true}
-                scaleMultiplier={isTouchMode ? 1.5 : 1.1}
+                scaleMultiplier={isTouchMode ? 1.2 : 1.1}
               />
             </div>
           </div>
@@ -578,12 +574,6 @@ export default function CalendarClient({ initialEvents, initialEventId, quote, s
           />
         )}
       </AnimatePresence>
-
-      {/* Contact Form Modal */}
-      <ContactForm
-        isOpen={isContactOpen}
-        onClose={() => setIsContactOpen(false)}
-      />
     </main>
   )
 }

@@ -34,8 +34,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html className={cn(mergedFontNeo.variable, 'custom-scrollbar')} lang="it" suppressHydrationWarning>
       <head>
-        <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+      </head>
+      <body className="font-neo bg-black text-white selection:bg-white selection:text-black custom-scrollbar">
         <Script
           id="theme-script"
           strategy="beforeInteractive"
@@ -76,8 +77,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       `,
           }}
         />
-      </head>
-      <body className="font-neo bg-black text-white selection:bg-white selection:text-black custom-scrollbar">
         <AppProviders>
           <InputModeProvider>
             <AudioProvider>

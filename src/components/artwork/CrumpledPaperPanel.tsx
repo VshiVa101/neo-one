@@ -10,6 +10,7 @@ interface CrumpledPaperPanelProps {
   onClick?: () => void
   side: 'left' | 'right'
   clusterSlug?: string | null
+  ballIndex?: number
 }
 
 /* 
@@ -38,19 +39,21 @@ const PANELS = [
  * Questo assicura che immagine e texture si muovano come una singola entità fisica perfetta, 
  * risolvendo il problema dei "due tempi di animazione".
  */
-export function CrumpledPaperPanel({ artworkImage, alt, onClick, side, clusterSlug }: CrumpledPaperPanelProps) {
+export function CrumpledPaperPanel({ artworkImage, alt, onClick, side, clusterSlug, ballIndex }: CrumpledPaperPanelProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 })
   const spotlightRef = React.useRef<HTMLDivElement>(null)
   
-  // Randomizzatore per le 3 palline iniziali (SSR-safe: valore deterministico al primo render,
-  // randomizzazione solo dopo il mount per evitare hydration mismatch)
-  const [randomBall, setRandomBall] = useState('paper_ball.png')
+  const initialBall = ballIndex !== undefined 
+    ? (ballIndex === 1 ? 'paper_ball.png' : `paper_ball_${ballIndex}.png`) 
+    : 'paper_ball.png'
+  const [randomBall, setRandomBall] = useState(initialBall)
 
   React.useEffect(() => {
-    const num = Math.floor(Math.random() * 3) + 1;
-    setRandomBall(num === 1 ? 'paper_ball.png' : `paper_ball_${num}.png`);
-  }, [])
+    if (ballIndex !== undefined) {
+      setRandomBall(ballIndex === 1 ? 'paper_ball.png' : `paper_ball_${ballIndex}.png`);
+    }
+  }, [ballIndex])
 
   const isNeon = clusterSlug?.toLowerCase() === 'neon'
   const bgImage = isNeon ? '/images/ui/web_2_color_banner.webp' : '/images/ui/artwork-scene-bg.jpeg'
@@ -227,27 +230,6 @@ export function CrumpledPaperPanel({ artworkImage, alt, onClick, side, clusterSl
         </div>
       </motion.div>
       
-      {/* ── FRECCIA HINT ── */}
-      <motion.div
-        className="absolute bottom-3 inset-x-0 flex justify-center pointer-events-none z-20"
-        initial={false}
-        animate={{ opacity: isHovered ? 0 : 0.6 }}
-        transition={{ duration: 0.3 }}
-      >
-        <motion.div
-          animate={{ y: [0, -6, 0], scale: [1, 1.1, 1] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <Image
-            src="/images/ui/direction-arrow-pink.webp"
-            alt={side === 'left' ? 'Precedente' : 'Successiva'}
-            width={40}
-            height={40}
-            className={`object-contain drop-shadow-[0_0_14px_rgba(0,0,0,1)] ${side === 'left' ? 'rotate-180' : ''}`}
-            unoptimized
-          />
-        </motion.div>
-      </motion.div>
     </div>
   )
 }

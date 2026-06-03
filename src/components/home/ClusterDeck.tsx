@@ -1,11 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import { AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { DeckHeader } from './DeckHeader'
 import { DeckCard } from './DeckCard'
 import { MockArtwork } from './deckCardStyle'
+import { useInputMode } from '@/contexts/InputModeContext'
 
 interface ClusterDeckProps {
   subclusterTitle: string
@@ -22,8 +23,17 @@ export const ClusterDeck = ({
 }: ClusterDeckProps) => {
   const router = useRouter()
   const [activeIndex, setActiveIndex] = useState(0)
+  const [isHovered, setIsHovered] = useState(false)
+  const [isIntroDone, setIsIntroDone] = useState(false)
+  const { isTouchMode } = useInputMode()
   const scrollTimeout = React.useRef<NodeJS.Timeout | null>(null)
-  const touchStartY = React.useRef<number | null>(null)
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsIntroDone(true)
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     if (scrollTimeout.current) return
@@ -47,34 +57,35 @@ export const ClusterDeck = ({
   }
 
   return (
-    <div
-      className="flex flex-col items-center justify-center w-[80vw] lg:w-[25vw] xl:w-[20vw] h-full relative cursor-ns-resize"
-      style={{ touchAction: 'none' }}
+    <motion.div
+      className="flex flex-col items-center justify-center w-[80vw] lg:w-[25vw] xl:w-[20vw] h-full relative cursor-ns-resize touch-pan-x select-none"
       role="group"
       aria-roledescription="carousel"
       aria-label={`Mazzo: ${subclusterTitle}`}
       onWheel={handleWheel}
-      onTouchStart={(e) => {
-        touchStartY.current = e.touches[0].clientY
-      }}
-      onTouchMove={(e) => {
-        // Prevent browser pull-to-refresh / scroll bounce
-        e.preventDefault()
-      }}
-      onTouchEnd={(e) => {
-        if (touchStartY.current === null) return
-        const touchEndY = e.changedTouches[0].clientY
-        const deltaY = touchStartY.current - touchEndY
-        if (Math.abs(deltaY) > 30) {
-          if (deltaY > 0) setActiveIndex((prev) => (prev + 1) % artworks.length)
-          else setActiveIndex((prev) => (prev - 1 + artworks.length) % artworks.length)
+      onPanEnd={(e, info) => {
+        if (Math.abs(info.offset.y) > 30 && Math.abs(info.offset.y) > Math.abs(info.offset.x)) {
+          if (info.offset.y < 0) {
+            // Swipe up (drag finger up) -> scroll forward
+            setActiveIndex((prev) => (prev + 1) % artworks.length)
+          } else {
+            // Swipe down (drag finger down) -> scroll backward
+            setActiveIndex((prev) => (prev - 1 + artworks.length) % artworks.length)
+          }
         }
-        touchStartY.current = null
       }}
     >
       <DeckHeader title={subclusterTitle} isActive={!!isDeckActive} />
 
-      <div className="relative w-[55vw] h-[70vw] md:w-[40vw] md:h-[50vw] lg:w-[20vw] lg:h-[25vw] flex items-center justify-center pointer-events-none">
+      <div 
+        className="relative w-[55vw] h-[70vw] md:w-[40vw] md:h-[50vw] lg:w-[20vw] lg:h-[25vw] flex items-center justify-center pointer-events-auto"
+        onMouseEnter={() => {
+          if (!isTouchMode) setIsHovered(true)
+        }}
+        onMouseLeave={() => {
+          setIsHovered(false)
+        }}
+      >
         <AnimatePresence>
           {artworks.map((artwork, i) => (
             <DeckCard
@@ -86,10 +97,12 @@ export const ClusterDeck = ({
               isActive={i === activeIndex}
               onActivate={setActiveIndex}
               onExpand={handleExpand}
+              isDeckHovered={isHovered}
+              isIntroDone={isIntroDone}
             />
           ))}
         </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   )
 }

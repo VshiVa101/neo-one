@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEO-ONE · Triangolo Magico</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0a0a; color: #fff; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const READINGS = [
+      { start: "N", word: "NEO", color: "#A2D729", desc: "l'inizio, il nuovo, il futuro." }, // Brighter brand green
+      { start: "E", word: "EON", color: "#E295A4", desc: "il tempo, il ciclo, l'eterno che ritorna." }, // Brighter soft rose
+      { start: "O", word: "ONE", color: "#FF5696", desc: "l'uno, l'io, l'ognuno." }, // Brighter brand hot pink
+    ];
+
+    const CX = 200, CY = 185, R = 115;
+
+    function vertexPos(index) {
+      const angle = -Math.PI / 2 + (2 * Math.PI * index) / 3;
+      return { x: CX + R * Math.cos(angle), y: CY + R * Math.sin(angle) };
+    }
+
+    const VERTICES = [
+      { label: "E", ...vertexPos(0) }, // Top
+      { label: "O", ...vertexPos(1) }, // Right
+      { label: "N", ...vertexPos(2) }, // Left
+    ];
+
+    function getReadingIndices(startLabel) {
+      const order = ["E", "O", "N"];
+      const si = order.indexOf(startLabel);
+      return [si, (si + 1) % 3, (si + 2) % 3];
+    }
+
+    function ArrowAlong({ from, to, color, progress = 1 }) {
+      const dx = to.x - from.x, dy = to.y - from.y;
+      const len = Math.sqrt(dx*dx + dy*dy);
+      const ux = dx/len, uy = dy/len;
+      const pad = 28;
+      const x1 = from.x + ux*pad, y1 = from.y + uy*pad;
+      const x2 = to.x   - ux*pad, y2 = to.y   - uy*pad;
+      const px = x1 + progress*(x2-x1), py = y1 + progress*(y2-y1);
+      return (
+        <g>
+          <line x1={x1} y1={y1} x2={px} y2={py}
+            stroke={color} strokeWidth="1.5" strokeLinecap="round" opacity="0.7"/>
+          {progress > 0.85 && (
+            <polygon
+              points="0,-5 4,4 -4,4"
+              transform={`translate(${px},${py}) rotate(${Math.atan2(uy,ux)*180/Math.PI+90})`}
+              fill={color} opacity="0.9"
+            />
+          )}
+        </g>
+      );
+    }
+
+    function App() {
+      const [active,   setActive]   = useState(0);
+      const [progress, setProgress] = useState(1);
+      const [autoPlay, setAutoPlay] = useState(true);
+
+      useEffect(() => {
+        if (!autoPlay) return;
+        const id = setInterval(() => {
+          setActive(p => (p+1)%3);
+          setProgress(0);
+        }, 2800);
+        return () => clearInterval(id);
+      }, [autoPlay]);
+
+      useEffect(() => {
+        if (progress >= 1) return;
+        const raf = requestAnimationFrame(() => setProgress(p => Math.min(1, p+0.04)));
+        return () => cancelAnimationFrame(raf);
+      }, [progress]);
+
+      const reading   = READINGS[active];
+      const indices   = getReadingIndices(reading.start);
+      const edgePairs = [[indices[0],indices[1]],[indices[1],indices[2]],[indices[2],indices[0]]];
+
+      function handleVertex(label) {
+        setAutoPlay(false);
+        const idx = READINGS.findIndex(r => r.start === label);
+        if (idx !== active) { setActive(idx); setProgress(0); }
+      }
+
+      return (
+        <div style={{
+          minHeight:"100vh", background:"#0a0a0a",
+          display:"flex", flexDirection:"column",
+          alignItems:"center", justifyContent:"center",
+          fontFamily:"Georgia,'Times New Roman',serif",
+          color:"#e0d8cc", userSelect:"none", padding:"24px",
+        }}>
+          <div style={{
+            letterSpacing:"0.45em", fontSize:"11px", color:"#888", // Made more visible (was #444)
+            textTransform:"uppercase", marginBottom:"8px", fontFamily:"monospace",
+          }}>
+            triangolo magico
+          </div>
+          <div style={{
+            fontSize:"11px", color:"#666", // Made more visible (was #2a2a2a)
+            letterSpacing:"0.2em", fontFamily:"monospace", textAlign:"center", marginBottom:"40px",
+          }}>
+            ◈ ogni vertice legge una parola diversa ◈
+          </div>
+
+          <svg width="400" height="430" viewBox="0 0 400 430"
+            style={{ overflow:"visible", maxWidth:"100%", height:"auto" }}>
+            <defs>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="5" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+
+            <polygon points={VERTICES.map(v=>`${v.x},${v.y}`).join(" ")}
+              fill={reading.color+"0a"} stroke={reading.color+"25"} strokeWidth="1"
+              style={{transition:"fill 0.8s, stroke 0.8s"}}/>
+
+            {[[0,1],[1,2],[2,0]].map(([a,b],i) => (
+              <line key={i}
+                x1={VERTICES[a].x} y1={VERTICES[a].y}
+                x2={VERTICES[b].x} y2={VERTICES[b].y}
+                stroke="#2a2a2a" strokeWidth="1"/> // Sligtly brighter line guides
+            ))}
+
+            {edgePairs.map(([a,b],i) => {
+              const ep = Math.max(0, Math.min(1, (progress - i*0.28) / 0.44));
+              return <ArrowAlong key={`${active}-${i}`}
+                from={VERTICES[a]} to={VERTICES[b]} color={reading.color} progress={ep}/>;
+            })}
+
+            {/* Render center word (glow filter removed) */}
+            <text x={CX} y={CY+10} textAnchor="middle" fontSize="38"
+              fontFamily="Georgia,serif" fontStyle="italic"
+              fill={reading.color}
+              style={{transition:"fill 0.6s"}}>
+              {reading.word}
+            </text>
+            <text x={CX} y={340} textAnchor="middle" fontSize="10"
+              fontFamily="monospace" fill={reading.color+"bb"} letterSpacing="2"
+              style={{transition:"fill 0.6s"}}>
+              {reading.desc}
+            </text>
+
+            {VERTICES.map((v) => {
+              const isActive = reading.start === v.label;
+              const col = READINGS.find(r => r.start === v.label).color;
+              return (
+                <g key={v.label} onClick={() => handleVertex(v.label)} style={{cursor:"pointer"}}>
+                  {isActive && (
+                    <circle cx={v.x} cy={v.y} r="26" fill="none"
+                      stroke={col} strokeWidth="1" opacity="0.5" filter="url(#glow)"/>
+                  )}
+                  <circle cx={v.x} cy={v.y} r="18"
+                    fill={isActive ? col+"1a" : "#111"}
+                    stroke={isActive ? col : "#3a3a3a"} // Brighter inactive border
+                    strokeWidth={isActive ? "1.5" : "1"}
+                    style={{transition:"all 0.4s"}}/>
+                  <text x={v.x} y={v.y+7} textAnchor="middle" fontSize="18"
+                    fontFamily="Georgia,serif"
+                    fill={isActive ? col : "#666"} // Made more visible (was #383838)
+                    filter={isActive ? "url(#glow)" : "none"}
+                    style={{transition:"fill 0.4s"}}>
+                    {v.label}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+
+          <div style={{ display:"flex", gap:"36px", marginTop:"28px", alignItems:"center" }}>
+            {READINGS.map((r, i) => (
+              <button key={r.word}
+                onClick={() => { setAutoPlay(false); setActive(i); setProgress(0); }}
+                style={{
+                  background:"none", border:"none", cursor:"pointer",
+                  display:"flex", flexDirection:"column", alignItems:"center", gap:"6px",
+                  opacity: active===i ? 1 : 0.45, transition:"opacity 0.4s", // More visible inactive button (was 0.22)
+                }}>
+                <span style={{
+                  fontFamily:"Georgia,serif", fontStyle:"italic",
+                  fontSize:"22px", color:r.color, letterSpacing:"4px",
+                  textShadow: active===i ? `0 0 14px ${r.color}99` : "none",
+                  transition:"text-shadow 0.4s",
+                }}>
+                  {r.word}
+                </span>
+                <span style={{
+                  fontFamily:"monospace", fontSize:"9px",
+                  color:"#888", letterSpacing:"2px", textTransform:"uppercase", // Made more visible (was #333)
+                }}>
+                  da {r.start}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <div style={{
+            marginTop:"52px", letterSpacing:"0.6em", fontSize:"12px",
+            color:"#444", fontFamily:"monospace", textTransform:"uppercase", // Made more visible (was #1a1a1a)
+          }}>
+            N E O — O N E
+          </div>
+
+          <button onClick={() => setAutoPlay(p => !p)} style={{
+            marginTop:"14px", background:"none", border:"1px solid #333", // Brighter border
+            color:"#888", fontSize:"9px", letterSpacing:"2px", // Made more visible (was #282828)
+            padding:"6px 14px", cursor:"pointer", fontFamily:"monospace",
+            textTransform:"uppercase",
+          }}>
+            {autoPlay ? "● auto" : "○ manuale"}
+          </button>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+  </script>
+</body>
+</html>
