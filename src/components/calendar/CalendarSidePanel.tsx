@@ -226,54 +226,54 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                     className="w-[52px] h-[52px] md:w-[60px] md:h-[60px] lg:w-[72px] lg:h-[72px] relative cursor-pointer focus:outline-none group"
                     title={count > 0 ? 'Carrello' : 'Contatta Neo'}
                   >
-                    <Image
-                      src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-vuoto-v3.webp'}
-                      alt={count > 0 ? 'Carrello' : 'Contatta'}
-                      fill
-                      className="object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.5)] group-hover:opacity-0 transition-opacity duration-200"
-                      unoptimized
-                      draggable={false}
-                    />
-                    <Image
-                      src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-verde-v3.webp'}
-                      alt={count > 0 ? 'Carrello' : 'Contatta'}
-                      fill
-                      className="object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.5)] opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                      unoptimized
-                      draggable={false}
-                    />
-                    {count === 0 && (
+                    {count > 0 ? (
+                      <Image
+                        src="/images/ui/carrelloverde.webp"
+                        alt="Carrello"
+                        fill
+                        className="object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]"
+                        unoptimized
+                        draggable={false}
+                      />
+                    ) : (
                       <>
-                        {/* Sliding Eye Container with circle-to-V clip-path */}
+                        {/* New clean envelope — has space pre-cut for the eye */}
+                        <Image
+                          src="/images/ui/busta-contatta.webp"
+                          alt="Contatta"
+                          fill
+                          className="object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]"
+                          unoptimized
+                          draggable={false}
+                        />
+                        {/* Animated Eye emerging from the envelope */}
+                        {/* Clip window = rectangular interior body of the envelope */}
                         <div
                           className="absolute overflow-hidden pointer-events-none select-none z-[9]"
                           style={{
-                            width: '34.4%',
-                            height: '32.4%',
-                            left: '48.4%',
-                            top: '46.7%',
+                            width: '60%',
+                            height: '55%',
+                            left: '50%',
+                            top: '58%',
                             transform: 'translate(-50%, -50%)',
-                            clipPath: 'polygon(0% 53%, 6.7% 25%, 25% 6.7%, 50% 0%, 75% 6.7%, 93.3% 25%, 100% 50.6%, 50% 100%)',
-                            filter: 'blur(0.5px)',
                           }}
                         >
-                          {/* Animated Eyeball web_4.webp */}
+                          {/* Eye starts hidden below, slides UP to peek out */}
                           <motion.div
                             className="absolute"
                             style={{
-                              width: '180%',
-                              aspectRatio: '181 / 256',
-                              left: '50%',
-                              top: '-85%',
-                              x: '-50%',
+                              width: '80%',
+                              height: '80%',
+                              left: '10%',
+                              bottom: '-80%',
                             }}
                             animate={{
-                              y: ['0%', '0%', '40%', '40%', '0%', '0%']
+                              y: ['0%', '0%', '-120%', '-120%', '0%', '0%']
                             }}
                             transition={{
                               duration: 6,
                               ease: "easeInOut",
-                              times: [0, 0.4, 0.45, 0.75, 0.8, 1],
+                              times: [0, 0.3, 0.45, 0.7, 0.82, 1],
                               repeat: Infinity,
                             }}
                           >

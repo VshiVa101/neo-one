@@ -401,22 +401,66 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                   animate={cartHovered ? "hover" : "idle"}
                   className="w-full h-full relative"
                 >
-                  {/* Default icon */}
-                  <Image
-                    src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-vuoto-v3.webp'}
-                    alt={count > 0 ? 'Carrello' : 'Contatta'}
-                    fill
-                    className="object-contain group-hover:opacity-0 transition-opacity duration-200"
-                    unoptimized
-                  />
-                  {/* Hover icon */}
-                  <Image
-                    src={count > 0 ? '/images/ui/carrelloverde.webp' : '/images/ui/invia-mail-verde-v3.webp'}
-                    alt={count > 0 ? 'Carrello' : 'Contatta'}
-                    fill
-                    className="object-contain opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                    unoptimized
-                  />
+                  {count > 0 ? (
+                    <Image
+                      src="/images/ui/carrelloverde.webp"
+                      alt="Carrello"
+                      fill
+                      className="object-contain"
+                      unoptimized
+                    />
+                  ) : (
+                    <>
+                      {/* New clean envelope with space for the eye */}
+                      <Image
+                        src="/images/ui/busta-contatta.webp"
+                        alt="Contatta"
+                        fill
+                        className="object-contain"
+                        unoptimized
+                      />
+                      {/* Animated Eye emerging from the envelope */}
+                      {/* Clip window = rectangular interior body of the envelope */}
+                      <div
+                        className="absolute overflow-hidden pointer-events-none select-none z-[9]"
+                        style={{
+                          width: '60%',
+                          height: '55%',
+                          left: '50%',
+                          top: '58%',
+                          transform: 'translate(-50%, -50%)',
+                        }}
+                      >
+                        {/* Eye starts hidden below, slides UP to peek out */}
+                        <motion.div
+                          className="absolute"
+                          style={{
+                            width: '80%',
+                            height: '80%',
+                            left: '10%',
+                            bottom: '-80%',
+                          }}
+                          animate={{
+                            y: ['0%', '0%', '-120%', '-120%', '0%', '0%']
+                          }}
+                          transition={{
+                            duration: 6,
+                            ease: "easeInOut",
+                            times: [0, 0.3, 0.45, 0.7, 0.82, 1],
+                            repeat: Infinity,
+                          }}
+                        >
+                          <Image
+                            src="/images/ui/web_4.webp"
+                            alt="Eye"
+                            fill
+                            className="object-contain"
+                            unoptimized
+                          />
+                        </motion.div>
+                      </div>
+                    </>
+                  )}
                 </motion.div>
                 {count > 0 && (
                   <span className="absolute -top-1 -right-1 w-[12px] h-[12px] md:w-[16px] md:h-[16px] lg:w-[20px] lg:h-[20px] flex items-center justify-center bg-[#809829] rounded-full font-neo text-[6px] md:text-[8px] lg:text-[10px] text-black font-bold border border-black shadow-[0_0_5px_rgba(128,152,41,0.8)] z-20">

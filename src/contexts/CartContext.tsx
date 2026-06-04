@@ -433,13 +433,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                                 <div className="w-6 h-6 lg:w-8 lg:h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                               ) : (
                                 <Image
-                                  src={
-                                    submitHovered && isActive
-                                      ? '/images/ui/invia-mail-verde-v3.webp'
-                                      : isActive
-                                        ? '/images/ui/invia-mail-rosa.webp'
-                                        : '/images/ui/invia-mail-vuoto-v3.webp'
-                                  }
+                                  src="/images/ui/busta-contatta.webp"
                                   alt="Invia"
                                   width={40}
                                   height={40}
