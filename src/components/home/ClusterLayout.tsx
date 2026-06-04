@@ -419,29 +419,29 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                         className="object-contain"
                         unoptimized
                       />
-                      {/* Animated Eye emerging from the envelope */}
-                      {/* Clip window = rectangular interior body of the envelope */}
+                      {/* Eye clip container: V-bottom matches the envelope interior opening */}
                       <div
                         className="absolute overflow-hidden pointer-events-none select-none z-[9]"
                         style={{
-                          width: '60%',
-                          height: '55%',
+                          width: '70%',
+                          height: '65%',
                           left: '50%',
-                          top: '58%',
+                          top: '54%',
                           transform: 'translate(-50%, -50%)',
+                          clipPath: 'polygon(0% 0%, 100% 0%, 100% 72%, 50% 100%, 0% 72%)',
                         }}
                       >
-                        {/* Eye starts hidden below, slides UP to peek out */}
+                        {/* Eye: starts BELOW (hidden), slides UP into view, returns DOWN (hidden) */}
                         <motion.div
                           className="absolute"
                           style={{
-                            width: '80%',
-                            height: '80%',
-                            left: '10%',
-                            bottom: '-80%',
+                            width: '85%',
+                            height: '85%',
+                            left: '7.5%',
+                            top: '5%',
                           }}
                           animate={{
-                            y: ['0%', '0%', '-120%', '-120%', '0%', '0%']
+                            y: ['105%', '105%', '0%', '0%', '105%', '105%']
                           }}
                           transition={{
                             duration: 6,
