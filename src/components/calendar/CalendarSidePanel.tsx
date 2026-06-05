@@ -246,29 +246,28 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                           unoptimized
                           draggable={false}
                         />
-                        {/* Eye clip container: V-bottom matches the envelope interior opening */}
+                        {/* Eye clip container: Custom polygon to match the envelope inner opening exactly */}
                         <div
                           className="absolute overflow-hidden pointer-events-none select-none z-[9]"
                           style={{
-                            width: '70%',
-                            height: '65%',
-                            left: '50%',
-                            top: '54%',
-                            transform: 'translate(-50%, -50%)',
-                            clipPath: 'polygon(0% 0%, 100% 0%, 100% 72%, 50% 100%, 0% 72%)',
+                            width: '100%',
+                            height: '100%',
+                            left: '0%',
+                            top: '0%',
+                            clipPath: 'polygon(50% 25%, 85% 45%, 85% 55%, 50% 70%, 15% 55%, 15% 45%)',
                           }}
                         >
                           {/* Eye: starts BELOW (hidden), slides UP into view, returns DOWN (hidden) */}
                           <motion.div
                             className="absolute"
                             style={{
-                              width: '85%',
-                              height: '85%',
-                              left: '7.5%',
-                              top: '5%',
+                              width: '60%',
+                              height: '60%',
+                              left: '20%',
+                              top: '20%',
                             }}
                             animate={{
-                              y: ['105%', '105%', '0%', '0%', '105%', '105%']
+                              y: ['60%', '60%', '-15%', '-15%', '60%', '60%']
                             }}
                             transition={{
                               duration: 6,
