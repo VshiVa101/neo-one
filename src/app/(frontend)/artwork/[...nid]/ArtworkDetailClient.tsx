@@ -412,7 +412,7 @@ export const ArtworkDetailClient = ({
           </div>
 
           {/* 2. CENTER ARTWORK */}
-          <div className="relative flex-1 lg:flex-[2] mx-1 sm:mx-2 lg:mx-0 bg-black rounded-lg p-2 lg:p-4 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-white/5 group perspective-[1000px]">
+          <div className={`relative flex-1 lg:flex-[2] mx-1 sm:mx-2 lg:mx-0 bg-black rounded-lg p-2 lg:p-4 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-white/5 group perspective-[1000px] ${isRumoreCluster ? 'z-[60]' : 'z-10'}`}>
 
             <motion.div
               className="w-full h-full relative"
@@ -448,7 +448,7 @@ export const ArtworkDetailClient = ({
                 {/* Garantisce che cover e vinile emergente abbiano le stesse proporzioni senza deformarsi (no ovali). Rimosso h-full! */}
                 <div 
                   className="relative m-auto flex items-center justify-center aspect-square"
-                  style={{ width: '100%', maxWidth: 'min(100%, 65vh)' }}
+                  style={{ width: '100%', maxWidth: 'min(100%, 65vh)', maxHeight: '100%' }}
                 >
                   
                   {/* ── VINILE EMERGENTE (solo mobile + RUMORE) ── */}

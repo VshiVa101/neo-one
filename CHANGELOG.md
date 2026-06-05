@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 
 
+## [1.3.6] - 2026-06-05
+
+### 🎨 FINAL MVP POLISH & UI REFINEMENTS
+
+- **Artwork Image Cropping**: Fixed an issue where central images in the artwork details component were improperly cropped at the bottom on desktop devices by ensuring `object-contain` is consistently applied.
+- **Cart Scrolling**: Restored vertical scrolling functionality within the side cart drawer to allow users to view all items.
+- **Icon Animations**: Added continuous blinking animations to the Contact and Mute icons in the side panel for improved affordance.
+- **Linktree UI Refinements**: Reduced Linktree link icon sizes by 10% and added a subtle 3-second nudge animation to the return arrow for better visual balance and interaction cues.
+
 ## [1.3.5] - 2026-05-22
 
 ### 🎵 RUMORE VINYL ANIMATION & INTERACTIVE TONEARM
