@@ -217,52 +217,77 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                         }}
                         className="w-full h-full relative"
                       >
-                        <Image
-                          src="/images/ui/volume.webp"
-                          alt="Volume"
-                          fill
-                          className={`object-contain transition-opacity duration-300 ${isMuted ? 'opacity-30' : 'opacity-95'}`}
-                          unoptimized
-                          draggable={false}
-                        />
-                        <div
-                          className="absolute rounded-full overflow-hidden pointer-events-none select-none z-10"
-                          style={{
-                            width: '28%',
-                            height: '38%',
-                            left: '51.6%',
-                            top: '43.6%',
-                            transform: 'translate(-50%, -50%)',
-                            filter: 'blur(1.5px)',
+                        {/* Rotation + float wrapper: ruota e fluttua SOLO quando mutato */}
+                        <motion.div
+                          animate={isMuted ? 'muted' : 'unmuted'}
+                          variants={{
+                            unmuted: {
+                              rotate: 0,
+                              y: 0,
+                              x: 0,
+                              transition: { duration: 0.4, ease: 'easeOut' }
+                            },
+                            muted: {
+                              rotate: 90,
+                              y: [0, -5, 0, 4, 0],
+                              x: [0, 1.5, 0, -1.5, 0],
+                              transition: {
+                                rotate: { duration: 0.5, type: 'spring', bounce: 0.4 },
+                                y: { duration: 3.5, repeat: Infinity, ease: 'easeInOut' },
+                                x: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+                              }
+                            }
                           }}
+                          className="absolute inset-0 w-full h-full"
                         >
-                          {/* Top Eyelid */}
-                          <motion.div
-                            className="absolute top-0 left-0 w-full h-1/2 bg-black"
-                            animate={{
-                              y: ['-100%', '-100%', '0%', '-100%', '-100%']
-                            }}
-                            transition={{
-                              duration: 5,
-                              ease: "easeInOut",
-                              times: [0, 0.92, 0.95, 0.98, 1],
-                              repeat: Infinity,
-                            }}
+                          <Image
+                            src="/images/ui/volume.webp"
+                            alt="Volume"
+                            fill
+                            className="object-contain"
+                            unoptimized
+                            draggable={false}
                           />
-                          {/* Bottom Eyelid */}
-                          <motion.div
-                            className="absolute bottom-0 left-0 w-full h-1/2 bg-black"
-                            animate={{
-                              y: ['100%', '100%', '0%', '100%', '100%']
+                          {/* Occhio: posizionato sul centro del bulbo oculare nel megafono */}
+                          <div
+                            className="absolute rounded-full overflow-hidden pointer-events-none select-none z-10"
+                            style={{
+                              width: '24%',
+                              height: '29%',
+                              left: '40%',
+                              top: '48%',
+                              transform: 'translate(-50%, -50%)',
+                              filter: 'blur(1.5px)',
                             }}
-                            transition={{
-                              duration: 5,
-                              ease: "easeInOut",
-                              times: [0, 0.92, 0.95, 0.98, 1],
-                              repeat: Infinity,
-                            }}
-                          />
-                        </div>
+                          >
+                            {/* Top Eyelid */}
+                            <motion.div
+                              className="absolute top-0 left-0 w-full h-1/2 bg-black"
+                              animate={{
+                                y: ['-100%', '-100%', '0%', '-100%', '-100%']
+                              }}
+                              transition={{
+                                duration: 5,
+                                ease: "easeInOut",
+                                times: [0, 0.92, 0.95, 0.98, 1],
+                                repeat: Infinity,
+                              }}
+                            />
+                            {/* Bottom Eyelid */}
+                            <motion.div
+                              className="absolute bottom-0 left-0 w-full h-1/2 bg-black"
+                              animate={{
+                                y: ['100%', '100%', '0%', '100%', '100%']
+                              }}
+                              transition={{
+                                duration: 5,
+                                ease: "easeInOut",
+                                times: [0, 0.92, 0.95, 0.98, 1],
+                                repeat: Infinity,
+                              }}
+                            />
+                          </div>
+                        </motion.div>
                       </motion.div>
                     </motion.button>
                   )}
@@ -291,7 +316,7 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                           src="/images/ui/busta-contatta.webp"
                           alt="Contatta"
                           fill
-                          className="object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]"
+                          className="object-contain"
                           unoptimized
                           draggable={false}
                         />
@@ -302,20 +327,20 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                           overflow:hidden hides the eye when it exits the diamond downward.
                         */}
                         <div
-                          className="absolute overflow-hidden pointer-events-none select-none z-[9]"
+                          className="absolute pointer-events-none select-none z-[9]"
                           style={{
                             width: '84%',
                             height: '63%',
                             left: '50%',
                             top: '34%',
                             transform: 'translate(-50%, -50%)',
-                            clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+                            clipPath: 'polygon(50% 2%, 98% 50%, 50% 98%, 2% 50%)',
                           }}
                         >
                           <motion.div
                             className="absolute inset-0"
                             animate={{
-                              y: ['120%', '120%', '60%', '60%', '120%', '120%']
+                              y: ['120%', '120%', '15%', '15%', '120%', '120%']
                             }}
                             transition={{
                               duration: 6,
@@ -374,12 +399,12 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                       <motion.div
                         className="absolute top-0 left-0 w-full h-1/2 bg-black"
                         animate={{
-                          y: ['-100%', '-100%', '0%', '-100%', '-100%']
+                          y: ['-100%', '-100%', '0%', '-100%', '0%', '-100%', '-100%']
                         }}
                         transition={{
-                          duration: 5,
+                          duration: 7,
                           ease: "easeInOut",
-                          times: [0, 0.92, 0.95, 0.98, 1],
+                          times: [0, 0.88, 0.90, 0.92, 0.94, 0.96, 1],
                           repeat: Infinity,
                         }}
                       />
@@ -387,12 +412,12 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                       <motion.div
                         className="absolute bottom-0 left-0 w-full h-1/2 bg-black"
                         animate={{
-                          y: ['100%', '100%', '0%', '100%', '100%']
+                          y: ['100%', '100%', '0%', '100%', '0%', '100%', '100%']
                         }}
                         transition={{
-                          duration: 5,
+                          duration: 7,
                           ease: "easeInOut",
-                          times: [0, 0.92, 0.95, 0.98, 1],
+                          times: [0, 0.88, 0.90, 0.92, 0.94, 0.96, 1],
                           repeat: Infinity,
                         }}
                       />

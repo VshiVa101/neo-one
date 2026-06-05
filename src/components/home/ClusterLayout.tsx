@@ -425,20 +425,20 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                         overflow:hidden hides the eye when it exits the diamond downward.
                       */}
                       <div
-                        className="absolute overflow-hidden pointer-events-none select-none z-[9]"
+                        className="absolute pointer-events-none select-none z-[9]"
                         style={{
                           width: '84%',
                           height: '63%',
                           left: '50%',
                           top: '34%',
                           transform: 'translate(-50%, -50%)',
-                          clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+                          clipPath: 'polygon(50% 2%, 98% 50%, 50% 98%, 2% 50%)',
                         }}
                       >
                         <motion.div
                           className="absolute inset-0"
                           animate={{
-                            y: ['120%', '120%', '60%', '60%', '120%', '120%']
+                            y: ['120%', '120%', '15%', '15%', '120%', '120%']
                           }}
                           transition={{
                             duration: 6,
