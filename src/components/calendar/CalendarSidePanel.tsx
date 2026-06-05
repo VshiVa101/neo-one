@@ -304,25 +304,18 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                         <div
                           className="absolute overflow-hidden pointer-events-none select-none z-[9]"
                           style={{
-                            width: '56%',
-                            height: '42%',
+                            width: '84%',
+                            height: '63%',
                             left: '50%',
                             top: '34%',
                             transform: 'translate(-50%, -50%)',
                             clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
                           }}
                         >
-                          {/* Eye: scaled to 150%, movement halved */}
                           <motion.div
-                            className="absolute"
-                            style={{
-                              width: '150%',
-                              height: '150%',
-                              left: '-25%',
-                              top: '-25%',
-                            }}
+                            className="absolute inset-0"
                             animate={{
-                              y: ['90%', '90%', '50%', '50%', '90%', '90%']
+                              y: ['120%', '120%', '60%', '60%', '120%', '120%']
                             }}
                             transition={{
                               duration: 6,
