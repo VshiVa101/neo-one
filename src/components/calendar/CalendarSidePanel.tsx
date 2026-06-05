@@ -139,14 +139,25 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                     draggable={false}
                   />
                 </motion.div>
-                <Image
-                  src="/images/ui/direction-arrow-green.webp"
-                  alt="Indietro"
-                  fill
-                  className={`object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.5)] transition-opacity duration-300 ${isLinksOpen ? 'opacity-100' : 'opacity-0'}`}
-                  unoptimized
-                  draggable={false}
-                />
+                <motion.div
+                  className={`absolute inset-0 w-full h-full transition-opacity duration-300 ${isLinksOpen ? 'opacity-100' : 'opacity-0'}`}
+                  animate={isLinksOpen ? { x: [0, 8, 0] } : { x: 0 }}
+                  transition={{
+                    duration: 0.3,
+                    ease: "easeInOut",
+                    repeat: Infinity,
+                    repeatDelay: 2.7,
+                  }}
+                >
+                  <Image
+                    src="/images/ui/direction-arrow-green.webp"
+                    alt="Indietro"
+                    fill
+                    className="object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]"
+                    unoptimized
+                    draggable={false}
+                  />
+                </motion.div>
               </motion.button>
 
               {/* CONTENITORE INFERIORE (Icone Principali o Link Social) */}
@@ -214,6 +225,44 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                           unoptimized
                           draggable={false}
                         />
+                        <div
+                          className="absolute rounded-full overflow-hidden pointer-events-none select-none z-10"
+                          style={{
+                            width: '28%',
+                            height: '38%',
+                            left: '51.6%',
+                            top: '43.6%',
+                            transform: 'translate(-50%, -50%)',
+                            filter: 'blur(1.5px)',
+                          }}
+                        >
+                          {/* Top Eyelid */}
+                          <motion.div
+                            className="absolute top-0 left-0 w-full h-1/2 bg-black"
+                            animate={{
+                              y: ['-100%', '-100%', '0%', '-100%', '-100%']
+                            }}
+                            transition={{
+                              duration: 5,
+                              ease: "easeInOut",
+                              times: [0, 0.92, 0.95, 0.98, 1],
+                              repeat: Infinity,
+                            }}
+                          />
+                          {/* Bottom Eyelid */}
+                          <motion.div
+                            className="absolute bottom-0 left-0 w-full h-1/2 bg-black"
+                            animate={{
+                              y: ['100%', '100%', '0%', '100%', '100%']
+                            }}
+                            transition={{
+                              duration: 5,
+                              ease: "easeInOut",
+                              times: [0, 0.92, 0.95, 0.98, 1],
+                              repeat: Infinity,
+                            }}
+                          />
+                        </div>
                       </motion.div>
                     </motion.button>
                   )}
@@ -263,11 +312,17 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                             clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
                           }}
                         >
-                          {/* Eye: y=120% → hidden below diamond; y=0% → visible in diamond */}
+                          {/* Eye: scaled to 150%, movement halved */}
                           <motion.div
-                            className="absolute inset-0"
+                            className="absolute"
+                            style={{
+                              width: '150%',
+                              height: '150%',
+                              left: '-25%',
+                              top: '-25%',
+                            }}
                             animate={{
-                              y: ['120%', '120%', '0%', '0%', '120%', '120%']
+                              y: ['90%', '90%', '50%', '50%', '90%', '90%']
                             }}
                             transition={{
                               duration: 6,
@@ -393,7 +448,7 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                             onTap={() => window.open(link.url, '_blank', 'noopener,noreferrer')}
                             whileHover={{ scale: 1.15, y: -3 }}
                             whileTap={{ scale: 0.9 }}
-                            className="w-[52px] h-[52px] md:w-[62px] md:h-[62px] lg:w-[72px] lg:h-[72px] relative shrink-0 cursor-pointer"
+                            className="w-[46px] h-[46px] md:w-[56px] md:h-[56px] lg:w-[64px] lg:h-[64px] relative shrink-0 cursor-pointer"
                             title={link.label}
                             draggable={false}
                             onDragStart={(e: any) => e.preventDefault()}

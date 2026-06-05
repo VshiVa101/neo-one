@@ -435,11 +435,17 @@ export const ClusterLayout = ({ clusters }: { clusters: ClusterData[] }) => {
                           clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
                         }}
                       >
-                        {/* Eye: y=120% → hidden below diamond; y=0% → visible in diamond */}
+                        {/* Eye: scaled to 150%, movement halved */}
                         <motion.div
-                          className="absolute inset-0"
+                          className="absolute"
+                          style={{
+                            width: '150%',
+                            height: '150%',
+                            left: '-25%',
+                            top: '-25%',
+                          }}
                           animate={{
-                            y: ['120%', '120%', '0%', '0%', '120%', '120%']
+                            y: ['90%', '90%', '50%', '50%', '90%', '90%']
                           }}
                           transition={{
                             duration: 6,
