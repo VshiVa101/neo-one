@@ -281,6 +281,13 @@ export const NeoUncensoredHero: React.FC<HeroProps> = () => {
             -webkit-tap-highlight-color: transparent;
           }
 
+          @media (max-width: 768px) {
+            .neo-globe-container {
+              width: 180px;
+              height: 180px;
+            }
+          }
+
           @media (prefers-reduced-motion: reduce) {
             .neo-ring-wrap {
               animation: none;

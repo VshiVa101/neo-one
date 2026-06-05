@@ -112,7 +112,7 @@ export default function HeroClient() {
             onReady={() => setIsEyeReady(true)}
             isUnlocked={isUnlocked}
             globalTracking={true}
-            scaleMultiplier={isTouchDevice ? 1.6 : 1}
+            scaleMultiplier={isTouchDevice ? 0.96 : 1}
             disableTransitionOverlay={false}
           />
         </div>
