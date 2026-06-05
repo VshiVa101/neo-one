@@ -246,28 +246,28 @@ export function CalendarSidePanel({ socialLinks, eyeComponent }: CalendarSidePan
                           unoptimized
                           draggable={false}
                         />
-                        {/* Eye clip container: Custom polygon to match the envelope inner opening exactly */}
+                        {/*
+                          Clip zone = ONLY the diamond interior (the open back-flap area).
+                          This is strictly above the opaque front V-body of the envelope.
+                          clipPath diamond: matches the rhombus shape of the open interior.
+                          overflow:hidden hides the eye when it exits the diamond downward.
+                        */}
                         <div
                           className="absolute overflow-hidden pointer-events-none select-none z-[9]"
                           style={{
-                            width: '100%',
-                            height: '100%',
-                            left: '0%',
-                            top: '0%',
-                            clipPath: 'polygon(50% 25%, 85% 45%, 85% 55%, 50% 70%, 15% 55%, 15% 45%)',
+                            width: '56%',
+                            height: '42%',
+                            left: '50%',
+                            top: '34%',
+                            transform: 'translate(-50%, -50%)',
+                            clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
                           }}
                         >
-                          {/* Eye: starts BELOW (hidden), slides UP into view, returns DOWN (hidden) */}
+                          {/* Eye: y=120% → hidden below diamond; y=0% → visible in diamond */}
                           <motion.div
-                            className="absolute"
-                            style={{
-                              width: '60%',
-                              height: '60%',
-                              left: '20%',
-                              top: '20%',
-                            }}
+                            className="absolute inset-0"
                             animate={{
-                              y: ['60%', '60%', '-15%', '-15%', '60%', '60%']
+                              y: ['120%', '120%', '0%', '0%', '120%', '120%']
                             }}
                             transition={{
                               duration: 6,
