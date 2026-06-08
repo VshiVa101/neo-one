@@ -1,4 +1,4 @@
-# Neo-One — Internal Alignment & Handoff
+﻿# Neo-One â€” Internal Alignment & Handoff
 
 **File:** `docs/NEO_ALIGNMENT.md`
 **Purpose:** single operational handoff document for future models/agents working on Neo-One.
@@ -439,7 +439,7 @@ Avoid:
 
 ---
 
-## 11. Current handoff snapshot — v1.3.4
+## 11. Current handoff snapshot â€” v1.3.4
 
 Current completed fix:
 
@@ -452,7 +452,7 @@ Current completed fix:
 - EventDetail styled with custom irregular background and high-contrast black text.
 - Cloudinary URL resolution fixed via centralized utility.
 - **v1.3.1 Fix**: Global text wrapping strategy implemented to prevent word-breaking on resize, with `overflow-x: hidden` on root to prevent horizontal scroll.
-- **v1.3.2 Fixes**: Pinch-to-zoom (two-finger pinch tracking) and double-tap zoom (1x ↔ 2.5x toggle) implemented in the artwork detail view on mobile. Added a dedicated close/ESC floating button matching the design system within the fullscreen zoom modal. local prevention of browser pull-to-refresh / scroll bounce on cluster decks and modals.
+- **v1.3.2 Fixes**: Pinch-to-zoom (two-finger pinch tracking) and double-tap zoom (1x â†” 2.5x toggle) implemented in the artwork detail view on mobile. Added a dedicated close/ESC floating button matching the design system within the fullscreen zoom modal. local prevention of browser pull-to-refresh / scroll bounce on cluster decks and modals.
 - **v1.3.3 Fix**: Removed the global `overscroll-behavior-y: none` rule on `body` from `globals.css` that was freezing vertical scrolling on mobile browsers (Safari). Maintained targeted pull-to-refresh blocks in modals/decks.
 - **v1.3.4 Fixes**: 
   - Corrected home page cluster loading to always retrieve B/N cluster (`b-n` slug) on initial load alongside the Neon cluster.

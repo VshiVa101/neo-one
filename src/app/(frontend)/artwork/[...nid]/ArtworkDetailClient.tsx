@@ -13,8 +13,10 @@ import { CrumpledPaperPanel } from '@/components/artwork/CrumpledPaperPanel'
 import { VinylCoverPanel } from '@/components/artwork/VinylCoverPanel'
 import { useInputMode } from '@/contexts/InputModeContext'
 
-// NOTE: rumoreSession state is now managed via useRef inside the component
-// to avoid cross-instance contamination in concurrent rendering.
+// NOTE: rumoreSession state is managed via module-level variables
+// to allow cross-instance continuity during artwork navigation.
+let globalRumoreSessionActive = false;
+let globalRestartTimeout: ReturnType<typeof setTimeout> | null = null;
 
 interface ArtworkDetailClientProps {
   nid: string
@@ -64,6 +66,9 @@ export const ArtworkDetailClient = ({
   const { fadeOutAndPause, restartFromStart } = useAudio()
   const { isTouchMode } = useInputMode()
 
+  const isRumoreCluster = clusterSlug?.toLowerCase() === 'rumore'
+  const isFotoOrMerce = clusterSlug?.toLowerCase() === 'foto' || clusterSlug?.toLowerCase() === 'merce' || clusterSlug?.toLowerCase() === 'cose'
+
   const [isZoomOpen, setIsZoomOpen] = useState(false)
   const scale = useMotionValue(1)
 
@@ -85,6 +90,40 @@ export const ArtworkDetailClient = ({
   }, [])
 
   const previewAudioRef = React.useRef<HTMLAudioElement | null>(null)
+  
+  // -- Arm ResizeObserver Logic --
+  const vinylRef = useRef<HTMLDivElement>(null)
+  const armBaseRef = useRef<HTMLDivElement>(null)
+  const [armMetrics, setArmMetrics] = useState({ length: 150, angle: 135 })
+  
+  useEffect(() => {
+    if (!isRumoreCluster) return;
+    const updateMetrics = () => {
+      if (!vinylRef.current || !armBaseRef.current) return;
+      const vinylRect = vinylRef.current.getBoundingClientRect();
+      const baseRect = armBaseRef.current.getBoundingClientRect();
+      // Target is the right-most point of the vinyl
+      const targetX = vinylRect.left + vinylRect.width;
+      const targetY = vinylRect.top + vinylRect.height / 2;
+      const baseX = baseRect.left + baseRect.width / 2;
+      const baseY = baseRect.top + baseRect.height / 2;
+      const dx = targetX - baseX;
+      const dy = targetY - baseY;
+      const dist = Math.hypot(dx, dy);
+      let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+      setArmMetrics({ length: dist / 2, angle });
+    };
+    const observer = new ResizeObserver(updateMetrics);
+    if (vinylRef.current) observer.observe(vinylRef.current);
+    if (armBaseRef.current) observer.observe(armBaseRef.current);
+    window.addEventListener('resize', updateMetrics);
+    setTimeout(updateMetrics, 50);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateMetrics);
+    };
+  }, [isRumoreCluster]);
+
   const [euroRotation, setEuroRotation] = useState(0)
   const [showEuroIconInRumore, setShowEuroIconInRumore] = useState(true)
   const ballIndexes = React.useMemo(() => {
@@ -143,11 +182,6 @@ export const ArtworkDetailClient = ({
       animate(scale, currentScale > 1 ? 1 : 2.5, { duration: 0.3 })
     }
   }, [])
-
-  const isRumoreCluster = clusterSlug?.toLowerCase() === 'rumore'
-  const isFotoOrMerce = clusterSlug?.toLowerCase() === 'foto' || clusterSlug?.toLowerCase() === 'merce' || clusterSlug?.toLowerCase() === 'cose'
-  const rumoreSessionActiveRef = useRef(false)
-  const restartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleAudioPreview = async () => {
     if (!audioSnippetUrl) return
@@ -241,10 +275,10 @@ export const ArtworkDetailClient = ({
   useEffect(() => {
     if (!isRumoreCluster) return
 
-    rumoreSessionActiveRef.current = true
-    if (restartTimeoutRef.current) {
-      clearTimeout(restartTimeoutRef.current)
-      restartTimeoutRef.current = null
+    globalRumoreSessionActive = true
+    if (globalRestartTimeout) {
+      clearTimeout(globalRestartTimeout)
+      globalRestartTimeout = null
     }
 
     if (!isCrtNoisePlaying()) {
@@ -253,13 +287,13 @@ export const ArtworkDetailClient = ({
     fadeOutAndPause()
 
     return () => {
-      rumoreSessionActiveRef.current = false
-      restartTimeoutRef.current = setTimeout(() => {
-        if (!rumoreSessionActiveRef.current) {
+      globalRumoreSessionActive = false
+      globalRestartTimeout = setTimeout(() => {
+        if (!globalRumoreSessionActive) {
           stopCrtNoise()
           restartFromStart()
         }
-        restartTimeoutRef.current = null
+        globalRestartTimeout = null
       }, 400)
     }
   }, [isRumoreCluster, clusterSlug, fadeOutAndPause, restartFromStart])
@@ -412,7 +446,7 @@ export const ArtworkDetailClient = ({
           </div>
 
           {/* 2. CENTER ARTWORK */}
-          <div className={`relative flex-1 lg:flex-[2] mx-1 sm:mx-2 lg:mx-0 bg-black rounded-lg p-2 lg:p-4 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-white/5 group perspective-[1000px] ${isRumoreCluster ? 'z-[60]' : 'z-10'}`}>
+          <div className={`relative flex-1 lg:flex-[2] mx-1 sm:mx-2 lg:mx-0 bg-black rounded-lg p-1 md:p-2 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-[#111] group perspective-[1000px] ${isRumoreCluster ? 'z-[60]' : 'z-10'}`}>
 
             <motion.div
               className="w-full h-full relative"
@@ -444,11 +478,11 @@ export const ArtworkDetailClient = ({
                   }
                 }}
               >
-                {/* ── WRAPPER QUADRATO PERFETTO ── */}
-                {/* Garantisce che cover e vinile emergente abbiano le stesse proporzioni senza deformarsi (no ovali). Rimosso h-full! */}
+                {/* ── WRAPPER ── */}
+                {/* Garantisce proporzioni corrette (quadrato per Rumore, massimo spazio per gli altri) */}
                 <div 
-                  className="relative m-auto flex items-center justify-center aspect-square"
-                  style={{ width: '100%', maxWidth: 'min(100%, 65vh)', maxHeight: '100%' }}
+                  className={`relative m-auto flex items-center justify-center ${isRumoreCluster ? 'aspect-square' : 'w-full h-full'}`}
+                  style={isRumoreCluster ? { width: '100%', maxWidth: 'min(100%, 65vh)', maxHeight: '100%' } : { width: '100%', height: '100%' }}
                 >
                   
                   {/* ── VINILE EMERGENTE (solo mobile + RUMORE) ── */}
@@ -482,7 +516,8 @@ export const ArtworkDetailClient = ({
 
                   {/* ── COVER e PLAYBACK VINYL (z-10 per coprire il vinile a riposo) ── */}
                   <motion.div
-                    className={`relative flex items-center justify-center overflow-hidden transition-colors duration-1000 z-10 ${
+                    ref={vinylRef}
+                    className={`relative flex items-center justify-center overflow-hidden transition-colors duration-1000 z-10 shrink-0 ${
                       isPreviewPlaying && isRumoreCluster ? 'bg-[#0a0a0a]' : 'bg-transparent'
                     }`}
                     initial={false}
@@ -556,65 +591,73 @@ export const ArtworkDetailClient = ({
                 </motion.div>
                 </div>
 
-                {/* Braccio Meccanico Giradischi — Visible su mobile e desktop */}
+                {/* Braccio Meccanico Giradischi — Mathematical responsive overlay (Sibling to Wrapper) */}
                 <AnimatePresence>
                   {isRumoreCluster && (
                     <motion.div
-                      className="absolute top-[5%] right-[2%] sm:right-[12%] lg:right-[15%] z-20 pointer-events-none origin-[24px_24px] lg:origin-[32px_32px]"
-                      initial={{ opacity: 0, rotate: -30 }}
-                      animate={{ 
-                        opacity: 1, 
-                        rotate: isPreviewPlaying ? (windowWidth >= 1024 ? -5 : 5) : -25 
-                      }}
+                      ref={armBaseRef}
+                      className="absolute top-[2%] right-[5%] sm:top-[5%] sm:right-[8%] lg:top-[5%] lg:right-[10%] xl:right-[15%] z-20 pointer-events-none flex items-center justify-center"
+                      style={{ width: '64px', height: '64px' }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ 
-                        opacity: { duration: 0.5 },
-                        rotate: { type: 'spring', stiffness: 60, damping: 15, delay: isPreviewPlaying ? 0.8 : 0 }
-                      }}
                     >
-                      {/* Base / Perno */}
-                      <div 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAudioPreview();
-                        }}
-                        className="absolute top-0 left-0 w-[40px] h-[40px] sm:w-[48px] sm:h-[48px] lg:w-[64px] lg:h-[64px] bg-gradient-to-br from-[#888] via-[#333] to-[#111] rounded-full border-4 border-[#222] shadow-[0_15px_25px_rgba(0,0,0,0.8),inset_0_2px_5px_rgba(255,255,255,0.3)] flex items-center justify-center z-20 pointer-events-auto cursor-pointer transition-transform hover:scale-110 active:scale-95"
+                      <motion.div
+                        className="absolute inset-0 origin-center"
+                        initial={{ rotate: armMetrics.angle + 45 }}
+                        animate={{ rotate: isPreviewPlaying ? armMetrics.angle : armMetrics.angle + 45 }}
+                        transition={{ rotate: { type: 'spring', stiffness: 60, damping: 15, delay: isPreviewPlaying ? 0.8 : 0 } }}
                       >
-                        {/* Perno centrale */}
-                        <div className="w-[12px] h-[12px] sm:w-[16px] sm:h-[16px] lg:w-[24px] lg:h-[24px] bg-gradient-to-t from-black via-[#333] to-[#777] rounded-full border-[2px] border-[#111] shadow-inner pointer-events-none" />
-                        {/* Riflesso circolare */}
-                        <div className="absolute inset-2 rounded-full border border-white/10 pointer-events-none" />
-                      </div>
-                      
-                      {/* Asta principale (Rod) */}
-                      <div className="absolute top-[17px] left-[20px] sm:top-[21px] sm:left-[24px] lg:top-[29px] lg:left-[32px] w-[120px] sm:w-[160px] md:w-[200px] lg:w-[35vh] h-[5px] sm:h-[6px] lg:h-[8px] bg-gradient-to-b from-[#e0e0e0] via-[#888] to-[#333] origin-left rounded-r-full shadow-[0_10px_20px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.8)]" style={{ transform: 'rotate(110deg)' }}>
-                         {/* Cavo visibile che esce dal rod */}
-                         <div className="absolute left-[10px] top-[-2px] w-[60%] h-[1px] bg-red-900/40 blur-[0.5px]" />
+                        {/* Base / Perno */}
+                        <div 
+                          className="absolute inset-0 bg-gradient-to-br from-[#888] via-[#333] to-[#111] rounded-full border-[2px] md:border-[4px] border-[#222] shadow-[0_10px_20px_rgba(0,0,0,0.8),inset_0_2px_5px_rgba(255,255,255,0.3)] flex items-center justify-center transition-transform hover:scale-110 active:scale-95 pointer-events-auto cursor-pointer"
+                          onClick={(e) => { e.stopPropagation(); handleAudioPreview(); }}
+                        >
+                          <div className="w-[30%] h-[30%] bg-gradient-to-t from-black via-[#333] to-[#777] rounded-full border border-[#111] shadow-inner pointer-events-none" />
+                        </div>
 
-                         {/* Contrappeso (dietro il perno) */}
-                         <div className="absolute left-[-30px] sm:left-[-40px] lg:left-[-55px] top-1/2 -translate-y-1/2 w-[25px] sm:w-[35px] lg:w-[50px] h-[16px] sm:h-[20px] lg:h-[28px] bg-gradient-to-r from-[#111] via-[#555] to-[#111] rounded-l-md border-y border-l border-[#666] shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] flex items-center">
-                           <div className="w-[4px] h-full bg-[#111] mx-1" />
-                           <div className="w-[4px] h-full bg-[#111] mx-1" />
-                         </div>
-                         
-                         {/* Testina / Headshell */}
-                         <div className="absolute right-[-15px] top-1/2 -translate-y-1/2 w-[30px] sm:w-[35px] lg:w-[50px] h-[16px] sm:h-[18px] lg:h-[26px] bg-gradient-to-b from-[#444] via-[#222] to-[#111] rounded-sm transform rotate-[-25deg] border-t border-[#777] border-b-2 border-r border-[#111] shadow-2xl flex items-center justify-end pr-1.5 gap-1">
-                           {/* Dettaglio hardware testina (viti) */}
-                           <div className="absolute left-2 top-1 w-1.5 h-1.5 bg-zinc-400 rounded-full shadow-inner" />
-                           <div className="absolute left-2 bottom-1 w-1.5 h-1.5 bg-zinc-400 rounded-full shadow-inner" />
+                        {/* Primo Segmento dell'Asta (Upper Rod) */}
+                        <div 
+                          className="absolute top-1/2 left-1/2 -translate-y-1/2 bg-gradient-to-b from-[#e0e0e0] via-[#888] to-[#333] origin-left rounded-r-full shadow-[0_10px_20px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.8)] pointer-events-none"
+                          style={{ width: `${armMetrics.length}px`, height: '12px' }}
+                        >
+                           {/* Contrappeso (dietro il perno principale) */}
+                           <div className="absolute left-[-50%] top-1/2 -translate-y-1/2 w-[50%] h-[250%] bg-gradient-to-r from-[#111] via-[#555] to-[#111] rounded-l-[4px] border-y border-l border-[#666] flex items-center shadow-lg">
+                             <div className="w-[10%] h-full bg-[#111] mx-[5%]" />
+                             <div className="w-[10%] h-full bg-[#111] mx-[5%]" />
+                           </div>
 
-                           {/* LED testina */}
-                           <div 
-                             className={`w-[4px] h-[10px] rounded-sm transition-all duration-300 ${
-                               isPreviewPlaying 
-                                 ? 'bg-[#A2D729] shadow-[0_0_12px_3px_rgba(162,215,41,0.9)]' 
-                                 : 'bg-[#FF5696] shadow-[0_0_6px_1px_rgba(255,86,150,0.6)]'
-                             }`} 
-                           />
-                           {/* Puntina (Stylus) che tocca il disco */}
-                           <div className="absolute bottom-[-6px] left-[12px] w-[2px] h-[8px] bg-gradient-to-b from-[#ccc] to-[#fff] shadow-[0_5px_5px_rgba(0,0,0,1)] origin-top rotate-12" />
-                         </div>
-                      </div>
+                           {/* Perno del Gomito */}
+                           <div className="absolute right-[0%] top-1/2 -translate-y-1/2 h-[150%] aspect-square bg-gradient-to-br from-[#555] to-[#111] rounded-full border border-[#222] shadow-inner translate-x-1/2 z-10 flex items-center justify-center">
+                              <div className="w-[40%] h-[40%] bg-zinc-400 rounded-full shadow-inner" />
+                           </div>
+
+                           {/* Secondo Segmento dell'Asta (Forearm) con animazione */}
+                           <motion.div 
+                             className="absolute left-[100%] top-0 w-[100%] h-[100%] bg-gradient-to-b from-[#e0e0e0] via-[#888] to-[#333] origin-left rounded-r-full shadow-[0_10px_20px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.8)]"
+                             initial={{ rotate: -175 }}
+                             animate={{ rotate: isPreviewPlaying ? 0 : -175 }}
+                             transition={{ rotate: { type: 'spring', stiffness: 60, damping: 15, delay: isPreviewPlaying ? 0.8 : 0 } }}
+                           >
+                             {/* Cavo visibile sul secondo segmento */}
+                             <div className="absolute left-[5%] top-0 w-[80%] h-[10%] bg-red-900/40 blur-[0.5px]" />
+                             
+                             {/* Testina / Headshell */}
+                             <div className="absolute right-[-4%] top-1/2 -translate-y-1/2 w-[24%] h-[300%] bg-gradient-to-b from-[#444] via-[#222] to-[#111] rounded-[2px] transform rotate-[-25deg] border-t border-[#777] border-b-[2px] border-r border-[#111] shadow-2xl flex items-center justify-end pr-[5%] gap-[5%]">
+                               {/* LED testina */}
+                               <div 
+                                 className={`w-[15%] h-[60%] rounded-sm transition-all duration-300 ${
+                                   isPreviewPlaying 
+                                     ? 'bg-[#A2D729] shadow-[0_0_8px_2px_rgba(162,215,41,0.9)]' 
+                                     : 'bg-[#FF5696] shadow-[0_0_4px_1px_rgba(255,86,150,0.6)]'
+                                 }`} 
+                               />
+                               {/* Puntina (Stylus) che tocca il disco */}
+                               <div className="absolute bottom-[-20%] left-[40%] w-[5%] h-[40%] bg-gradient-to-b from-[#ccc] to-[#fff] shadow-lg origin-top rotate-12" />
+                             </div>
+                           </motion.div>
+                        </div>
+                      </motion.div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -623,30 +666,30 @@ export const ArtworkDetailClient = ({
               {/* Back: Text Data */}
               <div
                 className="absolute inset-0 bg-[#111] rounded-lg border border-white/10 overflow-hidden"
-                style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+                style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', containerType: 'size' }}
               >
-                <div className="w-full h-full overflow-y-auto info-scrollbar py-6 px-4 md:py-8 md:px-8 text-center flex flex-col items-center justify-start min-h-full">
-                  <div className="my-auto flex flex-col items-center w-full">
-                    <h2 className="font-neo text-white text-3xl lg:text-5xl tracking-[0.2em] mb-4 uppercase branded-title">
+                <div className="w-full h-full overflow-y-auto info-scrollbar p-2 md:p-4 text-center flex flex-col items-center justify-center">
+                  <div className="flex flex-col items-center justify-center w-full max-h-full">
+                    <h2 className="font-neo text-white text-[clamp(1.2rem,8cqmin,3rem)] tracking-[0.2em] mb-[clamp(0.5rem,2cqmin,1rem)] uppercase branded-title leading-none">
                       <BrandedTitle text="Dettagli" />
                     </h2>
-                    <p className="font-neo text-white text-xl lg:text-2xl tracking-widest uppercase mb-2 break-words max-w-full">
+                    <p className="font-neo text-white text-[clamp(0.9rem,5cqmin,1.5rem)] tracking-widest uppercase mb-[clamp(0.25rem,1.5cqmin,0.5rem)] break-words max-w-full leading-tight">
                       {title}
                     </p>
-                    <p className="font-neo text-white text-base lg:text-xl tracking-widest uppercase mb-1 break-words max-w-full">
+                    <p className="font-neo text-white text-[clamp(0.8rem,4cqmin,1.25rem)] tracking-widest uppercase mb-[clamp(0.25rem,1cqmin,0.5rem)] break-words max-w-full leading-tight">
                       {method} / {support}
                     </p>
-                    <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest uppercase mb-6 break-words max-w-full">
+                    <p className="font-neo text-white/50 text-[clamp(0.7rem,3.5cqmin,1.125rem)] tracking-widest uppercase mb-[clamp(1rem,4cqmin,2rem)] break-words max-w-full leading-tight">
                       {dimensions} — {year}
                     </p>
 
-                    <h2 className="font-neo text-white text-2xl lg:text-4xl tracking-[0.2em] mb-2 uppercase branded-title">
+                    <h2 className="font-neo text-white text-[clamp(1.1rem,6cqmin,2.25rem)] tracking-[0.2em] mb-[clamp(0.5rem,2cqmin,1rem)] uppercase branded-title leading-none">
                       <BrandedTitle text="Disponibilità" />
                     </h2>
-                    <p className="font-neo text-white text-base lg:text-xl tracking-widest uppercase mb-1 break-words max-w-full">
+                    <p className="font-neo text-white text-[clamp(0.8rem,4cqmin,1.25rem)] tracking-widest uppercase mb-[clamp(0.25rem,1cqmin,0.5rem)] break-words max-w-full leading-tight">
                       {isAvailable ? 'acquistabile' : 'archivio'}
                     </p>
-                    <p className="font-neo text-white/50 text-sm lg:text-lg tracking-widest uppercase break-words max-w-full">
+                    <p className="font-neo text-white/50 text-[clamp(0.7rem,3.5cqmin,1.125rem)] tracking-widest uppercase break-words max-w-full leading-tight">
                       {priceInfo}
                     </p>
                   </div>

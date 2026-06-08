@@ -1,36 +1,36 @@
-# 🧬 NEO-ONE: MASTER RULES & ALIGNMENT
+﻿# ðŸ§¬ NEO-ONE: MASTER RULES & ALIGNMENT
 
-> **DIRETTIVA PRIMARIA:** Questo documento è la singola fonte di verità ("le redini") per lo sviluppo del progetto Neo-One Art Hub. Leggilo sempre prima di operare. 
+> **DIRETTIVA PRIMARIA:** Questo documento Ã¨ la singola fonte di veritÃ  ("le redini") per lo sviluppo del progetto Neo-One Art Hub. Leggilo sempre prima di operare. 
 
 > [!IMPORTANT]
 > **MILESTONE: CONSOLIDAMENTO E PULIZIA (29 APRILE 2026)**
-> Questo commit segna il passaggio del progetto da "Prototipo" a "Sistema Stabile". La struttura è stata snellita, le dipendenze allineate, e la documentazione unificata. Da qui in poi, il sistema segue le regole ferree di versionamento descritte in questo file.
+> Questo commit segna il passaggio del progetto da "Prototipo" a "Sistema Stabile". La struttura Ã¨ stata snellita, le dipendenze allineate, e la documentazione unificata. Da qui in poi, il sistema segue le regole ferree di versionamento descritte in questo file.
 
 ---
 
 ## 1. Vibe Coding Spec (Il Metodo Leon9)
 
 ### Chi Sono & Come Comunico
-- Sono un **UX Designer e Creative Technologist**. Il mio focus è trasformare universi creativi in esperienze web interattive, con una mentalità "zero budget" e alta qualità.
+- Sono un **UX Designer e Creative Technologist**. Il mio focus Ã¨ trasformare universi creativi in esperienze web interattive, con una mentalitÃ  "zero budget" e alta qualitÃ .
 - Comunico in **MAIUSCOLO** per enfasi e urgenza creativa, non per rabbia.
 - Mando **screenshot** come linguaggio primario: guardali con attenzione chirurgica.
 - Parlo italiano come lingua primaria.
 - Non voglio premesse diplomatiche o complimenti vuoti. Se qualcosa non va, dimmelo.
 
 ### Regole Operative Non Negoziabili
-1. **Rischio Zero Progressivo**: Lavoro sequenziale: `Ricerca → Piano → Approvazione → Esecuzione → Verifica → Commit → Prossimo Step`. Mai due cose in parallelo.
-2. **Mai toccare il DB senza permesso**: Aggiungere campi è ok, modifiche distruttive richiedono OK scritto.
+1. **Rischio Zero Progressivo**: Lavoro sequenziale: `Ricerca â†’ Piano â†’ Approvazione â†’ Esecuzione â†’ Verifica â†’ Commit â†’ Prossimo Step`. Mai due cose in parallelo.
+2. **Mai toccare il DB senza permesso**: Aggiungere campi Ã¨ ok, modifiche distruttive richiedono OK scritto.
 3. **Versionamento Sacro**: Prima di passare al prossimo step, `git status` deve essere pulito. Un commit per step logico.
 4. **Mock first, data dopo**: Costruisci la UI con dati finti, stabilizza, poi collega i dati reali.
 5. **Niente lavoro parallelo non richiesto**: Se dico "fermati", ti fermi.
 
 ---
 
-## 2. Identità del Progetto & Estetica
+## 2. IdentitÃ  del Progetto & Estetica
 
-Neo-One **non è un template Payload generico**. È un art hub interattivo.
+Neo-One **non Ã¨ un template Payload generico**. Ãˆ un art hub interattivo.
 - L'esperienza deve essere: **viva, premium, leggermente pericolosa, tattile, cinematografica**.
-- **L'occhio 3D è il cuore**: Non è decorativo. È un'ancora di navigazione emotiva.
+- **L'occhio 3D Ã¨ il cuore**: Non Ã¨ decorativo. Ãˆ un'ancora di navigazione emotiva.
 - **Micro-animazioni ovunque**: Hover, transizioni, click... tutto deve avere un feedback vitale.
 - **Senza E-commerce standard**: Tutto passa per "Inquiry" via form email. Non ci sono carrelli classici.
 
@@ -100,8 +100,8 @@ pnpm generate:importmap
 - Lato lungo Opere: **1920px**
 - Lato lungo Clusters/Signali: **1200px**
 - Icone UI: **256/512px**
-- Formato: **WEBP (Qualità 85)**, rimuovere metadati (Lanczos resampling).
+- Formato: **WEBP (QualitÃ  85)**, rimuovere metadati (Lanczos resampling).
 - Nessun asset deve essere caricato su Payload senza passare da questo flusso.
 
 ---
-*Ultimo Aggiornamento: 2026-04-29 — Consolidamento totale delle linee guida del progetto.*
+*Ultimo Aggiornamento: 2026-04-29 â€” Consolidamento totale delle linee guida del progetto.*

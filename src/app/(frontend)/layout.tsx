@@ -22,6 +22,7 @@ import { AudioProvider } from '@/contexts/AudioContext'
 import { InputModeProvider } from '@/contexts/InputModeContext'
 import { AudioBackground } from '@/components/AudioBackground'
 import { ClickSoundListener } from '@/components/ClickSoundListener'
+import ServiceWorkerRegister from '@/components/ServiceWorkerRegister'
 
 const mergedFontNeo = localFont({
   src: '../../../public/fonts/MergedFontNEO.otf', // adjust relative path from app/(frontend) to public/fonts/ if needed, or use full path. Actually next/font/local resolves relative to the file.
@@ -88,7 +89,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   }}
                 />
                 
-
+                <ServiceWorkerRegister />
                 <TransitionOverlay />
                 
                 {/* Main Content Area */}
