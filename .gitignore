@@ -17,7 +17,6 @@ public/sitemap*.xml
 !public/media/explosion-arcade.mp3
 !public/media/return.mp3
 !public/media/banana.mp3
-!public/media/fruscio-satanico.mp3
 !public/media/click-sounds/
 
 # Environment overrides
@@ -46,3 +45,13 @@ scratch/
 
 # Desktop metadata
 desktop.ini
+
+# Workflow documentation (local reference only)
+workflows/
+
+# Raw video assets (local only)
+videos_raw/
+videos_raw_2/
+
+# Local utility scripts
+src/scripts/createNeoUser.ts

@@ -263,7 +263,7 @@ export function EventDetail({ event, quote, onClose }: EventDetailProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
             style={{
-              backgroundImage: "url('/images/ui/bbjdhsgfshdjyg.png')",
+              backgroundImage: "url('/images/ui/event-speech-bubble.png')",
               backgroundSize: '100% 100%',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',

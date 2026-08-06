@@ -160,11 +160,11 @@ const EyeModel = ({
     }
     
     if (disableTransitionOverlay) {
-      router.push('/home')
+      router.push(targetRoute)
     } else {
       triggerTransition()
       setTimeout(() => {
-        router.push('/home')
+        router.push(targetRoute)
       }, 1500)
     }
   }
