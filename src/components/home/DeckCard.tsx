@@ -91,6 +91,7 @@ export const DeckCard = ({
         className="object-cover"
         style={{ opacity: isActive ? 1 : 0.8 }}
         sizes="(max-width: 768px) 55vw, (max-width: 1024px) 40vw, 20vw"
+        unoptimized
       />
 
       {isActive && (

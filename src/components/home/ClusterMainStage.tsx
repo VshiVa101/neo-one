@@ -127,6 +127,7 @@ const ClusterPanel = ({
             fill
             className="object-cover"
             sizes="(max-width: 768px) 45vw, 18vw"
+            unoptimized
           />
         </motion.div>
       </AnimatePresence>

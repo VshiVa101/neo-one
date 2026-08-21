@@ -237,7 +237,7 @@ export const NeoUncensoredHero: React.FC<HeroProps> = () => {
           }
 
           .neo-bg--home {
-            background-image: url('/images/drops/bg-home.gif');
+            background-image: url('/images/drops/bg-herosection.gif');
           }
 
           .neo-hero-center {

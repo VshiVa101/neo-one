@@ -75,6 +75,7 @@ export const ExpandedGalleryOverlay = ({
                           : 'grayscale brightness-110 contrast-125 group-hover:grayscale-0 group-hover:brightness-100 group-hover:contrast-100'
                       }`}
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                      unoptimized
                     />
 
                     {/* Overlay Testo Sempre Visibile In Basso */}

@@ -83,6 +83,7 @@ export default async function SubclusterPage({ params: paramsPromise }: Args) {
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  unoptimized
                 />
               </div>
               <div className="mt-3 sm:mt-4 flex justify-between items-start gap-2">

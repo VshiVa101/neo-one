@@ -38,6 +38,7 @@ export function EventItem({ event, onTap, index }: EventItemProps) {
           draggable={false}
           className="object-cover"
           sizes="(max-width: 768px) 51px, 71px"
+          unoptimized
         />
       </div>
     </motion.button>

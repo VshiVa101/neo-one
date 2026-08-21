@@ -61,6 +61,7 @@ export const ClusterNavFooter = ({
                   fill
                   className="object-contain p-2 pointer-events-none"
                   sizes="(max-width: 768px) 12vh, 15vh"
+                  unoptimized
                 />
               </motion.div>
             )

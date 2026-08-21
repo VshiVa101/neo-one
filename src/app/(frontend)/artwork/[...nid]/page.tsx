@@ -37,7 +37,7 @@ export default async function ArtworkDetailPage(props: {
       {/* Background GIF - Desktop first */}
       <div className="absolute inset-0 w-screen h-screen z-0 opacity-40 brightness-75 scale-100 md:scale-105 pointer-events-none">
         <Image
-          src="/images/drops/bg-home.gif"
+          src="/images/drops/bg-herosection.gif"
           alt=""
           fill
           className="object-cover"

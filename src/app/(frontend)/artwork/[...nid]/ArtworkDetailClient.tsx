@@ -551,6 +551,7 @@ export const ArtworkDetailClient = ({
                     }`}
                     sizes="(max-width: 1024px) 100vw, 60vw"
                     priority
+                    unoptimized
                   />
                   {/* Vinyl center hole */}
                   <motion.div 
