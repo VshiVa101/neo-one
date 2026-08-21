@@ -401,7 +401,7 @@ export const ArtworkDetailClient = ({
           {/* 1. LEFT PANEL / COLUMN (Previews on lg, narrow navigation column when smaller) */}
           <div className={`relative flex items-center justify-center rounded-lg transition-all duration-300 ${
             isTouchMode ? 'w-[20px] sm:w-[36px] md:w-[60px] lg:flex-1' : 'w-[22vw] lg:flex-1'
-          } lg:bg-black ${isRumoreCluster ? 'overflow-visible z-50' : 'overflow-hidden'} cursor-pointer opacity-70 hover:opacity-100`}>
+          } lg:bg-black ${isRumoreCluster ? 'overflow-visible z-50' : 'overflow-hidden'} cursor-pointer brightness-[0.7] hover:brightness-100`}>
             {/* Desktop View (Visible on lg and larger) */}
             <div className={`${isFotoOrMerce ? 'hidden' : 'hidden lg:block'} absolute inset-0 w-full h-full`}>
               {isRumoreCluster ? (
@@ -702,7 +702,7 @@ export const ArtworkDetailClient = ({
           {/* 3. RIGHT PANEL / COLUMN (Previews on lg, narrow navigation column when smaller) */}
           <div className={`relative flex items-center justify-center rounded-lg transition-all duration-300 ${
             isTouchMode ? 'w-[20px] sm:w-[36px] md:w-[60px] lg:flex-1' : 'w-[22vw] lg:flex-1'
-          } lg:bg-black ${isRumoreCluster ? 'overflow-visible z-50' : 'overflow-hidden'} cursor-pointer opacity-70 hover:opacity-100`}>
+          } lg:bg-black ${isRumoreCluster ? 'overflow-visible z-50' : 'overflow-hidden'} cursor-pointer brightness-[0.7] hover:brightness-100`}>
             {/* Desktop View (Visible on lg and larger) */}
             <div className={`${isFotoOrMerce ? 'hidden' : 'hidden lg:block'} absolute inset-0 w-full h-full`}>
               {isRumoreCluster ? (
